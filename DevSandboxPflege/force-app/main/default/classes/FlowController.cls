@@ -11,17 +11,7 @@ public class FlowController{
         get{
             if (contactsMap == null){
                 System.debug('I have just changed this line to check it ');
-             Set<Id> contactIds = new Set<Id>();
-                if (UpdatedFollowUpTasks != null){
-                    for (Follow_up_Task__c task : UpdatedFollowUpTasks){
-                    contactIds.add(task.Contact__c);
-                    }
-                }
-                
-              contactsMap = new Map<Id, Contact>([SELECT Id,Status_PG54__c,Status_PG51__c , LastName, Name, Salutation, Salutation_Text_Curabox__c, WorkAroundTemplatesAccountNumber__c, Email
-                                                    FROM Contact
-                                                    WHERE Email != null AND Id =:contactIds ]);
-            }
+             }
             return contactsMap;
         }
         set;
