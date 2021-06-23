@@ -1,0 +1,86 @@
+<apex:page renderas="PDF" controller="RA_nur_anzeigen_sto_controller_class" sidebar="FALSE" showHeader="False">
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Autor:          WDS
+//      Stand:          07.12.2012
+//      Version:        0.1
+//      geändert:       
+//      Beschreibung:   auf dieser Seite wird die Patientenrückantwort Stoma angezeigt
+//
+//
+//  wds         am 07.12.2012 deployed
+//  wds         am 03.09.2013 Einbindung Druckersteuerung
+//  wds         am 11.10.2013 Controller korrigiert war auf ent und nicht auf sto !
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--><HTML>
+<head> 
+    <apex:stylesheet value="{!$Resource.pdf_style}"/>   
+</head>
+ 
+<body> 
+<div id="head">
+    <div id="inoxision">
+        %%01[Adpt_FEDO]%% 
+        %%99[CreateFullTextChecked=1]%% 
+        %%99[AutoExecute=1]%%
+        </div>
+        <div id="logo">
+        <apex:outputtext value="{!Kunde.Anrede__c}"/><br />
+            <apex:outputtext value="{!Kunde.Vorname__c} {!Kunde.Name__c}"/><br />
+            <apex:outputtext value="{!Kunde.Stra_e__c} {!Kunde.Hausnummer__c}"/><br />
+            <apex:outputtext value="{0,number, 00000}">  <apex:param value="{!Kunde.PLZ__c}" /> </apex:outputText>&nbsp;<apex:outputtext value=" {!Kunde.Ort__c}"/>
+        </div>
+        <p style="font-family:'Arial'; font-weight: bold; text-align: center;">Rückantwort bitte sofort an FEDO senden !!!</P>
+        
+        <div id="address">
+           <apex:outputtext value="FEDO Praxis- und Sanitätsbedarf"/><br />
+            <apex:outputtext value="F. u. M. Holzwarth GbR"/><br />
+            <apex:outputtext value="-Rückantwort-"/><br/>
+            <apex:outputtext value="Halternerstraße 29"/><br />
+            <apex:outputtext value="46284 Dorsten" />
+        </div>
+        
+        <div id="bearbeiter">
+             <table>
+                <tr>
+                <td></td><td><apex:outputtext value="{!KK.Name}" /></td>
+                </tr>
+                <tr>
+                <td></td><td><apex:outputtext value="{!KK.BillingStreet}" /></td>
+                </tr>
+                <tr>
+                <td></td><td><apex:outputtext value="{!KK.BillingPostalCode} {!KK.BillingCity}" /></td>
+                </tr>
+               </table>
+        </div>
+    </div>    
+    
+      <!-- Header is done -->
+      <div id="document_info">
+
+      
+      
+      
+               
+         
+      <p><apex:outputtext value="Sehr geehrte Damen und Herren,"/></p>  
+      <p>hiermit bestätige ich, dass ich über die nachfolgenden Punkte informiert bin:</p>
+      <p>1. Ihre Krankenkasse hat die Firma FEDO mit der Lieferung der beantragten Versorgung mit Stomaprodukten beauftragt.</p>    
+      <p>Die Kosten für eine Versorgung mit diesen Produkten durch andere Firmen können nur nach vorheriger Genehmigung durch Ihre Krankenkasse übernommen werden.</p><br/>
+      <p>2. FEDO Öffnungszeiten:</p> <p style="text-align: center;"> Montag - Freitag 10-13 Uhr und 15-17 Uhr</p>
+      <p>3. Bestellmöglichkeiten:</p> <p style="text-align: center;"> Tel.   02362 6776-150</p>
+      <p style="text-align: center;">Fax    02362 6776-160</p>
+      <p style="text-align: center;">mail   info@fedo-online.de</p>
+      <p>4. Mit der Speicherung meiner für die Auftragsabwicklung erforderlichen Daten bin ich einverstanden.</p>
+      <p>Mit freundlichen Grüßen</p>
+      <p>______________________________</p>
+      <p>Unterschrift des Versicherten</p>
+
+       </div>   
+       
+       <c:PDFFooter />
+</body>
+</HTML>
+</apex:page>

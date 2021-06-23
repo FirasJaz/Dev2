@@ -1,0 +1,165 @@
+<!--
+//****************************************************************************************************************************
+// Erstellt 01.08.2016 von MZ
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Mindelweg 11
+//                         22393 Hamburg 
+//                         Tel.:  04064917161
+//                         Fax.: 04064917162
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// xxxx
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+//                      
+//
+//
+//****************************************************************************************************************************
+//Änderungen:
+//
+// bt    15.09.2016    Auswahl von Partner-Produkten
+// Mz    05.12.2016    Auswahl von Abrechnungszeitraum 
+//****************************************************************************************************************************
+-->
+<apex:page id="page_id" standardController="Account" extensions="IndividualPartnerInvoicing" sidebar="false" showHeader="false" showQuickActionVfHeader="false">
+  
+  <apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+  <apex:form id="cmForm">
+    <script type="text/javascript">    
+    
+    function selektierePP(input){    
+         var ppIds = document.getElementById('page_id:cmForm:idStr').value;
+         
+         document.getElementById('page_id:cmForm:obt').disabled = true;
+         document.getElementById('page_id:cmForm:ubt').disabled = true;                                            
+         for( i=0; i<{!plist_size}; i++) {       
+             if(document.getElementById('page_id:cmForm:rep_id:' + i + ':pnum') != null) { 
+                if(document.getElementById('page_id:cmForm:rep_id:' + i + ':pnum').checked == true) {                          
+                     document.getElementById('page_id:cmForm:obt').disabled = false;
+                     document.getElementById('page_id:cmForm:ubt').disabled = false; 
+                }                 
+             }            
+         }
+          
+         if(ppIds.includes(input) == true){
+             ppIds = ppIds.replace(input + " ", ""); 
+         }
+         else {
+             ppIds = ppIds + input + " ";             
+         } 
+         
+         document.getElementById('page_id:cmForm:idStr').value = ppIds;
+     }
+     
+     function abrechnen(){
+         invoicing(ppIds);
+     }
+    </script>
+   <div class="slds">
+     <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+         <!-- LAYOUT GRID -->
+           <div class="slds-grid" id="id" >
+               <!-- GRID COL -->
+               <div class="slds-col" style="color: white;">
+               <!-- HEADING AREA -->
+               <h1 class="slds-text-heading--medium" style="text-align: center;">Abrechnung</h1> 
+               </div>
+           </div>
+    </div>   
+    
+    <apex:outputPanel >
+      <apex:pageMessages id="showmsg"/>
+    </apex:outputPanel>
+    <br/>
+
+    <!-- Message -->
+    <div class="slds-notify_container" style="text-align: center; display: {!message_display};">
+       <div class="slds-notify slds-notify--alert slds-theme--alert-texture" role="alert">    
+        <h2>{!message}</h2>
+       </div>
+       <br/>
+    </div>
+    <!-- Message -->
+    
+    <!-- Buttons -->  
+    <div style="text-align: center;">
+          <apex:commandButton styleClass="slds-button slds-button--neutral" value="Zurück zum Partner" action="{!zurueck}"  />
+          <apex:commandButton styleClass="slds-button slds-button--brand" value="Abrechnen" action="{!startInvoicing}" disabled="{!button_disabled}" id="obt"/>
+    </div>
+    <!-- Buttons -->
+   <br/>
+
+    <!-- Text -->    
+    <div style="display: {!text_display};">
+         <p style="text-align: center;">Wähle bitte die Partner-Produkte aus, die du abrechnen möchtest !</p>
+    </div>
+    <!-- Text -->
+    
+    <br/>
+    
+    <div class="slds-theme--default slds-container--medium slds-container--center">
+        <apex:outputLabel value="" for="timePeriodList" styleClass="slds-form-element__label">Abrechnungszeitraum</apex:outputLabel>
+        <apex:selectList id="timePeriodList" value="{!timePeriodValue}" size="1" styleClass="slds-select">
+            <apex:selectOptions value="{!timePeriodItems}" />
+        </apex:selectList>
+    </div>
+   
+    <br/><br/>
+    
+    <!-- String mit Ids -->
+    <apex:inputHidden value="{!pIds}" id="idStr" />   
+    <!-- String mit Ids -->
+    
+    <!-- Tabelle für Partner-Produkte -->
+    <table class="slds-table slds-table--bordered" style="display: {!table_display}">
+      <thead>
+        <tr class="slds-text-heading--label">
+          <th class="slds-cell-shrink" style="width: 50px;">
+          </th>
+          <th scope="col">
+            <div class="slds-truncate">Partner-Produkt Name</div>
+          </th>
+          <th scope="col">
+            <div class="slds-truncate">Produkt</div>
+          </th>
+          <th scope="col">
+            <div class="slds-truncate">Abrechnungsmethode</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+          <apex:repeat value="{!plist}" var="p" id="rep_id">
+            <tr class="slds-hint-parent" >
+              <td class="slds-cell-shrink" data-label="Select Row" >
+                <label class="slds-checkbox">                
+                   <apex:inputcheckbox id="pnum" selected="true" value="{!allselected}" onchange="javascript:selektierePP('{!p.id}');"  />                   
+                   <span class="slds-checkbox--faux"></span> 
+                  <span class="slds-form-element__label"></span> 
+                 </label> 
+              </td>
+              <td class="slds-truncate" data-label="Name">{!p.Name}</td>  
+              <td class="slds-truncate" data-label="Produkt">{!p.Produktgruppe__c}</td>
+              <td class="slds-truncate" data-label="Abrechnungsmethode">{!p.Abrechnungsmethode__c}</td>
+            </tr>
+          </apex:repeat>   
+      </tbody>
+    </table>
+    <!-- Tabelle für Partner-Produkte -->
+     
+    <br/>
+    
+    <!-- Buttons -->
+    <div style="text-align: center;">
+          <apex:commandButton styleClass="slds-button slds-button--neutral" value="Zurück zum Partner" action="{!zurueck}" rendered="{!button_rendered}" />
+          <apex:commandButton styleClass="slds-button slds-button--brand" value="Abrechnen" action="{!startInvoicing}" rendered="{!button_rendered}" disabled="{!button_disabled}" id="ubt"/>
+    </div>
+    <!-- Buttons -->
+        
+  </div>
+  </apex:form>
+</apex:page>

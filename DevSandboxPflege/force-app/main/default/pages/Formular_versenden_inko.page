@@ -1,0 +1,34 @@
+<apex:page standardController="Lead" id="fmPage" extensions="Formular_versenden_Inko" tabStyle="lead" sidebar="true">
+<script type="text/javascript"> 
+function fmDrucken(ta) {
+    // alert(ta);
+    var URL = ta ;
+    window.open(URL, "_blank");
+}
+</script>  
+    <apex:form id="fmForm">
+    <apex:pagemessages id="Page_Message"  escape="false"/>
+        <apex:Pageblock id="pblp" title="{!pageTitle}">
+        
+            <apex:pageBlockButtons >              
+                <apex:CommandButton id="btnzurueck" value="Zurück zu Lead" immediate="True" action="{!zurueck}"/>
+            </apex:pageBlockButtons>
+            
+            <apex:PageBlocksection title="Versandart" collapsible="false" id="fmPbs" columns="2">
+                <apex:outputtext value="Versenden an"  />  
+                <apex:selectList value="{!selectedRcpt}" multiselect="false" styleclass="SelectOptions" size="1"  disabled="false">
+                    <apex:selectOptions value="{!selRCPT}"/>
+                    <apex:actionsupport action="{!changeRcpt}"  event="onchange" rerender="fmPbs" />      
+                </apex:selectList>      
+            
+                        <apex:commandButton onClick="javascript:fmDrucken('{!MainPageName}')" value="per Post" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;"  />
+                        <apex:outputtext value="{!beschreibung}"  />
+                        
+                        <apex:commandButton action="{!perEmail}" value="per Email" styleClass="btn" disabled="{!!hasMail}" immediate="true" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;" />
+                        <apex:outputtext value="Email mit Anhang {!mailHinweis}"  id="hinw"/>  
+
+                        
+            </apex:PageBlocksection>            
+        </apex:Pageblock> 
+    </apex:form>           
+</apex:page>

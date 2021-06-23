@@ -1,0 +1,88 @@
+<apex:page standardController="Curabox_Genehmigung__c" extensions="processCBGenehmigung" tabStyle="Curabox_Genehmigung__c" id="pageid">
+    <script type="text/javascript">
+        function addLoadEvent(func) { 
+            var oldonload = window.onload;
+            if (typeof window.onload != 'function') {
+                window.onload = func;
+            } else {
+                window.onload = function() {
+                    oldonload();
+                    func();
+                }
+            }
+        }
+        
+        function setFocus() {
+            document.getElementById('pageid:formid:Kundenblock:Genehmigunssection:nachParagrapf').focus();
+        }
+        addLoadEvent(setFocus);
+    </script>
+    <apex:form id="formid">
+    <apex:messages id="Page_Message" />
+     
+    <apex:Pageblock id="Kundenblock" title="Genehmigung bearbeiten" >
+        <apex:pageBlockButtons >
+             <apex:CommandButton id="gensichern" value="speichern" action="{!neueGenehmigungSichern}"/>
+             <apex:CommandButton id="genzurueck" value="abbrechen" immediate="True" action="{!neueGenehmigungZurueck}"/>
+        </apex:pageBlockButtons>    
+        <apex:pageBlockSection title="Details der Genehmigung" collapsible="false" id="Genehmigunssection" columns="2">
+            <apex:outputfield value="{!Genehmigung.Nach_Paragraph__c}" />
+            <apex:outputfield value="{!Genehmigung.Contact__c}"  rendered="{!IF(Genehmigung.Contact__c != null, true, false)}"/>
+            <apex:inputfield value="{!Genehmigung.Status__c}" required="true" id="nachParagrapf" />
+            <apex:inputfield value="{!Genehmigung.unbefristet_genehmigt__c}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Kommunikation Krankenkasse" collapsible="false" id="Genehmigunssection2" columns="2">
+            <apex:inputfield value="{!Genehmigung.Antrag_eingegangen_am__c}"/>
+             <!-- <apex:outputText value=""/> -->
+            <apex:inputfield value="{!Genehmigung.KV_status__c}" label="Kostenvoranschlag Status" /> 
+            <apex:inputfield value="{!Genehmigung.Antrag_versandt_am__c}"/>
+            <apex:outputText value=""/>
+            <apex:inputfield value="{!Genehmigung.Antrag_beantwortet_am__c}"/>
+            <apex:outputText value=""/>
+            <apex:inputfield value="{!Genehmigung.genehmigt_ab__c}"/>
+            <apex:outputText value=""/>
+            <apex:inputfield value="{!Genehmigung.genehmigt_bis__c}" />
+            <apex:outputText value=""/>
+            <apex:inputfield value="{!Genehmigung.Genehmigungsnummer__c}" />
+             
+        </apex:pageBlockSection>
+         
+            <apex:PageBlocksection title="Positionen" collapsible="false" id="Adresssection" columns="2" >
+                <apex:pageBlockTable style="text-align:center;white-space: pre;" value="{!positionen}" var="p" id="APBlockTable">
+                         <apex:column >
+                             <apex:facet name="header">Artikelgruppe</apex:facet>
+                             <apex:outputfield value="{!p.Product_Group__r.Name}"/>
+                         </apex:column>  
+
+                         <apex:column >
+                             <apex:facet name="header">Beantragte Menge</apex:facet>
+                             <apex:outputfield value="{!p.Ant_Menge_Stk__c}" />
+                         </apex:column>                         
+
+                         <apex:column >
+                             <apex:facet name="header">Genehmigte Menge</apex:facet>
+                             <apex:inputfield value="{!p.Gen_Menge_Stk__c}" style="width:20pt;" />
+                         </apex:column>
+                         
+                         <apex:column >
+                             <apex:facet name="header">Genehmigt ab</apex:facet>
+                             <apex:inputfield value="{!p.genehmigt_ab__c}"/>
+                         </apex:column>
+                         
+                         <apex:column >
+                             <apex:facet name="header">Genehmigt bis</apex:facet>
+                             <apex:inputfield value="{!p.genehmigt_bis__c}"/>
+                         </apex:column>
+                         
+                         <apex:column >
+                             <apex:facet name="header">Unbefristet</apex:facet>
+                             <apex:inputfield value="{!p.unbefristet_genehmigt__c}" />
+                         </apex:column>
+ 
+                     </apex:pageBlockTable>
+            </apex:PageBlocksection>
+           
+
+     </apex:Pageblock>
+ </apex:form>
+</apex:page>

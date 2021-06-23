@@ -1,0 +1,410 @@
+<!--
+/********************************************************************************************************************************************
+//  Erstellt 04.04.2017 von MZ
+//  Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//  Mindelweg 11
+//  22393 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//
+//********************************************************************************************************************************************
+//
+// Beschreibung: selfmailer component
+//
+//********************************************************************************************************************************************
+// Änderungen:
+// 16.06.2017    BT Beim Senden der E-Mail wird das Button "senden" inaktiv gesetzt.
+//********************************************************************************************************************************************
+*/
+-->
+
+<apex:component id="cmp_selfmailer"  allowDML="true" >
+
+<script type="text/javascript">
+    function custAddr() {
+        document.getElementById('page_id:cmForm:cm_block:cm_hnr_ProductList:cmp_pl:cm_selfmailer:cmp_selfmailer:toCust').checked = true;
+        document.getElementById('page_id:cmForm:cm_block:cm_hnr_ProductList:cmp_pl:cm_selfmailer:cmp_selfmailer:toAlt').checked = false;        
+    }
+    
+    function otherAddr() {
+        document.getElementById('page_id:cmForm:cm_block:cm_hnr_ProductList:cmp_pl:cm_selfmailer:cmp_selfmailer:toAlt').checked = true;
+        document.getElementById('page_id:cmForm:cm_block:cm_hnr_ProductList:cmp_pl:cm_selfmailer:cmp_selfmailer:toCust').checked = false;      
+    }
+    
+    function inaktivSetzen() {
+        document.getElementById('page_id:cmForm:cm_block:cm_hnr_ProductList:cmp_pl:cm_selfmailer:cmp_selfmailer:send').disabled = true;
+    }
+</script> 
+    
+    <apex:attribute name="selfmailerCntlr" description="the controllerselfmailer" type="SelfmailerController" required="true"/>
+
+    <apex:actionFunction name="emptyForm" action="{!selfmailerCntlr.emptyForm}" rerender="cmForm">
+    </apex:actionFunction>
+
+    <!-- Selfmailer -->
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-modal--large slds-fade-in-open" id="selfmailer_layout" style="display: {!selfmailerCntlr.layout}">
+      <div class="slds-modal__container">
+        <div class="slds-modal__header">
+            <h2 id="header43" class="slds-text-heading--small">Selfmailer verschicken</h2>
+        </div>
+
+        <div class="slds-modal__content slds-p-around--medium" >
+        <apex:pageMessages id="showmsgdialogSelfmailer"/>
+        <div class="slds-theme--default slds-container--large">
+        
+            <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent slds-m-bottom--medium">
+                        <span class="slds-form-element__label slds-m-top--small">Bestellformular unausgefüllt verschicken</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputCheckbox value="{!selfmailerCntlr.emptyFormFlag}" onchange="emptyForm();">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>
+             </div>
+                       
+             <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--small">Kundendaten</h3>
+             <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                  <div class="slds-col--padded slds-size--1-of-6">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Anrede</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!selfmailerCntlr.customer.Salutation}" label="" styleClass="slds-select" id="c_sal" rendered="{!!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputField>
+                            <apex:inputText value="{!selfmailerCntlr.customer.Salutation}" label="" styleClass="slds-input" disabled="true" rendered="{!selfmailerCntlr.emptyFormFlag}"/>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Vorname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.customer.FirstName}" id="c_fn" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Nachname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.customer.LastName}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Telefon</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.customer.Phone}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">E-Mail</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.customerEmail}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Straße</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.customer.MailingStreet}" label="" id="MailingStreet" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+         
+                     <div class="slds-col--padded slds-size--1-of-6">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Postleitzahl</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.customer.MailingPostalCode}" label="" id="MailingPostalCode" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Stadt</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.customer.MailingCity}" label="" id="MailingCity" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+             </div>
+             
+             <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Installation des Notrufsystems in</h3>
+             <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent" >
+                        <span class="slds-form-element__label">der oben genannten Adresse</span>
+                        <div class="slds-form-element__control" >
+                        <span class="slds-form-element">               
+                          <apex:inputCheckbox id="toCust" value="{!selfmailerCntlr.toCustomer}" disabled="{!selfmailerCntlr.emptyFormFlag}" onchange="custAddr();">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">der Alternativen Adresse</span>
+                        <div class="slds-form-element__control" disabled="disabled">
+                        <span class="slds-form-element">
+                          <apex:inputCheckbox tabIndex="1" id="toAlt" value="{!selfmailerCntlr.toAlternative}" disabled="{!selfmailerCntlr.emptyFormFlag}" onchange="otherAddr();">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>
+             </div>
+                
+             <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large" id="test">Alternative Daten</h3>
+             <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-6">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Anrede</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!selfmailerCntlr.alternative.Salutation}" label="" styleClass="slds-select" id="a_sal" rendered="{!!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputField>
+                            <apex:inputText value="{!selfmailerCntlr.alternative.Salutation}" label="" styleClass="slds-input" disabled="true" rendered="{!selfmailerCntlr.emptyFormFlag}"/>
+                            
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Vorname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.alternative.FirstName}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Nachname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.alternative.LastName}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Telefon</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.alternative.Phone}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">E-Mail</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.alternative.Email}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Straße</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.alternative.MailingStreet}" label=""  styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+         
+                     <div class="slds-col--padded slds-size--1-of-6">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Postleitzahl</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.alternative.MailingPostalCode}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Stadt</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.alternative.MailingCity}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+             
+             <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Bitte wählen Sie das gewünschte Paket</h3>
+             <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                      <div class="slds-col--padded slds-size--1-of-4">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">{!selfmailerCntlr.fach1Label}</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputCheckbox value="{!selfmailerCntlr.KlasBasisPaket}" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-4">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">{!selfmailerCntlr.fach2Label}</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputCheckbox tabIndex="1" value="{!selfmailerCntlr.KlasServicePaket}" rendered="{!selfmailerCntlr.has3Fach}" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                          </apex:inputCheckbox>
+                          <apex:inputCheckbox tabIndex="1" value="{!selfmailerCntlr.ModBasisPaket}" rendered="{!selfmailerCntlr.has2Fach}" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-4">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">{!selfmailerCntlr.fach3Label}</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputCheckbox tabIndex="1" value="{!selfmailerCntlr.ModBasisPaket}" rendered="{!selfmailerCntlr.has3Fach}" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                          </apex:inputCheckbox>
+                          <apex:inputCheckbox tabIndex="1" value="{!selfmailerCntlr.ModServicePaket}" rendered="{!selfmailerCntlr.has2Fach}" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-4">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">{!selfmailerCntlr.fach4Label}</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputCheckbox tabIndex="1" value="{!selfmailerCntlr.ModServicePaket}" rendered="{!selfmailerCntlr.has3Fach}" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>                      
+             </div>
+             
+             <!--
+             <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Bitte bei Bedarf ankreuzen</h3>
+             <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Der Nutzer des Notrufsystems hat einen Pflegegrad/eine Pflegestufe</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputCheckbox value="{!selfmailerCntlr.hasPflegegrad}" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>
+             </div>
+             
+             <div class="slds-grid slds-wrap slds-grid--pull-padded">                      
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Die Pflegekasse hat bereits den Zuschuss (18,36 €/Monat) für Notrufsystem genehmigt</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputCheckbox tabIndex="1" value="{!selfmailerCntlr.hasZuschuss}" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>
+             </div>
+             
+             <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Bitte schicken Sie mir ein Antragsformular für die Bezuschussung des Hausnotrufs zu</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputCheckbox tabIndex="1" value="{!selfmailerCntlr.sendAntragsformular }" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                          </apex:inputCheckbox>
+                        </span>
+                        </div>
+                      </div></div>
+             </div>
+             !-->
+             <br/><br/>
+             <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent slds-m-bottom--medium">
+                        <span class="slds-form-element__label slds-m-top--small">Telefonnummer für die Vereinbarung des Installationstermins</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputText value="{!selfmailerCntlr.terminPhone}" label="" styleClass="slds-input" disabled="{!selfmailerCntlr.emptyFormFlag}">
+                            </apex:inputText>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>       
+             </div>
+        </div>
+        </div>
+        <div class="slds-modal__footer" style="text-align: center;">
+           <apex:commandButton styleClass="slds-button slds-button--neutral" value="Abbrechen" action="{!selfmailerCntlr.abbruch}"/>
+           <apex:commandButton styleClass="slds-button slds-button--brand" id="send" value="Senden" action="{!selfmailerCntlr.sendEmail}" onclick="inaktivSetzen();" rerender="send"/>
+        </div>
+      </div>
+    </div>    
+    <div class="slds-backdrop slds-backdrop--open" id="backdrop" style="display: {!selfmailerCntlr.layout}"></div>        
+    <!-- Selfmailer -->
+    
+</apex:component>

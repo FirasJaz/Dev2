@@ -1,0 +1,344 @@
+<!--
+// Erstellt 04.11.2015 von BT
+//  Klose und Srocke Gesellschaft für kreative Konfliktlösungen GmbH
+//  Nordkanalstr. 58
+//  20097 Hamburg 
+//  Tel.:  04023882986
+//  Fax.: 04023882989
+//  Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+// Konvertierung von Curabox Lead zu Kund              
+//
+//****************************************************************************************************************************
+// Änderungen:
+// 29.08.2018	MZ    case 00001653 - disable button after one click
+//****************************************************************************************************************************
+-->
+<apex:page StandardController="Lead" extensions="Curabox_zu_Kunde" id="page_id">
+<apex:form id="auForm" > 
+    <script>
+    	function inaktivSetzen() {
+            document.getElementById("page_id:auForm:block:pbBtn:BtnSpeichern").style.visibility = 'hidden';
+            document.getElementById("page_id:auForm:block:pbBtn:bottom:BtnSpeichern").style.visibility = 'hidden';
+            konvertieren_losJS();
+    	}                                                   
+	</script> 
+    
+    <apex:actionfunction action="{!konvertieren_los}" name="konvertieren_losJS" />
+    
+      <apex:Pageblock title="Lead zu Kunde curabox. Schritt {!seite}" id="block" >  
+        <apex:pagemessages id="Page_Message"  escape="false"/>
+        <apex:pageBlockButtons id="pbBtn">   
+            <apex:commandButton value="zurück zu Lead" action="{!zurueck}" />     
+            <apex:commandButton value="Zurück" action="{!seitezurueck}" rendered="{!IF(seite == 1, false, true)}" reRender="block" />       
+            <apex:commandButton value="Weiter" action="{!seiteweiter}" rendered="{!IF(seite == lastPage, false, true)}" reRender="block" /> 
+            <apex:commandButton value="Speichern" rendered="{!IF(seite == lastPage, true, false)}" id="BtnSpeichern" onclick="inaktivSetzen();return false;" />      
+        </apex:pageBlockButtons>     
+                                
+        <apex:PageBlocksection title="Kunden-Daten" collapsible="false" columns="1" id="pbsKunde" rendered="{!IF(seite == 1, true, false)}">    
+            <apex:outputtext value="Neuen Kunden anlegen" />
+            <apex:pageBlockTable value="{!lead}" var="l" >
+                 <apex:column width="40px" rendered="{!IF(selKd == '9', true, false)}">
+                    <apex:actionSupport action="{!reload}" event="onclick" reRender="Page_Message" >
+                        <input type="radio" name="selectedKunde" checked="true">    
+                         <apex:param name="kundeid" value="9"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>    
+                 <apex:column width="40px" rendered="{!IF(selKd == '9', false, true)}">
+                    <apex:actionSupport action="{!reload}" event="onclick" reRender="Page_Message" >
+                        <input type="radio" name="selectedKunde" >    
+                         <apex:param name="kundeid" value="9"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>                  
+                <apex:column width="200px" headerValue="Kunde Name" value="{!l.lastname}, {!l.firstname}"/>     
+                <apex:column width="100px" headerValue="Geburtsdatum" value="{!l.Geburtsdatum__c}"/>                               
+                <apex:column width="200px" headerValue="Email" value="{!l.Email}"/> 
+                <apex:column width="300px" headerValue="Adresse" value="{!l.Street}, {!l.PostalCode} {!l.City}"/> 
+                <apex:column headerValue="Produktgruppe" > 
+                    <apex:outputtext value="PG54" />
+                </apex:column>
+            </apex:pageBlockTable>
+            <apex:outputtext value="oder bestehendem Kunden zuweisen" rendered="{!!kdVorschlag.empty}" /> 
+            
+            <apex:pageBlockTable value="{!kdVorschlag}" var="kdv" rendered="{!!kdVorschlag.empty}">
+ 
+                <apex:column rendered="{!IF(FIND('PG54', kdv.Produktgruppe__c) > 0, true, false)}"  width="40px" headerValue="" >   
+                    <apex:image value="{!$Resource.Aufrufzeichen}" height="18px" width="24px"/>   
+                </apex:column>  
+                
+                <apex:column width="40px" rendered="{!IF((FIND('PG54', kdv.Produktgruppe__c) == 0) && kdv.id == selKd, true, false)}" headerValue="" >
+                    <apex:actionSupport action="{!reload}" event="onclick" reRender="Page_Message" >
+                    <input type="radio" name = "selectedKunde" checked="true">
+                            <apex:param name="kundeid" value="{!kdv.Id}"/ >
+                    </input>
+                    </apex:actionSupport>
+                </apex:column>  
+                
+                <apex:column width="40px" rendered="{!IF((FIND('PG54', kdv.Produktgruppe__c) == 0) && kdv.id != selKd, true, false)}" headerValue="" >  
+                    <apex:actionSupport action="{!reload}" event="onclick" reRender="Page_Message" >
+                    <input type="radio" name = "selectedKunde">
+                            <apex:param name="kundeid" value="{!kdv.Id}"/ >
+                    </input>
+                    </apex:actionSupport>
+                </apex:column>                  
+ 
+                <apex:column width="200px" headerValue="Kunde Name" value="{!kdv.Name__c}, {!kdv.Vorname__c}"/>  
+                <apex:column width="100px" headerValue="Geburtsdatum" value="{!kdv.Geburtsdatum_text__c}"/>                                       
+                <apex:column width="200px" headerValue="Email" value="{!kdv.e_mail__c}"/> 
+                <apex:column width="300px" headerValue="Adresse" value="{!kdv.komb_Adresse__c}"/> 
+                <apex:column headerValue="Produktgruppe" value="{!kdv.Produktgruppe__c}"/> 
+            </apex:pageBlockTable>   
+                        
+        </apex:PageBlocksection>  
+        <apex:PageBlocksection title="Kunden-Daten Details" collapsible="false" columns="2" id="pbsKundeDetail" rendered="{!IF(seite == 1, true, false)}">    
+                <apex:outputPanel >
+                    <b><apex:outputText value="Wunschbox: "/></b>
+                    &nbsp; &nbsp;
+                    <apex:outputText value="{!l.CB_Box__c}  "/>
+                    &nbsp; &nbsp;
+                    <apex:inputField value="{!pdkunde.Wunschbox__c}" style="width: 240px;"/>        
+                </apex:outputPanel>
+
+                <apex:outputPanel >
+                    <b><apex:outputText value="Art. für Einmalhandsch.: "/></b>
+                    &nbsp; &nbsp;
+                    <apex:outputText value="{!l.CB_Handschuh_Groesse__c}"/> 
+                    &nbsp; &nbsp;
+                    <apex:inputField value="{!pdkunde.bevorzugter_Art_f_r_Einmalhandsch__c}" style="width: 280px;"/>                             
+                </apex:outputPanel>                     
+                
+                <apex:outputPanel >
+                    <b><apex:outputText value="Geburtsdatum: "/></b>
+                    &nbsp; &nbsp;
+                    <apex:outputText value="{!l.Geburtsdatum__c}"/> 
+                    &nbsp; &nbsp;
+                    <apex:inputField value="{!pdkunde.Geburtsdatum_text__c}"/>               
+                </apex:outputPanel>
+                <apex:outputPanel >
+                    <b><apex:outputText value="Kostenträger: "/></b>
+                    &nbsp; &nbsp;
+                    <apex:outputText value="{!l.Kostentr_ger__c}"/> 
+                    &nbsp; &nbsp;
+                    <apex:inputField value="{!pdkunde.Krankenkasse__c}" />                             
+                </apex:outputPanel>   
+                
+                <apex:outputPanel >
+                    <b><apex:outputText value="Ursprungsanfrage: "/></b>
+                    &nbsp; &nbsp;
+                    <apex:outputField value="{!l.OM_Wizzard_Name2__c}"/> 
+                    &nbsp; &nbsp;
+                    <apex:inputField value="{!pdkunde.Ursprungsanfrage__c}"/>               
+                </apex:outputPanel>
+
+                <apex:outputPanel >
+                    <b><apex:outputText value=" "/></b>
+                        
+                </apex:outputPanel>                                
+
+                <apex:outputPanel >
+                    <b><apex:outputText value="Versand Formular:"/></b> 
+                    &nbsp; &nbsp;
+                    <apex:outputText value="{!l.next_Step__c}"/>                    
+                </apex:outputPanel>                
+                <apex:outputPanel >
+                    <b><apex:outputText value="Formular: "/></b>
+                    &nbsp; &nbsp;
+                    <apex:outputLink value="/{!attach.id}">{!attach.name}</apex:outputLink>                                
+                </apex:outputPanel> 
+                
+        </apex:PageBlocksection>  
+        
+        <apex:PageBlocksection title="Familienangehörigen-Daten" collapsible="false" id="pdFmAn" columns="1" rendered="{!IF(seite == 2, true, false)}" >
+            <apex:outputtext value="bestehenden pflege.de-Familienangehörigen zuweisen" rendered="{!!fmAnVorschlag.empty}"  />
+            
+            <apex:pageBlockTable value="{!fmAnVorschlag}" var="fmAn" rendered="{!!fmAnVorschlag.empty}">   
+                <apex:column width="40px" rendered="{!IF(selFmAn == fmAn.id, true, false)}">
+                    <apex:actionSupport action="{!selFmAnId}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedFmAn" checked="true">    
+                         <apex:param name="fmAnid" value="{!fmAn.id}"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column> 
+                <apex:column width="40px" rendered="{!IF(selFmAn == fmAn.id, false, true)}">
+                    <apex:actionSupport action="{!selfmAnId}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedDmAn" >    
+                         <apex:param name="fmAnid" value="{!fmAn.id}"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column> 
+                <apex:column headerValue="Familienangehöriger Name" value="{!fmAn.lastname},{!fmAn.firstname}" width="300px" />    
+                <apex:column headerValue="Familienangehöriger Telefon" value="{!fmAn.Phone}"/>
+                <apex:column headerValue="Familienangehöriger Email" value="{!fmAn.Email}"/> 
+                <apex:column headerValue="Familienangehöriger Account-Name" value="{!fmAn.Account.name}"/>                  
+                <apex:column headerValue="Familienangehöriger Adresse" value="{!fmAn.mailingstreet}, {!fmAn.mailingpostalcode} {!fmAn.mailingcity}"/>                 
+            </apex:pageBlockTable>
+            
+            <apex:outputpanel id="counter">
+            <apex:actionSupport action="{!selfmAnId}" event="onclick" reRender="Page_Message " >
+                <input type="radio" name="selectedDmAn" > keinen pflege.de-Familienangehörigen zuweisen.
+                <apex:param name="fmAnid" value="0"/ >
+                </input>
+            </apex:actionSupport> 
+            </apex:outputpanel>                                      
+        </apex:PageBlocksection>         
+
+        <apex:PageBlocksection title="Angehörigen-Daten" collapsible="false" id="pdAng" columns="1" rendered="{!IF(seite == 3, true, false)}" >
+            <apex:outputtext value="Neuen Angehörigen anlegen" />
+            <apex:pageBlockTable value="{!lead}" var="cont">   
+                 <apex:column width="40px" rendered="{!IF(selAn == '9', true, false)}" >
+                    <apex:actionSupport action="{!selAngId}" event="onclick"  reRender="Page_Message ">
+                        <input type="radio" name="selectedAng" checked="true">    
+                            <apex:param name="angid" value="9"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>  
+                 <apex:column width="40px" rendered="{!IF(selAn == '9', false, true)}">
+                    <apex:actionSupport action="{!selAngId}" event="onclick"  reRender="Page_Message ">
+                        <input type="radio" name="selectedAng" >    
+                            <apex:param name="angid" value="9"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>                  
+                <apex:column headerValue="Angehöriger Name" width="300px" >
+                    <apex:outputText value="{!l.Angehoeriger_Nachname__c},{!l.Angehoeriger_Vorname__c}"  />
+                </apex:column>                         
+                <apex:column headerValue="Angehöriger Email" value="{!l.Angehoeriger_Email__c}"/>                     
+                <apex:column headerValue="Angehöriger Adresse" value="{!l.Angehoeriger_Strasse__c}, {!l.Angehoeriger_PLZ__c} {!l.Angehoeriger_Ort__c}"/>          
+             </apex:pageBlockTable> 
+             
+            <apex:outputtext value="bestehendem Angehörigen zuweisen" rendered="{!!anVorschlag.empty}"  />
+            
+            <apex:pageBlockTable value="{!anVorschlag}" var="an" rendered="{!!anVorschlag.empty}">   
+                <apex:column width="40px" rendered="{!IF(selAn == an.id, true, false)}">
+                    <apex:actionSupport action="{!selAngId}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedAng" checked="true">    
+                         <apex:param name="angid" value="{!an.id}"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column> 
+                <apex:column width="40px" rendered="{!IF(selAn == an.id, false, true)}">
+                    <apex:actionSupport action="{!selAngId}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedAng" >    
+                         <apex:param name="angid" value="{!an.id}"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column> 
+                <apex:column headerValue="Angehöriger Name" value="{!an.lastname},{!an.firstname}" width="300px" />    
+                <apex:column headerValue="Angehöriger Email" value="{!an.Email}"/>                  
+                <apex:column headerValue="Angehöriger Adresse" value="{!an.mailingstreet}, {!an.mailingpostalcode} {!an.mailingcity}"/> 
+                
+            </apex:pageBlockTable>                          
+             
+            <apex:pageBlockTable value="{!lead}" var="cont">  
+                 <apex:column width="40px" rendered="{!IF(selAn == '0', true, false)}">
+                    <apex:actionSupport action="{!selAngId}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedAng" checked="true" >    
+                            <apex:param name="angid" value="0"/ >
+                        </input>
+                 </apex:actionSupport>
+                 </apex:column>
+                 <apex:column width="40px" rendered="{!IF(selAn == '0', false, true)}">
+                    <apex:actionSupport action="{!selAngId}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedAng" >    
+                            <apex:param name="angid" value="0"/ >
+                        </input>
+                 </apex:actionSupport>
+                 </apex:column>
+                <apex:column >
+                    <apex:outputText >Keinen Angehörigen anlegen</apex:outputText>  
+                </apex:column>                   
+            </apex:pageBlockTable> 
+        </apex:PageBlocksection>        
+
+        <apex:PageBlocksection title="Pflegedienst-Daten" collapsible="false" id="pbPD" columns="1" rendered="{!IF(seite == 4, true, false)}" >
+             <apex:outputtext value="Neuen Pflegedienst anlegen" />
+             <apex:pageBlockTable value="{!lead}" var="pfl">   
+                <apex:column width="40px" rendered="{!IF(selPd == '9', true, false)}">
+                    <apex:actionSupport action="{!selpdid}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedPD" checked="true" >    
+                         <apex:param name="pdid" value="9"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>
+                <apex:column width="40px"  rendered="{!IF(selPd == '9', false, true)}">
+                    <apex:actionSupport action="{!selpdid}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedPD" >    
+                         <apex:param name="pdid" value="9"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>              
+                <apex:column headerValue="Pflegedienst Name" value="{!l.CB_Pflegedienst_Name__c}" width="400px"/>                                                  
+                <apex:column headerValue="Pflegedienst Adresse" value="{!l.CB_Pflegedienst_Strasse__c}, {!l.CB_Pflegedienst_PLZ__c} {!l.CB_Pflegedienst_Ort__c}"/> 
+             </apex:pageBlockTable>   
+             <apex:outputtext value="oder bestehendem Pflegedienst zuweisen" rendered="{!!pdVorschlag.empty}" /> 
+             <apex:pageBlockTable value="{!pdVorschlag}" var="pd" rendered="{!!pdVorschlag.empty}">   
+                <apex:column width="40px" rendered="{!IF(selPd == pd.id, true, false)}">
+                    <apex:actionSupport action="{!selpdid}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedPD" checked="true">    
+                         <apex:param name="pdid" value="{!pd.id}"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column> 
+                <apex:column width="40px" rendered="{!IF(selPd == pd.id, false, true)}">
+                    <apex:actionSupport action="{!selpdid}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedPD" >    
+                         <apex:param name="pdid" value="{!pd.id}"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column> 
+                <apex:column headerValue="Pflegedienst Name" value="{!pd.name}" width="400px"/>                                                  
+                <apex:column headerValue="Pflegedienst Adresse" value="{!pd.billingstreet}, {!pd.billingpostalcode} {!pd.billingcity}"/> 
+                
+             </apex:pageBlockTable>                
+             
+             <apex:outputtext value="oder anderen Pflegedienst finden" />
+             <apex:pageBlockTable value="{!lead}" var="pfl">   
+                <apex:column width="40px"  rendered="{!IF(selPd == '1', true, false)}">
+                    <apex:actionSupport action="{!selpdid}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedPD" checked="true" >    
+                         <apex:param name="pdid" value="1"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>   
+                <apex:column width="40px"  rendered="{!IF(selPd == '1', false, true)}">
+                    <apex:actionSupport action="{!selpdid}" event="onclick" reRender="Page_Message " >
+                        <input type="radio" name="selectedPD" >    
+                         <apex:param name="pdid" value="1"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>                  
+            <apex:column >    
+                <apex:inputField value="{!pdkunde.Pflegedienst__c}"/>                             
+            </apex:column>
+            </apex:pageBlockTable>
+            
+            <apex:pageBlockTable value="{!lead}" var="pfl">         
+                <apex:column width="40px" rendered="{!IF(selPd == '0', true, false)}">
+                    <apex:actionSupport action="{!selpdid}" event="onclick" rerender="Page_Message " >
+                        <input type="radio" name="selectedPD" checked="true">    
+                         <apex:param name="pdid" value="0"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>  
+                <apex:column width="40px" rendered="{!IF(selPd == '0', false, true)}">
+                    <apex:actionSupport action="{!selpdid}" event="onclick" rerender="Page_Message " >
+                        <input type="radio" name="selectedPD" >    
+                         <apex:param name="pdid" value="0"/ >
+                        </input>
+                    </apex:actionSupport>
+                </apex:column>  
+                <apex:column >
+                    <apex:outputText >Keine Pflegedienst anlegen</apex:outputText>  
+                </apex:column>       
+            </apex:pageBlockTable>
+        </apex:PageBlocksection>    
+        
+    </apex:Pageblock>
+    
+</apex:form>
+</apex:page>

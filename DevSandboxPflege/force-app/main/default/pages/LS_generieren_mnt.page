@@ -1,0 +1,69 @@
+<apex:page controller="LS_generieren_mnt" tabStyle="Auftragsposition__c" sidebar="false">
+    <apex:form >
+        <apex:pageBlock id="pb" title="{!pageTitle}" >
+            <apex:pagemessages id="Page-Messages"/>
+            <apex:pageBlockButtons id="pbbButtons" >
+                
+                <apex:CommandButton id="btnzurueck" value="Abbrechen" immediate="True" action="{!LS_generieren_abbrechen}"/>
+                <!-- <apex:CommandButton id="btnlsgen" value="{!buttonLabel}" rendered="{!!LSpos.empty}" immediate="True" action="{!LS_generieren_erzeugen}"/> -->
+                <apex:outputPanel id="myButtons" rendered="{!hasPaging}"> 
+                <apex:commandButton status="fetchStatus" reRender="pb" value="|<" action="{!first}" disabled="{!!hasPrevious}" title="First Page"/>
+                <apex:commandButton status="fetchStatus" reRender="pb" value="<" action="{!previous}" disabled="{!!hasPrevious}" title="Previous Page"/>
+                <apex:commandButton status="fetchStatus" reRender="pb" value=">" action="{!next}" disabled="{!!hasNext}" title="Next Page"/>
+                <apex:commandButton status="fetchStatus" reRender="pb" value=">|" action="{!last}" disabled="{!!hasNext}" title="Last Page"/>                
+                </apex:outputPanel>   
+                <apex:outputPanel style="color:#4AA02C;font-weight:bold">
+                    <apex:actionStatus id="fetchStatus" startText="Fetching..." stopText="" />
+                </apex:outputPanel>
+            </apex:pageBlockButtons>
+            <apex:PageBlocksection title="Lieferscheinpositionen. Sätze {!(pageNumber * size)+1-size}-{!IF((pageNumber * size)> noOfRecords, noOfRecords,(pageNumber * size))} von {!noOfRecords} " collapsible="false" id="lposPbs" >
+          
+               <apex:pageBlockTable value="{!LSpos}" var="LP" id="LPtab" rendered="{!!LSpos.empty}" >    
+
+                    <apex:column headerValue="Kunde" style="white-space : nowrap;"> 
+                        <apex:outputLink value="/{!LP.Kunde__c}" >{!LP.Kunde__r.Name}</apex:outputLink>
+                    </apex:column>
+                    <apex:column headerValue="Krankenkasse" style="white-space : nowrap;"> 
+                        <apex:outputtext value="{!LP.Kunde__r.Krankenkasse__r.Name}" />
+                    </apex:column> 
+                    <apex:column headerValue="Pflegedienst" style="white-space : nowrap;"> 
+                        <apex:outputtext value="{!LP.Kunde__r.Pflegedienst__r.Name}" />
+                    </apex:column> 
+                    <apex:column headerValue="Lieferschein-Name" rendered="{!LsSpalte}"> 
+                        <apex:outputLink value="/{!LP.Lieferschein__c}" >{!LP.Lieferschein__r.Name}</apex:outputLink>
+                    </apex:column>                  
+                    <apex:column headerValue="Lieferscheinposition-Name"> 
+                        <apex:outputLink value="/{!LP.id}" >{!LP.Name}</apex:outputLink>
+                    </apex:column> 
+                    <apex:column headerValue="Artikel" > 
+                        <apex:outputtext value="{!LP.Artikel__r.Name}" style="white-space : nowrap; padding-right:40px;"/>
+                    </apex:column> 
+                    <apex:column headerValue="Menge" style="text-align:right; white-space : nowrap;"> 
+                        <apex:outputtext value="{!LP.Menge__c}" style="text-align:right; white-space : nowrap;"/>
+                    </apex:column>  
+                    <apex:column headerValue="Liefer Status" > 
+                        <apex:outputtext value="{!LP.Status__c}"/>
+                    </apex:column>  
+                    <apex:column headerValue="Versorgungszeitraum von" > 
+                        <apex:outputtext value="{0,date,dd'.'MM'.'yyyy}">
+                            <apex:param value="{!LP.VZ_von__c}"/>
+                        </apex:outputText>
+                    </apex:column>
+                    <apex:column headerValue="Versorgungszeitraum bis" > 
+                        <apex:outputtext value="{0,date,dd'.'MM'.'yyyy}">
+                            <apex:param value="{!LP.VZ_bis__c}"/>
+                        </apex:outputText>
+                    </apex:column>  
+                    <apex:column headerValue="Genehmigt bis" > 
+                        <apex:outputtext value="{0,date,dd'.'MM'.'yyyy}">
+                            <apex:param value="{!LP.Auftragsposition__r.genehmigt_bis__c}"/>
+                        </apex:outputText>
+                    </apex:column>  
+                    
+               </apex:pageBlockTable>
+                <apex:outputLabel value="Keine Datensätze zum Anzeigen vorhanden" rendered="{!LSpos.empty}"   styleClass="noRowsHeader"></apex:outputLabel>           
+               </apex:PageBlocksection>             
+    
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

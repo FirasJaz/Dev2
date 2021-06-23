@@ -1,0 +1,63 @@
+<!--
+/****************************************************************************************************************************
+// Created 17.04.2019 von  AD
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.: 04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// 	Order Id
+//  Contact Id
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	This lightning card contains the curabox order's component and the component of the curabox order line.
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction,lightning:isUrlAddressable" access="global">
+        
+    <aura:attribute name="title" type="String" default="Auftrag verwalten"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="curabox" type="String" />
+    <aura:attribute name="paragraph" type="String" />
+    <aura:attribute name="toSendMail" type="boolean" />
+    <aura:attribute name="showChildComponent" type="boolean" />
+    <aura:attribute name="isConsole" type="boolean" default="true" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:if isTrue="{!v.showChildComponent}">
+    <lightning:card>
+        <aura:set attribute="title">
+                <lightning:icon iconName="utility:connected_apps" size="small"/>
+                {! v.title }
+        </aura:set>
+        <div>
+            <div class="slds-p-around_x-small">
+                <div class="slds-text-heading_small">
+                    <h1 class="title" >Contact</h1>
+                </div>
+                <div class="slds-p-around_x-small">
+                    <c:Curabox_Contact_Details recordId="{!v.recordId}" />
+                </div>
+            </div>
+            <div class="slds-p-around_x-small">
+                <div class="slds-text-heading_small">
+                    <h1 class="title" >Auftrag</h1>
+                </div>
+                <div class="slds-p-around_x-small">
+                    <c:Curabox_Order recordId="{!v.recordId}" paragraph="{!v.paragraph}" wunschbox="{!v.curabox}" toSendMail="{!v.toSendMail}"/>
+                </div>
+            </div>
+        </div>
+    </lightning:card>
+</aura:if>
+</aura:component>

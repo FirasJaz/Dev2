@@ -1,0 +1,76 @@
+<apex:page controller="AB_normale_genehmigung" tabStyle="Lieferscheinposition__c" sidebar="false" >
+
+    <apex:form id="auForm" >
+    <apex:Pageblock id="pb" title="Abrechnungen für die Krankenkasse {!mfKundenTitel}">
+    <apex:pagemessages id="Page_Message"  escape="false"/>
+    <apex:pageBlockButtons location="top">
+        <apex:outputPanel id="myButtons">   
+                <apex:CommandButton id="btnCreateSend" value="An ASB versenden" action="{!createAndSend}"  rendered="{!ButtonVersenden}"/> 
+                <apex:commandButton status="fetchStatus" reRender="pb" value="|<" action="{!first}" disabled="{!!hasPrevious}" title="First Page" rendered="{!!Aufruf}"/>
+                <apex:commandButton status="fetchStatus" reRender="pb" value="<" action="{!previous}" disabled="{!!hasPrevious}" title="Previous Page" rendered="{!!Aufruf}"/>
+                <apex:commandButton status="fetchStatus" reRender="pb" value=">" action="{!next}" disabled="{!!hasNext}" title="Next Page" rendered="{!!Aufruf}"/>
+                <apex:commandButton status="fetchStatus" reRender="pb" value=">|" action="{!last}" disabled="{!!hasNext}" title="Last Page" rendered="{!!Aufruf}"/>                
+                <apex:CommandButton id="btnCall" value="Start" action="{!startBatch}" rendered="{!Aufruf}"/>
+                </apex:outputPanel>   
+                <apex:outputPanel style="color:#4AA02C;font-weight:bold">
+                    <apex:actionStatus id="fetchStatus" startText="Fetching..." stopText="" />
+                </apex:outputPanel>
+
+        
+    </apex:pageBlockButtons>
+    <apex:PageBlocksection title="Auswahl" rendered="{!Aufruf}" collapsible="false" id="kkPbs" >
+        <apex:pageBlockSectionItem id="pbsiKkID"> 
+             Krankenkasse / Gruppe   
+            <apex:outputPanel id="opID">
+                <apex:inputtext value="{!kkName}" title="Krankenkasse" />
+            </apex:outputPanel> 
+        </apex:pageBlockSectionItem>
+                    <apex:selectList value="{!mfKunden}" multiselect="false" styleclass="SelectOptions" size="1" label="Kunden">
+                <apex:selectOptions value="{!mfKundenSelect}"/>
+            </apex:selectList>
+    </apex:PageBlocksection>
+    
+    <apex:PageBlocksection title="Sätze {!(pageNumber * size)+1-size}-{!IF((pageNumber * size)> noOfRecords, noOfRecords,(pageNumber * size))} von {!noOfRecords} " collapsible="false" id="lposPbs" rendered="{!!Aufruf}" columns="1">    
+        <apex:pageBlockTable value="{!zumAbrechnen}" var="LP" id="lstab" width="90%" >  
+                <apex:column headerValue="Krankenkasse" > 
+                    <apex:outputLink value="/{!LP.Auftragsposition__r.Auftrag__r.Kunde__r.Krankenkasse__c}" >{!LP.Auftragsposition__r.Auftrag__r.Kunde__r.Krankenkasse__r.Name}</apex:outputLink>
+                </apex:column>  
+                <apex:column headerValue="Kunde" > 
+                    <apex:outputLink value="/{!LP.Kunde__c}" >{!LP.Kunde__r.Name}</apex:outputLink>
+                </apex:column> 
+                <apex:column headerValue="Lieferschein" > 
+                    <apex:outputLink value="/{!LP.Lieferschein__c}" >{!LP.Lieferschein__r.Name}</apex:outputLink>
+                </apex:column> 
+                <apex:column headerValue="Artikel" > 
+                    <apex:outputtext value="{!LP.Artikel__r.Name}" style="white-space : nowrap; padding-right:40px;"/>
+                </apex:column>  
+                <apex:column headerValue="Preis" > 
+                    <apex:outputtext value="{!LP.Artikel__r.Anlage_4_Preis__c}" style="white-space : nowrap; padding-right:40px;" />
+                </apex:column> 
+                <apex:column headerValue="Menge" > 
+                    <apex:outputtext value="{!LP.Menge__c}" style="white-space : nowrap; padding-right:40px;" />
+                </apex:column> 
+                <apex:column headerValue="VZ von" > 
+                    <apex:outputtext value="{0,date,dd.MM.yyyy}" style="white-space : nowrap; padding-right:40px;" >
+                        <apex:param value="{!LP.VZ_von__c}" />
+                    </apex:outputtext>                  
+                </apex:column> 
+                <apex:column headerValue="VZ bis" > 
+                    <apex:outputtext value="{0,date,dd.MM.yyyy}" style="white-space : nowrap; padding-right:40px;" >
+                        <apex:param value="{!LP.VZ_bis__c}" />
+                    </apex:outputtext>                  
+                </apex:column>       
+                <apex:column headerValue="Medifox" > 
+                    <apex:outputtext value="{!IF(LP.Kunde__r.Medifox_2__c, 'Ja', 'Nein')}" style="white-space : nowrap; padding-right:40px;" />
+                </apex:column>                  
+                <apex:column headerValue="Beihilfe" > 
+                    <apex:outputtext value="{!IF(LP.Kunde__r.Beihilfeberechtigt__c, 'Ja', 'Nein')}" style="white-space : nowrap; padding-right:40px;" />
+                </apex:column>  
+                <apex:column headerValue="Privat" > 
+                    <apex:outputtext value="{!IF(((LP.Auftragsposition__r.Auftrag__r.Kunde__r.Krankenkasse__r.Kanal_Unterpunkt__c == 'privat') && !LP.Kunde__r.Abrechnung_direkt_mit_PPK__c ), 'Ja', 'Nein')}" style="white-space : nowrap; padding-right:40px;" />
+                </apex:column>                   
+        </apex:pageBlockTable>  
+    </apex:PageBlocksection>    
+    </apex:Pageblock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,84 @@
+<!--
+//****************************************************************************************************************************
+// Erstellt 01.08.2016 von MZ
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Mindelweg 11
+//                         22393 Hamburg 
+//                         Tel.:  04064917161
+//                         Fax.: 04064917162
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// xxxx
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+//                      
+//
+//
+//****************************************************************************************************************************
+//Änderungen:
+//
+//    Mz    06.12.2016    Auswahl von Abrechnungszeitraum 
+//****************************************************************************************************************************
+-->
+<apex:page id="page_id" standardController="Account" extensions="Monatsauflistung" sidebar="false" showHeader="false" showQuickActionVfHeader="false">
+
+  <apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+  <apex:form id="cmForm">
+
+   <div class="slds">
+     <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+         <!-- LAYOUT GRID -->
+           <div class="slds-grid" id="id" >
+               <!-- GRID COL -->
+               <div class="slds-col" style="color: white;">
+               <!-- HEADING AREA -->
+               <h1 class="slds-text-heading--medium" style="text-align: center;">Auflistung</h1> 
+               </div>
+           </div>
+    </div>   
+    
+    <apex:outputPanel >
+      <apex:pageMessages id="showmsg"/>
+    </apex:outputPanel>
+    <br/>
+
+    <!-- Message -->
+    <div class="slds-notify_container" style="text-align: center; display: {!message_display};">
+       <div class="slds-notify slds-notify--alert slds-theme--alert-texture" role="alert">    
+        <h2>{!message}</h2>
+       </div>
+       <br/>
+    </div>
+    <!-- Message -->
+    
+    <!-- Buttons -->  
+    <div style="text-align: center;">
+          <apex:commandButton styleClass="slds-button slds-button--neutral" value="Zurück zum Partner" action="{!zurueck}"  />
+          <apex:commandButton styleClass="slds-button slds-button--brand" value="Auflisten" action="{!startAuflistung}" id="obt"/>
+    </div>
+    <!-- Buttons -->
+   <br/>
+    
+    <div class="slds-theme--default slds-container--medium slds-container--center">
+        <apex:outputLabel value="" for="timePeriodList" styleClass="slds-form-element__label">Auflistungszeitraum</apex:outputLabel>
+        <apex:selectList id="timePeriodList" value="{!timePeriodValue}" size="1" styleClass="slds-select">
+            <apex:selectOptions value="{!timePeriodItems}" />
+        </apex:selectList>
+    </div>
+   
+    <br/><br/>
+    <!-- Buttons -->
+    <div style="text-align: center;">
+          <apex:commandButton styleClass="slds-button slds-button--neutral" value="Zurück zum Partner" action="{!zurueck}"  />
+          <apex:commandButton styleClass="slds-button slds-button--brand" value="Auflisten" action="{!startAuflistung}" id="ubt"/>
+    </div>
+    <!-- Buttons -->
+        
+  </div>
+  </apex:form>
+</apex:page>

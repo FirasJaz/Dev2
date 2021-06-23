@@ -1,0 +1,33 @@
+<!--
+//////////////////////////////////////////////////////////////////
+//
+//        Autor: Malte Srocke
+//        Erstellt: 01.03.15
+//        Beschreibung:
+//            Übersichtstabelle der E-Mail-Vorlagen; Vorlage kann ausgewählt
+//            werden und übergibt ID an Seite, die in returnURL-Parameter steht
+//            (siehe CustomEmailTemplateSelect_Controller.PassTemplateIdToReturnURL())
+//
+//
+//        Änderungen:
+//            01.03.15, MS, Erste Version erstellt
+//                noch nicht deployed
+//            
+//
+//////////////////////////////////////////////////////////////////
+//-->
+<apex:page controller="CustomEmailTemplateSelect_Controller" showHeader="false" sidebar="false">
+    <apex:pageBlock title="Vorlagen">
+        <apex:pageBlockTable value="{!EmailTemplates}" var="e">
+            <apex:column headerValue="Vorlagenname">
+                <apex:form >
+                    <apex:commandLink action="{!PassTemplateIdToReturnURL}">
+                        <apex:outputText value="{!e.name}" />
+                        <apex:param name="etid" value="{!e.id}" assignTo="{!etid}"/>
+                    </apex:commandLink>
+                </apex:form>
+            </apex:column>
+            <apex:column title="Beschreibung" value="{!e.description}" />
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+</apex:page>

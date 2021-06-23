@@ -1,0 +1,231 @@
+<!--
+/********************************************************************************************************************************************
+//  Created 12.08.2020 by BT
+//                          Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                          Nordkanalstraße 58
+//                          20097 Hamburg 
+//                          Tel.:  04064917161
+//                          Fax.: 04064917162
+//                          Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//
+//********************************************************************************************************************************************
+//
+// Description:    
+//                          This page represents a view of some follow-up tasks in a console app. 
+//                          It displays follow-up tasks, which are in a specific status
+//                          
+//********************************************************************************************************************************************
+// Changes:
+//                  05.10.2020  DZ   Added new column "Last_modified__c"         
+//********************************************************************************************************************************************
+-->
+<apex:page controller="FollowUpController" title="Follow-up Tasks" action="{!queryFollowUpTasks}" showHeader="true" standardStylesheets="false" sidebar="false" applyHtmlTag="true"
+    applyBodyTag="false" docType="html-5.0" id="page_id">
+    <apex:includeScript value="/support/console/49.0/integration.js"/>
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="de">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <apex:slds />
+
+        <script type="text/javascript">
+            function openFollowUpTaskRecord(taskId, taskName) {
+                setFollowUpCurrentEditor(taskId);
+                selectFollowUp(taskId, taskName);
+            }
+            
+            function setFollowUpCurrentEditor(taskId) {
+                setCurrentEditor(taskId);
+            }
+        
+            function selectFollowUp(taskId, taskName) {
+                // open a new tab in the console app
+                sforce.console.openPrimaryTab(null, '/'+taskId, true, taskName, openSuccess, taskName);    
+            }
+        
+            var openSuccess = function openSuccess(result) {
+                    //report whether opening the new tab was successful
+                    if (result.success == false){
+                        alert('Der ausgewählte Follow-up Task konnte nicht angezeigt werden. Bitte wenden Sie sich an Ihren Salesforce-Administrator.');
+                    }
+            };        
+        </script>
+    </head>
+
+    <body>
+        <apex:form >
+            <apex:actionFunction name="setCurrentEditor" action="{!setFollowUpCurrentEditor}" reRender="panel, pageMessage" >
+                    <apex:param id="fuId" name="followUpId" value="" />    
+            </apex:actionFunction>
+            <div class="slds-scope" >
+                <div class="myapp slds-p-horizontal--medium">
+                    <apex:outputText rendered="{!all}">
+                            <p style="background-color: white;font-size: 20px;">Follow-up Tasks "{!subject}"</p>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!isDueBool && !all}">
+                            <p style="background-color: white;font-size: 20px;">Fällige Follow-up Tasks im Status "{!status}"</p>
+                    </apex:outputText>
+                    <apex:outputText rendered="{!!isDueBool && !all}">
+                            <p style="background-color: white;font-size: 20px;">Nicht fällige Follow-up Tasks im Status "{!status}"</p>
+                    </apex:outputText>
+                    <br/>
+                    <apex:outputText id="pageMessage" value="{!pageMessage}" style="font-size:14px;color:blue;" />
+                    <apex:outputPanel id="panel" >
+                        <apex:outputPanel layout="block" style="text-align: center;" >
+                                    Anzahl der Datensätze : &nbsp;<apex:outputText rendered="{!IF(Con.resultSize==10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(Con.resultSize < 10000,true,false)}">{!Con.resultSize}</apex:outputText>&nbsp;&nbsp;                                
+                                    <apex:commandLink action="{!Previous}" title="zurück" value="zurück" rendered="{!Con.HasPrevious}"/>
+                                    <apex:outputPanel style="color:grey" rendered="{!NOT(Con.HasPrevious)}">zurück</apex:outputPanel>         
+                                    &nbsp;({!IF(Con.PageNumber == 1,1,((Con.PageNumber -1) * Con.PageSize)+1)}-{!IF(Con.resultSize < Con.PageSize,Con.resultSize,Con.PageNumber * Con.pageSize)})&nbsp;
+                                    <apex:outputPanel style="color:grey" rendered="{!NOT(Con.HasNext)}">weiter</apex:outputPanel>         
+                                    <apex:commandLink title="weiter" value="weiter" rendered="{!Con.HasNext}" action="{!Next}"/>&nbsp;                                        
+                        </apex:outputPanel>      
+                        <br/>
+                        <apex:outputPanel layout="block" >
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                <thead>
+                                    <tr class="slds-text-title_caps">
+                                        <!-- Name -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Follow_up_Task__c.Fields.Name.Label}">
+                                                <apex:commandLink action="{!queryFollowUpTasks}" value="{!$ObjectType.Follow_up_Task__c.Fields.Name.Label}{!IF(sortExpression=='Name',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                        <apex:param value="Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                                  
+                                            </div>
+                                        </th>
+    
+                                        <!-- Subject__c -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Follow_up_Task__c.Fields.Subject__c.Label}">
+                                                <apex:commandLink action="{!queryFollowUpTasks}" value="{!$ObjectType.Follow_up_Task__c.Fields.Subject__c.Label}{!IF(sortExpression=='Subject__c',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                        <apex:param value="Subject__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                               
+                                            </div>
+                                        </th>
+                                        
+                                        <!-- Status -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Follow_up_Task__c.Fields.Status__c.Label}">
+                                                <apex:commandLink action="{!queryFollowUpTasks}" value="{!$ObjectType.Follow_up_Task__c.Fields.Status__c.Label}{!IF(sortExpression=='Status__c',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                        <apex:param value="Status__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                               
+                                            </div>
+                                        </th>
+                                        
+                                        <!-- Contact__c -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Follow_up_Task__c.Fields.Contact__c.Label}">
+                                                <apex:commandLink action="{!queryFollowUpTasks}" value="{!$ObjectType.Follow_up_Task__c.Fields.Contact__c.Label}{!IF(sortExpression=='Contact__r.Name',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                        <apex:param value="Contact__r.Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                                  
+                                            </div>
+                                        </th>
+                                        
+                                        <!-- Contact__r.Pflegedienst__c !-->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Contact.Fields.Pflegedienst__c.Label}">
+                                                <apex:commandLink action="{!queryFollowUpTasks}" value="{!$ObjectType.Contact.Fields.Pflegedienst__c.Label}{!IF(sortExpression=='Contact__r.Pflegedienst__r.Name',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                        <apex:param value="Contact__r.Pflegedienst__r.Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                                  
+                                            </div>
+                                        </th>
+    
+                                        <!-- Due_Date__c -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Follow_up_Task__c.Fields.Due_Date__c.Label}">
+                                                <apex:commandLink action="{!queryFollowUpTasks}" value="{!$ObjectType.Follow_up_Task__c.Fields.Due_Date__c.Label}{!IF(sortExpression=='Due_Date__c',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                    <apex:param value="Due_Date__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                                   
+                                            </div>
+                                        </th>
+                                        
+                                        <!-- Last_Modified__c -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Follow_up_Task__c.Fields.Last_Modified__c.Label}">
+                                                <apex:commandLink action="{!queryFollowUpTasks}" value="{!$ObjectType.Follow_up_Task__c.Fields.Last_Modified__c.Label}{!IF(sortExpression=='Last_Modified__c',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                    <apex:param value="Last_Modified__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                                   
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+    
+                                <tbody>
+                                    <apex:repeat value="{!followUpTasks}" var="fu">
+                                        <tr>
+                                            <!-- Name -->
+                                            <td data-label="{!$ObjectType.Follow_up_Task__c.Fields.Name.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Follow_up_Task__c.Fields.Name.Label}">
+                                                    <a href="javascript:openFollowUpTaskRecord('{!fu.id}', '{!fu.Name}');">{!fu.Name}</a>
+                                                    <!-- <apex:outputLink onclick="setFollowUpCurrentEditor('{!fu.id}');selectFollowUp('{!fu.id}');">{!fu.Name}</apex:outputLink> !-->
+                                                </div>
+                                            </td>
+    
+                                            <!-- Subject__c -->
+                                            <td data-label="{!$ObjectType.Follow_up_Task__c.Fields.Subject__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Follow_up_Task__c.Fields.Subject__c.Label}">
+                                                    <apex:outputField value="{!fu.Subject__c}" />
+                                                </div>
+                                            </td>
+                                            
+                                            <!-- Status__c -->
+                                            <td data-label="{!$ObjectType.Follow_up_Task__c.Fields.Status__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Follow_up_Task__c.Fields.Status__c.Label}">
+                                                    <apex:outputField value="{!fu.Status__c}" />
+                                                </div>
+                                            </td>
+    
+                                            <!-- Contact__c -->
+                                            <td data-label="{!$ObjectType.Follow_up_Task__c.Fields.Contact__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Follow_up_Task__c.Fields.Contact__c.Label}">
+                                                    <apex:outputField value="{!fu.Contact__r.Name}" />
+                                                </div>
+                                            </td>
+                                            
+                                            <!-- Contact__r.Pflegedienst__c -->
+                                            <td data-label="{!$ObjectType.Contact.Fields.Pflegedienst__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Contact.Fields.Pflegedienst__c.Label}">
+                                                    <apex:outputField value="{!fu.Contact__r.Pflegedienst__r.Name}" />
+                                                </div>
+                                            </td>
+    
+                                            <!-- Due_Date__c -->
+                                            <td data-label="{!$ObjectType.Follow_up_Task__c.Fields.Due_Date__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Follow_up_Task__c.Fields.Due_Date__c.Label}">
+                                                    <apex:outputField value="{!fu.Due_Date__c}" />
+                                                </div>
+                                            </td>
+    
+                                            <!-- Last_Modified__c -->
+                                            <td data-label="{!$ObjectType.Follow_up_Task__c.Fields.Last_Modified__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Follow_up_Task__c.Fields.Last_Modified__c.Label}">
+                                                    <apex:outputField value="{!fu.Last_Modified__c}" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </apex:repeat>
+                                </tbody>
+                            </table>
+                        </apex:outputPanel>    
+                        <br/>
+                        <apex:outputPanel layout="block" style="text-align: center;" >
+                                    Anzahl der Datensätze : &nbsp;<apex:outputText rendered="{!IF(Con.resultSize==10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(Con.resultSize < 10000,true,false)}">{!Con.resultSize}</apex:outputText>&nbsp;&nbsp;                                
+                                    <apex:commandLink action="{!Previous}" title="zurück" value="zurück" rendered="{!Con.HasPrevious}"/>
+                                    <apex:outputPanel style="color:grey" rendered="{!NOT(Con.HasPrevious)}">zurück</apex:outputPanel>         
+                                    &nbsp;({!IF(Con.PageNumber == 1,1,((Con.PageNumber -1) * Con.PageSize)+1)}-{!IF(Con.resultSize < Con.PageSize,Con.resultSize,Con.PageNumber * Con.pageSize)})&nbsp;
+                                    <apex:outputPanel style="color:grey" rendered="{!NOT(Con.HasNext)}">weiter</apex:outputPanel>         
+                                    <apex:commandLink title="weiter" value="weiter" rendered="{!Con.HasNext}" action="{!Next}"/>&nbsp;                                        
+                        </apex:outputPanel>  
+                   </apex:outputPanel>
+                </div>
+            </div>
+        </apex:form>
+    </body>
+
+    </html>
+</apex:page>

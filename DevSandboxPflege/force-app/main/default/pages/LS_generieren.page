@@ -1,0 +1,65 @@
+<apex:page standardController="Lieferscheinposition__c" id="lpPage" extensions="LS_generieren" tabStyle="Auftragsposition__c" sidebar="false">
+ <apex:form id="lpForm">   
+        <apex:Pageblock id="pblp" title="LS Positionen">
+            <apex:pagemessages id="Page-Messages"/>
+            <apex:pageBlockButtons id="pbbButtons">
+                <apex:outputPanel id="myButtons">   
+                <apex:CommandButton id="btnzurueck" value="Abbrechen" immediate="True" action="{!LS_generieren_abbrechen}"/>
+                <apex:CommandButton id="btnlsgen" value="LS generieren" immediate="True" action="{!LS_generieren_erzeugen}" rendered="{!!LS_generiert}"/>
+                
+                <apex:commandButton action="{!Beginning}" title="Beginning" value="<<" disabled="{!disablePrevious}" reRender="lposPbs,myButtons"/>
+                <apex:commandButton action="{!Previous}" title="Previous" value="<" disabled="{!disablePrevious}" reRender="lposPbs,myButtons"/>       
+                <apex:commandButton action="{!Next}" title="Next" value=">" immediate="True" disabled="{!disableNext}" reRender="lposPbs,myButtons"/>
+                <apex:commandButton action="{!End}" title="End" value=">>" immediate="True" disabled="{!disableNext}" reRender="lposPbs,myButtons"/>       
+                </apex:outputPanel>   
+            </apex:pageBlockButtons>
+
+           <apex:PageBlocksection title="Lieferscheinpositionen (Gesamt Sätze: {!total_size}. Seite {!pageNumber} von {!totalPages})" collapsible="false" id="lposPbs" >
+               
+               <apex:pageBlockTable value="{!LSpos}" var="LP" id="LPtab" >    
+
+                    <apex:column headerValue="Kunde" style="white-space : nowrap;"> 
+                        <apex:outputLink value="/{!LP.Kunde__c}" >{!LP.Kunde__r.Name}</apex:outputLink>
+                    </apex:column>
+                         <apex:column headerValue="Krankenkasse" style="white-space : nowrap;"> 
+                        <apex:outputtext value="{!LP.Kunde__r.Krankenkasse__r.Name}" />
+                    </apex:column> 
+                    <apex:column headerValue="Pflegedienst" style="white-space : nowrap;"> 
+                        <apex:outputtext value="{!LP.Kunde__r.Pflegedienst__r.Name}" />
+                    </apex:column> 
+                    <apex:column headerValue="Lieferscheinposition-Name"> 
+                        <apex:outputLink value="/{!LP.id}" >{!LP.Name}</apex:outputLink>
+                    </apex:column> 
+                    <apex:column headerValue="Artikel" > 
+                        <apex:outputtext value="{!LP.Artikel__r.Name}" style="white-space : nowrap; padding-right:40px;"/>
+                    </apex:column> 
+                    <apex:column headerValue="Menge" style="text-align:right; white-space : nowrap;"> 
+                        <apex:outputtext value="{!LP.Menge__c}" style="text-align:right; white-space : nowrap;"/>
+                    </apex:column>  
+                    <apex:column headerValue="Liefer Status" > 
+                        <apex:outputtext value="{!LP.Status__c}"/>
+                    </apex:column>  
+                    <apex:column headerValue="Versorgungszeitraum von" > 
+                        <apex:outputtext value="{0,date,dd'.'MM'.'yyyy}">
+                            <apex:param value="{!LP.VZ_von__c}"/>
+                        </apex:outputText>
+                    </apex:column>
+                    <apex:column headerValue="Versorgungszeitraum bis" > 
+                        <apex:outputtext value="{0,date,dd'.'MM'.'yyyy}">
+                            <apex:param value="{!LP.VZ_bis__c}"/>
+                        </apex:outputText>
+                    </apex:column>  
+                    <apex:column headerValue="Genehmigt bis" > 
+                        <apex:outputtext value="{0,date,dd'.'MM'.'yyyy}">
+                            <apex:param value="{!LP.Auftragsposition__r.genehmigt_bis__c}"/>
+                        </apex:outputText>
+                    </apex:column>  
+                    <apex:facet name="footer"><div style="text-align:center;fontweight:bold;">Seite {!pageNumber} von {!totalPages}</div></apex:facet>
+               </apex:pageBlockTable>
+           
+               </apex:PageBlocksection>  
+
+                       
+        </apex:Pageblock>
+ </apex:form>    
+</apex:page>

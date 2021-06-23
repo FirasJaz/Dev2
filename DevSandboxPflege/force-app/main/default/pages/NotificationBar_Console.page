@@ -1,0 +1,140 @@
+<!--
+/********************************************************************************************************************************************
+//  Created 12.08.2020 by BT
+//                          Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                          Nordkanalstraße 58
+//                          20097 Hamburg 
+//                          Tel.:  04064917161
+//                          Fax.: 04064917162
+//                          Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//
+//********************************************************************************************************************************************
+//
+// Description:    
+//                          This page represents a notification center for a console app. 
+//                          It displays different statuses of approval/follow-up tasks and the number of approval/follow-up tasks, 
+//                          which are in these statuses
+//********************************************************************************************************************************************
+// Changes:
+//
+//********************************************************************************************************************************************
+-->
+<apex:page controller="NotificationController" title="Notification Center" >
+<apex:includeScript value="/support/console/49.0/integration.js"/>    
+<apex:form >
+    <apex:actionFunction name="checkItems" action="{!checkItems}" status="myStatus" reRender="content" />
+</apex:form>
+
+<apex:outputPanel id="content">
+<!-- Approvals !-->
+<apex:outputText style="color: ##4169E1; text-align: center; font-size: 15px; font-weight: bold;" value="Genehmigungen" />
+<br/>
+<apex:outputPanel id="gen">
+    <table border="0" style="width:100%">
+        <tr>
+            <th></th>
+            <apex:repeat value="{!translatedKvStatuses}" var="apStatus">
+                <th>{!translatedKvStatuses[apStatus]}</th>
+            </apex:repeat>
+        </tr>
+        <apex:repeat value="{!approvals}" var="genStatus" >
+            <tr>
+                <td width="38%"> 
+                    <apex:outputLink onclick="showApprovalItems('{!genStatus}', 'null')" >
+                        <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="{!genStatus}" />
+                    </apex:outputLink>
+                </td>
+                <apex:repeat value="{!approvals[genStatus]}" var="kvStatus" >
+                    <td width="15%">
+                        <apex:outputLink onclick="showApprovalItems('{!genStatus}', '{!kvStatus}')" >
+                            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="{!approvals[genStatus][kvStatus]}" />
+                        </apex:outputLink>
+                    </td>
+                </apex:repeat>
+            </tr>
+        </apex:repeat>
+    </table>
+</apex:outputPanel>
+<br/><br/><br/><br/>
+
+<!-- Follow-up Tasks !-->
+<apex:outputText style="color: ##4169E1; text-align: center; font-size: 15px; font-weight: bold;" value="Follow-up Tasks" />
+<br/><br/>
+<apex:outputPanel id="fu">
+    <table border="0" style="width:100%">        
+        <tr>
+            <th>Thema</th>            
+            <th>Offen / Fällig</th>      
+            <th>In Bearbeitung / Fällig</th>
+            <th>Offen / Nicht Fällig</th>            
+            <th>In Bearbeitung / Nicht Fällig</th>
+        </tr>
+        <apex:repeat value="{!followUpTaskSubjectValues}" var="fuSubject" >
+            <tr>
+                <td width="40%"> 
+                    <apex:outputLink onclick="showFollowUpItems('null', 'null', '{!fuSubject}')" >
+                        <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="{!fuSubject}" />
+                    </apex:outputLink>
+                </td>                
+                <td width="15%">
+                    <apex:outputLink onclick="showFollowUpItems('Offen', 'true', '{!fuSubject}')" >
+                        <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="{!dueOpenFollowUpTasks[fuSubject]}" />
+                    </apex:outputLink>
+                </td>
+                <td width="15%">
+                    <apex:outputLink onclick="showFollowUpItems('In Bearbeitung', 'true', '{!fuSubject}')" >
+                        <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="{!duePendingFollowUpTasks[fuSubject]}" />
+                    </apex:outputLink>
+                </td>
+                <td width="15%">
+                    <apex:outputLink onclick="showFollowUpItems('Offen', 'false', '{!fuSubject}')" >
+                        <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="{!undueOpenFollowUpTasks[fuSubject]}" />
+                    </apex:outputLink>
+                </td>
+                <td width="15%">
+                    <apex:outputLink onclick="showFollowUpItems('In Bearbeitung', 'false', '{!fuSubject}')" >
+                        <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="{!unduePendingFollowUpTasks[fuSubject]}" />
+                    </apex:outputLink>
+                </td>
+            </tr>
+        </apex:repeat>
+    </table>
+</apex:outputPanel>
+</apex:outputPanel>
+<apex:actionStatus startText="." id="myStatus" />
+
+<!-- Page refresh after each 10 seconds !-->
+<script type="text/javascript" >
+    window.setInterval(checkItems, 10000);
+
+    function showApprovalItems(status, kvStatus) {
+        // open a new tab in the console app
+        sforce.console.openPrimaryTab(null, '/apex/ApprovalView_Console?status='+status+'&kvStatus='+kvStatus, true, 
+                'Curabox Genehmigungen', approvalOpenSuccess, 'Curabox Genehmigungen');                                  
+    }
+
+    function showFollowUpItems(status, isDue, subject) {
+        subject = encodeURIComponent(subject);
+        // open a new tab in the console app
+        sforce.console.openPrimaryTab(null, '/apex/FollowUpView_Console?status='+status+'&isDue='+isDue+'&subject='+subject, true, 
+                'Follow-up Tasks', followUpOpenSuccess, 'Follow-up Tasks');             
+    }
+    
+    var approvalOpenSuccess = function approvalOpenSuccess(result) {
+            //report whether opening the new tab was successful
+            if (result.success == false){
+                alert('Eine Registerkarte für Curabox Genehmigungen konnte nicht geöffnet werden. Bitte wenden Sie sich an Ihren Salesforce-Administrator.');
+            }
+    }; 
+    var followUpOpenSuccess = function followUpOpenSuccess(result) {
+            //report whether opening the new tab was successful
+            if (result.success == false) {
+                alert('Eine Registerkarte für Follow-up Tasks konnte nicht geöffnet werden. Bitte wenden Sie sich an Ihren Salesforce-Administrator.');
+            }    
+    }; 
+</script>
+</apex:page>

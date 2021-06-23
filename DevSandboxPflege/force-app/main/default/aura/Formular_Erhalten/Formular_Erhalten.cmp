@@ -1,0 +1,92 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="Formular_Erhalten" access="global" >
+    
+    <aura:attribute name="files" type="ContentDocument[]"/>  
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="aprovalId51" type="String"/>
+    <aura:attribute name="aprovalId54" type="String"/>
+    <aura:attribute name="curabox" type="String"/>
+    <aura:attribute name="role" type="String"/>
+    <aura:attribute name="isCooperativ" type="boolean"/>
+    <aura:attribute name="orderId" type="String" default=""/> 
+    <aura:attribute name="accept" type="List" default="['.pdf']"/>  
+    <aura:attribute name="multiple" type="Boolean" default="true"/>
+    <aura:attribute name="isTerminated54" type="Boolean" default="false"/>
+    <aura:attribute name="isTerminated51" type="Boolean" default="false"/>
+    <aura:attribute name="disableUpload" type="Boolean" default="false"/>
+    <!-- -->
+    <aura:attribute name="formulartart" type="List" default="[
+    		{'label': 'Antrag_1', 'value': 'Antrag_1'},
+            {'label': 'Antrag_2', 'value': 'Antrag'},
+            {'label': 'EV', 'value': 'EV'},
+            {'label': 'Genehmigung', 'value': 'Genehmigung'},
+            {'label': 'Ablehnung', 'value': 'Ablehnungen'},
+            {'label': 'Kündigung', 'value': 'Kündigung'},
+            {'label': 'Benachrichtigung', 'value': 'Benachrichtigung'},                                            
+    		{'label': 'Frei', 'value': 'frei'},
+            ]"/>
+            
+    <aura:attribute name="options" type="List" default="[
+    		{'label': '51', 'value': '51'},
+            {'label': '54', 'value': '54'},
+            {'label': '5X', 'value': '5X'},
+            ]"/>
+
+    <!-- init function-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <!-- -->
+    <aura:html tag="style">
+        .slds-modal__container{
+        width: 40%;
+        max-width: 70rem;
+        }
+    </aura:html>
+	
+    <div class="modal-header slds-docked-form-header slds-modal__header ">
+        <h1 class="title" >Formular erhalten</h1>
+    </div>
+    
+    <div class="slds-modal__content slds-p-around_x-small">
+        <!-- the messages component is for error messages -->
+        <lightning:messages />
+        
+        <div class="slds-grid slds-wrap">
+            	<div class="slds-size_1-of-2 slds-p-around_x-small">
+                	<lightning:combobox name="art" 
+                                    label="Art des Formulars"
+                                    aura:id="form_art"
+                                    value="Antrag_1" 
+                                    placeholder="Select document type" 
+                                    options="{! v.formulartart }" 
+                                    onchange="{! c.handleChange }"/>
+            	</div>
+            	<div class="slds-size_1-of-2 slds-p-around_x-small"> 
+                	<lightning:combobox name="paragraph" 
+                                    label="Paragraph" 
+                                    aura:id="form_code"
+                                    value="54" 
+                                    options="{! v.options }" 
+                                    onchange="{! c.handleChange }"/>
+            	</div>
+        </div>
+
+        <div class="slds-size_1-of-1 slds-p-around_x-small">  
+            <lightning:input name="other" 
+                             aura:id="anderer_art"
+                             disabled="true"
+                             label="Art des Dokuments"/>         
+        </div>
+
+        <div class="slds-size_2-of-3 slds-p-around_x-small">
+            <lightning:fileUpload name="fileUploader"
+                                  label= ""
+                                  multiple="{!v.multiple}"
+                                  accept="{!v.accept}"
+                                  disabled="{!v.disableUpload}"
+                                  recordId="{!v.recordId}"
+                                  onuploadfinished="{!c.UploadFinished}" />
+        </div>
+        
+    </div>
+    
+</aura:component>

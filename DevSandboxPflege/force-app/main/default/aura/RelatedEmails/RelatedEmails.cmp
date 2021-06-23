@@ -1,0 +1,188 @@
+<!--
+/****************************************************************************************************************************
+// Created 24.07.2018 von  MS
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	component which shows related emails to a given record.
+//  created primarily for BADUMBAU-opportunity record page (#1536)
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" controller="RelatedEmails">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="allEmails" type="List"
+                    description="containing all emails related to given opportunity"/>
+    <aura:attribute name="filteredEmails" type="List"
+                    description="containing the emails after being filtered, datatable filled using this" />
+    <aura:attribute name="emailMessageDataTableColumns" type="List"
+                    description="description of columns for DataTable with emailmessages" />
+    <aura:attribute name="toFromAddresses" type="List"
+                    description="all email-addresses (either to or from) for filtering using multiSelectCombobox"/>
+    <aura:attribute name="selectedToFromAddresses" type="List"
+                    description="selected addresses for filtering using multiSelectCombobox"/>
+    <aura:attribute name="searchString" type="String" default=""
+                    description="the search string for searching in emails's text/subject"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"
+                    description="Defines whether modal is open or not" />    
+    <aura:attribute name="emailMessageId" type="Id" default=""
+                    description="id of emailmessage which is then shown in modal-dialog" />
+    <aura:attribute name="emailAttachments" type="List" 
+                    description="attachment list of selected email message" />
+    
+    <aura:attribute name="replyEmailFlag" type="boolean" default="false"
+                    description="to control displaying reply layout" />
+    <aura:attribute name="forwardEmailFlag" type="boolean" default="false"
+                    description="to control displaying forward layout" />
+    
+    <!-- create onChange handler in case selectedToFromAddresses changes, so that emails get filtered accordingly //-->
+    <aura:handler name="change" value="{!v.selectedToFromAddresses}" action="{!c.filterEmails}" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <div class="slds-section slds-is-open">
+      <h3 class="slds-section__title">
+          <span class="slds-truncate" title="Section Title">Nach Sender/Empfänger filtern</span>
+      </h3>
+      <div aria-hidden="false" class="slds-section__content">
+        <c:multiSelectCombobox allOptions="{!v.toFromAddresses}"
+                               selectedOptions="{!v.selectedToFromAddresses}"
+                               placeholder="Suchen..."
+                               iconName="standard:email" />
+      </div>
+    </div>
+    <div class="slds-section slds-is-open">
+      <h3 class="slds-section__title">
+          <span class="slds-truncate" title="Section Title">In Betreff/Inhalt suchen</span>
+      </h3>
+      <div aria-hidden="false" class="slds-section__content">
+        <div aura:id="lookupField" class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" style="width: 100%;">
+            <ui:inputText updateOn="keyup"
+                          keyup="{!c.filterEmails}"
+                          class="slds-lookup__search-input slds-input inputSize"
+                          value="{!v.searchString}" />
+            <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                <lightning:icon iconName="utility:search" size="x-small" alternativeText="icon" />
+            </span>
+        </div>
+      </div>
+    </div>
+    
+<!--       
+            <lightning:dualListbox name="emails" label="Select Emails" sourceLabel="Available" selectedLabel="Selected" fieldLevelHelp="This is a dual listbox" options="{!v.toFromAddresses}" onchange="{!c.filterEmails}" />
+         //-->
+
+
+    <lightning:datatable keyField="id"
+                         data="{!v.filteredEmails}" 
+                         columns="{!v.emailMessageDataTableColumns}" 
+                         onrowaction="{!c.openModal}"
+                         hideCheckboxColumn="true" />
+
+
+    <div class="slds-m-around_X-Large">
+        <!--Use aura:if tag to display Model Box, on the bese of conditions. [isOpen boolean attribute] -->
+        <aura:if isTrue="{!v.isOpen}">
+
+            <!--###### MODAL BOX Start######-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal--large">
+                <div class="slds-modal__container slds-modal__content slds-p-around--medium" >
+                    <!-- ###### MODAL BOX HEADER Start ######-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModal }" alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">E-Mail</h2>
+                    </header>
+                    <!--###### MODAL BOX BODY Part Start######-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        
+                        <lightning:layout>
+                            <lightning:layoutItem padding="around-small" size="9">
+                                <force:recordView recordId="{!v.emailMessageId}" />                                
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around-small" size="3">
+                                <div class="slds-box">
+                                <lightning:card variant="Narrow" title="Anhänge" iconName="standard:file">
+                                    <!--aura:set attribute="actions">
+                                        <lightning:buttonIcon iconName="utility:down" variant="border-filled" alternativeText="Show More"/>
+                                    </aura:set-->
+                                    <p class="slds-p-horizontal_small">
+                                        <aura:iteration items="{!v.emailAttachments}" var="option">
+                                            <p>
+                                                <lightning:icon iconName="doctype:image" alternativeText="Doc image" />
+                                                <lightning:button variant="base" label="{!option.Name}" value="{!option.Id}" title="{!option.Name}" onclick="{!c.openAttachment}" />
+                                            </p>
+                                            <br/>
+                                    	</aura:iteration>
+                                    </p>
+                                </lightning:card>
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        
+                        
+                    </div>
+                    <!--###### MODAL BOX FOOTER Part Start ######-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="brand" label="antworten" title="antworten" onclick="{! c.openReplyEmail }" />
+                        <lightning:button variant="brand" label="weiterleiten" title="weiterleiten" onclick="{! c.openForwardEmail }" />
+                        <lightning:button variant="neutral" label="schließen" title="schließen" onclick="{! c.closeModal }" />
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            <!--###### MODAL BOX Part END Here ######-->
+        </aura:if>
+    </div>
+    
+    
+    
+    <!-- reply email dialog -->
+        <aura:if isTrue="{!v.replyEmailFlag}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open slds-modal--medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeReplyModal }" alternativeText="schließen" variant="bare-inverse" class="slds-modal__close" />
+                        <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">E-Mail antworten</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <c:EmailMessageAction_Badumbau messageId="{!v.emailMessageId}" actionType="reply"/>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral" label="schließen" title="schließen" onclick="{! c.closeReplyModal }" />
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    <!--/div-->
+    
+    <!-- forward email dialog -->
+        <aura:if isTrue="{!v.forwardEmailFlag}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-03" aria-modal="true" aria-describedby="modal-content-id-3" class="slds-modal slds-fade-in-open slds-modal--medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeForwardModal }" alternativeText="schließen" variant="bare-inverse" class="slds-modal__close" />
+                        <h2 id="modal-heading-03" class="slds-text-heading_medium slds-hyphenate">E-Mail weiterleiten</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <c:EmailMessageAction_Badumbau messageId="{!v.emailMessageId}" actionType="forward"/>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral" label="schließen" title="schließen" onclick="{! c.closeForawrdModal }" />
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    <!--/div-->
+</aura:component>

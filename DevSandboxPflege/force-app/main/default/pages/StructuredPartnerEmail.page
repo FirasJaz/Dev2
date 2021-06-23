@@ -1,0 +1,85 @@
+<apex:page sidebar="false" showHeader="false" showQuickActionVfHeader="false" standardController="Strukturierte_Partner_Emails__c"  extensions="StructuredPartnerEmail">
+
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+
+<apex:outputPanel >
+<apex:pageMessages id="showmsg"/>
+<apex:form >
+
+<div class="slds">
+        <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+
+                  <!-- LAYOUT GRID -->
+                  <div class="slds-grid" id="id" >
+                    <!-- GRID COL -->
+                    <div class="slds-col" style="color: white;">
+                      <!-- HEADING AREA -->
+                      <h1 class="slds-text-heading--medium">füllen Sie bitte die E-Mail Körper</h1> 
+                    </div>
+                  </div>
+             </div>
+             <br/>
+             
+             <div  style="text-align: center;">
+                 <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Strukturierte Partner-Emails" action="{!cancel}" />
+                 <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!Speichern}" />
+             </div>
+             <br/>
+             <apex:pageBlock >
+                 <div class="slds-grid slds-grid--pull-padded">
+                 
+                     <div class="slds-col--padded slds-box slds-theme--default slds-container slds-size--1-of-2">                        
+                         <apex:outputLabel value="Name" for="emailName" styleClass="slds-form-element__label" />
+                         <apex:inputField id="emailName" value="{!formObj.name}" label="" styleClass="slds-input" >
+                         </apex:inputField>
+                            
+                         <br/><br/>
+                         
+                         <apex:outputLabel value="betreff" for="emailName" styleClass="slds-form-element__label" />
+                         <apex:inputField id="emailSubject" value="{!formObj.Email_Subject__c}" label="" styleClass="slds-input" >
+                         </apex:inputField>
+                         
+                         <br/><br/>
+                            
+                         <apex:outputLabel value="Body" for="emailbody" styleClass="slds-form-element__label" />
+                         <apex:inputTextArea id="emailbody" value="{!formObj.Inhalt_der_Email__c}" rows="8" styleclass="slds-textarea" >
+                         </apex:inputTextArea>
+                                          
+                     </div>
+                     
+                     <div class="slds-col--padded slds-box slds-theme--default slds-container slds-size--1-of-2">
+                         <apex:outputLabel value="Merge Field Value" for="mergeFieldValue" styleClass="slds-form-element__label" />
+                         <apex:inputText id="mergeFieldValue" value="{!mergeFieldValue}" label="" styleClass="slds-input" >
+                         </apex:inputText>
+                         
+                         <br/><br/>
+                         
+                         <apex:outputLabel value="Field Type" for="objList" styleClass="slds-form-element__label" />
+                         <apex:selectList id="objList" value="{!selectedObj}" size="1" styleClass="slds-select">
+                             <apex:selectOptions value="{!objList}" />
+                             <apex:actionSupport event="onchange" action="{!refreshFieldMap}" reRender="fieldList, mergeFieldValue"></apex:actionSupport>
+                         </apex:selectList>
+                         
+                         <br/><br/>
+                         
+                         <apex:outputLabel value="Select Field" for="fieldList" styleClass="slds-form-element__label" />
+                         <apex:selectList id="fieldList" value="{!selectedField}" size="1" styleClass="slds-select">
+                             <apex:selectOptions value="{!fieldList}" />
+                             <apex:actionSupport event="onchange" action="{!refreshMergeFieldValue}" reRender="mergeFieldValue"></apex:actionSupport>
+                         </apex:selectList>
+                         
+                     </div>
+                     
+                 </div>
+             </apex:pageBlock>
+             
+             <div  style="text-align: center;">
+                 <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Strukturierte Partner-Emails" action="{!cancel}" />
+                 <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!Speichern}" />
+             </div>
+             <br/>
+</div>
+
+</apex:form>
+</apex:outputPanel>
+</apex:page>

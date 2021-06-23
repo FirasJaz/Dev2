@@ -1,0 +1,82 @@
+<apex:page standardController="Lead" extensions="Lead_zu_Kunde" action="{!konvertieren}">
+<apex:form id="auForm" >
+    <apex:Pageblock title="Lead zu Kunde" id="block">
+        <apex:pageMessage summary="{!message}" rendered="{!!fertig}" severity="info" strength="3"/>   
+        <apex:pageMessage summary="{!ergebnis}" rendered="{!fertig}" severity="info" strength="3"/>
+       
+        <apex:pageBlockButtons location="bottom">       
+           <apex:commandButton value="zurück zu Leads" action="{!zurueck}" rendered="{!fertig && !gespeichert}"/>
+           <apex:commandButton value="Neuen Kunden mit Auftrag erstellen" action="{!kundeMitAuftragErstellen}" rendered="{!!Kdgefunden && !fertig}" reRender="block"/>          
+           <apex:commandButton value="Kundendaten updaten" action="{!kundendatenUpdaten}" rendered="{!!fertig && !!statusUpdate}"/>
+           <apex:commandButton value="Änderungen speichern" action="{!aenderungenSpeichern}" rendered="{!fertig && !!gespeichert}"/>
+           <apex:commandButton value="Abbrechen" action="{!zurueck}" rendered="{!!fertig && !statusUpdate}"/>
+        </apex:pageBlockButtons>
+    
+        <apex:PageBlocksection collapsible="false" columns="1" > 
+           <apex:pageBlockTable value="{!zeilenlist}" var="z" rendered="{!!zeilenlist.empty}" id="tb">
+                <apex:column headerValue="Kunde Name" >                     
+                    <apex:outputLink value="{!z.KdPage}" style="white-space : nowrap; padding-right:40px;" target="_blank">{!z.KdName}</apex:outputLink>
+                </apex:column>  
+                <apex:column headerValue="Kundennummer" >                     
+                    <apex:outputField value="{!z.k.Kundennummer_abena__c}" />
+                </apex:column>   
+                <apex:column headerValue="Status Inko" rendered="{!!shop}">                     
+                    <apex:outputtext value="{!z.Status}" />
+                </apex:column>  
+                <apex:column headerValue="Auftrag Name" >                     
+                    <apex:outputLink value="{!z.AUPage}" style="white-space : nowrap; padding-right:40px;" target="_blank">{!z.AufName}</apex:outputLink>
+                </apex:column>   
+                <apex:column headerValue="" >
+                        <apex:commandLink action="{!auftragErstellen}" value="Auftrag erstellen" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none;"  rendered="{!z.keinStatus && !fertig}" reRender="block">
+                            <apex:param name="kdIdParam" assignto="{!kdId}" value="{!z.kdId}" />
+                        </apex:commandLink>
+                </apex:column>            
+           </apex:pageBlockTable>  
+           
+           <apex:pageBlockTable value="{!NeuZeilenlist}" var="z1" rendered="{!!NeuZeilenlist.empty}" >
+                <apex:column headerValue="Kunde Name" >                     
+                    <apex:outputLink value="{!z1.KdPage}" style="white-space : nowrap; padding-right:40px;" target="_blank">{!z1.KdName}</apex:outputLink>
+                </apex:column>  
+                <apex:column headerValue="Kundennummer" >                     
+                    <apex:outputField value="{!z1.k.Kundennummer_abena__c}" />
+                </apex:column>   
+                <apex:column headerValue="Status Inko" >                     
+                    <apex:outputtext value="{!z1.status}" rendered="{!!shop}" />
+                </apex:column> 
+                <apex:column headerValue="Auftrag Name" >                     
+                    <apex:outputLink value="{!z1.AUPage}" style="white-space : nowrap; padding-right:40px;" target="_blank">{!z1.AufName}</apex:outputLink>
+                </apex:column>   
+                <apex:column headerValue="" >
+                        <apex:commandLink action="{!auftragErstellen}" value="Auftrag erstellen" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none;"  rendered="{!z1.keinStatus && !fertig}" reRender="block">
+                            <apex:param name="kdIdParam" assignto="{!kdId}" value="{!z1.kdId}" />
+                        </apex:commandLink>
+                </apex:column>            
+           </apex:pageBlockTable>  
+                     
+            <apex:pageBlockTable value="{!Kdlist}" var="Kd" rendered="{!!Kdlist.empty}" >
+                <apex:column headerValue="Kunde Name" >                     
+                    <apex:outputLink value="/{!Kd.id}" style="white-space : nowrap; padding-right:40px;" target="_blank">{!Kd.Name__c},{!Kd.Vorname__c}</apex:outputLink>
+                </apex:column>  
+                <apex:column headerValue="Versichertennummer" >                     
+                    <apex:outputfield value="{!Kd.Versichertennummer__c}" />
+                </apex:column>  
+                <apex:column headerValue="Geburtsdatum aus Lead" >                     
+                    <apex:outputfield value="{!l.Geburtsdatum__c}" />
+                </apex:column>  
+                <apex:column headerValue="Geburtsdatum" >                     
+                    <apex:inputfield value="{!Kd.Geburtsdatum_text__c}" />
+                </apex:column>         
+                <apex:column headerValue=" IK Nummer des Trägers" >                     
+                    <apex:outputfield value="{!Kd.IK_Nummer_des_Tr_gers__c}"/>
+                </apex:column> 
+                <apex:column headerValue="Kostenträger" >                     
+                    <apex:outputfield value="{!l.Kostentr_ger__c}"/>
+                </apex:column> 
+                <apex:column headerValue="Krankenkasse" >                     
+                    <apex:inputfield value="{!Kd.Krankenkasse__c}" required="false" />
+                </apex:column> 
+           </apex:pageBlockTable>                     
+       </apex:PageBlocksection>
+    </apex:Pageblock>
+</apex:form>
+</apex:page>

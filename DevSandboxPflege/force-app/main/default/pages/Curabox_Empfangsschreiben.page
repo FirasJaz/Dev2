@@ -1,0 +1,260 @@
+<apex:page renderAs="pdf" standardStylesheets="false" controller="Anschreiben_Blanko_Per_Post" sidebar="FALSE" showHeader="False" applyHtmlTag="false">
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Aktuelle Page für Empfangsschreiben!
+//      Autor:          MS
+//      Stand:          26.10.2018
+//      Beschreibung:   Diese Seite ist das Empfangsschreiben an Kunden/Betreuer, wenn Antragsformular erhalten wurde.
+//                      #160450239/1753: Zuvor RA_nur_anzeigen_ent... neues Design/Layout.
+//                      Based on Anschreiben_Formular_Neu...
+//
+// Changes
+//  18.05.2020  BT      00002471 - added new page
+//  18.08.2020  DZ      added customer number
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--><HTML>
+<head>
+<apex:stylesheet value="{!$Resource.CSS_Anschreiben}" />
+<style>
+@page {
+margin-bottom:0;
+}
+div.page-break {
+page-break-after:always;
+}
+
+
+#content {
+top:300px;
+    line-height:1.1;
+}
+
+ol {
+    list-style:none;
+    padding:0;
+    margin:0;
+    padding-bottom:10px;
+}
+ol li {
+    background-image: url({!$Resource.anschreiben_li_bg_1});
+    background-repeat:no-repeat;
+    background-position:left center;
+    margin:0;
+    padding:8px 0 8px 40px;
+}
+ol li.element1 {
+    background-image: url({!$Resource.anschreiben_li_bg_1});}
+ol li.element2 {
+    background-image: url({!$Resource.anschreiben_li_bg_2});}
+ol li.element3 {
+    background-image: url({!$Resource.anschreiben_li_bg_3});}
+ol li.element4 {
+    background-image: url({!$Resource.anschreiben_li_bg_4});}
+
+
+#bottom_box {
+    background-image: url({!$Resource.anschreiben_bettschutz});
+    background-size:110px;
+    background-repeat:no-repeat;
+    background-position:465px 45px;
+    position:absolute;
+    top:815px;
+    left:25px;
+    border: 3px solid #9AB900;
+    margin-top: 1em;
+    width:650px;
+}
+#bottom_box h1 {
+  font-size: 14px;
+  text-align: center;
+  margin-bottom:5px;
+}
+
+#bottom_box h1 span {
+  display: inline;
+  background: #fff;
+  padding: 5px 10px;
+  position: relative;
+  top:-10px;
+  color:#9AB900;
+}
+#bottom_box_content div {
+    float:left;
+    display:block;
+}
+    
+#bottom_box_content ul li  {
+    background-image: url({!$Resource.li_bg_green_square});
+    background-repeat:no-repeat;
+    background-position:left center;
+    padding:15px 0 15px 40px;
+}
+
+    
+#bottom_box_content #bottom_box_content_text {
+    line-height:1.5;
+    width:370px;
+    margin-bottom: 20px;
+    padding-left: 10px;
+}
+#bottom_box_content #bottom_box_content_text p {
+ margin:0;
+}
+#bottom_box_content #bottom_box_content_matte {
+    width:190px;
+    padding-right:10px;
+}
+
+#footer {
+    position:absolute;
+    top:800px;
+    width:650px;
+    left:27px;
+}
+#footer h2 {
+font-size:8px;
+width:100%; text-align:center; border-bottom: 1px solid #000;
+line-height:0.1em; margin:10px 0 10px; } 
+#footer h2 span { background:#fff; padding:0 10px; }
+#footer p {
+margin-top:0;
+text-align:center;
+font-size:8px;
+}
+
+
+
+
+#text {
+    width:580px;
+    text-align: left;
+    font-size: 9pt;
+}
+
+p.agb {
+font-size:9px;
+margin:0;
+padding:0;
+}
+
+</style>
+</head>
+<body>
+<div id="head">
+    <div id="tuev" style="float:right">
+           <img src="{!$Resource.tuev_2018_sehrgut}" style="height:100px;"/>
+    </div>    
+    <div id="logo">
+           <apex:image url="{!$Resource.curabox_logo}" />
+    </div>
+                
+    <div id="address">
+           <span class="own_address">{!$Organization.Name} &bull; {!$Organization.Street} &bull; {!$Organization.PostalCode} {!$Organization.City}</span>
+           <br />
+           <br />
+           {!KdaddrD.Anrede}<br />
+           {!kdAddrD.vorname_name}<br />
+           {!kdAddrD.strasse}<br />
+           {!kdAddrD.plz_ort}
+    </div>
+        
+    
+</div>    
+    
+      <!-- Header is done -->
+      <div id="content">
+          <div id="text">
+               
+<!--         
+Betreff und Ort/Datum?
+<p><strong>Vielen Dank für Ihr Interesse an der curabox</strong><br/> <br/>
+              Hamburg,&nbsp;<apex:outputtext value="{0,date,dd.MM.yyyy}">
+                        <apex:param value="{!Now()}" /></apex:outputtext></p> -->
+              <p>Kundennummer: {!kdNummer}</p>          
+              <p><apex:outputtext value="{!Anredeformel}"/></p>   
+              <p>hiermit bestätigen wir Ihnen den Eingang des Antrags und möchten uns herzlich für Ihr Vertrauen in unser Team
+                  und unseren TÜV-geprüften Service bedanken.<br />
+                  Schon in diesem Moment sind wir dabei, alle Hebel für Sie in Bewegung zu setzen.</p>
+              <p style="color:#9ab900;font-weight:bold">So geht es jetzt weiter:</p>
+              <div style= "display: {!If(gesetzlich,'none','inherit')};">
+              <ol>
+                  <li class="element1">Die erste curabox erreicht Sie schon in den nächsten Tagen. Etwa zwei Wochen später erhalten Sie eine Rechnung von unserem Abrechnungszentrum (AS-Bremen).</li>
+                  <li class="element2">Reichen Sie diese Rechnung nach Begleichung bei Ihrer privaten Krankenkasse ein (Pflegeabteilung). Sie haben nach § 40 Abs. 2 SGB XI einen Anspruch auf  <strong>volle Rückerstattung</strong>. Das Vorgehen ist wie bei Ihren anderen Rechnungen auch.</li> 
+                  <li class="element3">Die Pauschale wurde aufgrund der Corona-Pandemie von 40€ auf 60€ (bis 31.12.2021) erhöht. Diese ist aber aufgrund der Gesetzesänderung nach wie vor bei Ihrer Kasse voll erstattungsfähig! Sollten Sie zudem beihilfeberechtigt sein, ist die Rechnung beim Beihilfebemessungssatz voll erstattungsfähig.</li>
+                  <li class="element4">Die curabox ist ein monatlicher Anspruch. Wenn nicht anders von Ihnen gewünscht, erhalten Sie die Pflegehilfsmittel bis auf weiteres monatlich. Sie können die Zusammenstellung jederzeit einfach ändern - am schnellsten online unter <a href="www.curabox.de/curabox-aendern">www.curabox.de/curabox-aendern</a>.</li>
+                                  </ol>
+            </div>
+              <div style= "display: {!If(NOT(gesetzlich),'none','inherit')}">
+              <ol>
+                  <li class="element1">Der Antrag wird an die entsprechende Abteilung Ihrer Pflegekasse weitergeleitet.</li>
+                  <li class="element2">Ihre erste curabox erreicht Sie umgehend nach erfolgreicher Prüfung der Pflegekasse.</li>
+                  <li class="element3">Sollten Sie beihilfeberechtigt sein, informieren Sie uns bitte umgehend.</li>
+                  <li class="element4">Wenden Sie sich gerne jederzeit an uns, wenn Sie die Zusammenstellung Ihrer curabox ändern möchten. Dies ist auch einfach online möglich unter: <a href="www.curabox.de/curabox-aendern">www.curabox.de/curabox-aendern</a>.</li>
+              </ol>
+            </div>
+              <br/>
+              <p>Wir freuen uns, Sie mit unserem curabox-Service unterstützen zu können.</p>
+              <p>Mit herzlichen Grüßen</p>
+              <p><img src="{!$Resource.anschreiben_signature_black}" style="height:53px;"/></p>
+         </div>
+     </div>
+    <div style="page-break-before:always;margin-top:50px;">
+        <p style="text-align:center;"><b>Hinweis zur neuen Verordnung für zum Verbrauch bestimmte Pflegehilfsmittel</b></p>
+        <br/>
+        <p style="text-align:justify;">
+Am 04.03.2021 wurde vom Gesetzgeber das EpiLage-Fortgeltungsgesetz beschlossen, in dem geregelt ist, dass die Erhöhung der Pflegehilfsmittel-Pauschale von 40€ auf 60€ bis zum 31.12.2021 verlängert wird. 
+Das Ziel der Verordnung ist die weitere Sicherstellung der Versorgung durch zum Verbrauch bestimmte Pflegehilfsmittel. Hintergrund sind die aufgrund der Corona-Pandemie enorm gestiegenen Produkt- und Rohstoffkosten beispielsweise bei Handschuhen, 
+Desinfektionsmittel und Mundschutz (z.B. um den Faktor >20) bzw. die Rohstoffknappheit, da teilweise Produkte schlichtweg nicht mehr verfügbar waren bzw. sind. 
+Dies hat zur Folge, dass eine Versorgung der Pflegebedürftigen im Rahmen der monatlichen Pauschale in Höhe von 40 Euro kaum bzw. gar nicht möglich war. Daher wurde die Erhöhung des Pauschalbetrags von 40€ auf 60€ bis Ende 2021 verlängert.
+
+        </p>
+        <p style="text-align:justify;">
+            Der Gesetzgeber und die Kassen gehen diesen Weg, um grundsätzlich eine weitere Belieferung der Pflegebedürftigen mit 
+            den notwendigen Produkten ermöglichen zu können und explizit nicht um Mehrlieferungen zu realisieren. Deswegen bekommen 
+            die Leistungserbringer rückwirkend bis zum 01.04.2020 die gestiegenen Produktkosten (sofern möglich) i.H.v. max. 60€ entsprechend erstattet. 
+        </p>
+        <p style="text-align:justify;">
+Alle wichtigen Informationen speziell zur curabox erhalten Sie auch unter 
+            <a href="www.curabox.de/corona">www.curabox.de/corona</a>.
+        </p>
+        <p style="text-align:justify;">
+            Wir geben unser Bestes, um auch in diesen Zeiten als zuverlässiger Partner für Sie da zu sein und bestmöglich Unterstützung zu leisten!
+        </p>
+    </div>
+<!--<div id="bottom_box">
+    <h1><span>Haben Sie noch Fragen?</span></h1>
+    <div id="bottom_box_content">
+        <div id="bottom_box_content_text">
+            <p>
+                Wir sind jederzeit für Sie da.
+            </p>
+            <p>
+                <ul style="list-style:none">
+                    <li><b>Per E-Mail:</b><br />
+<span style="color: #5B9BE5">curabox@pflege.de</span></li>  
+                    <li><b>Kostenfrei per Telefon</b><br />
+040 87409757</li>  
+                </ul>
+            </p>
+            <p>Bis zu 300 Mal waschbar - praktisch und umweltschonend. Auf Wunsch erhalten Sie diese ebenfalls <strong>kostenlos</strong>.</p>
+            <p style="margin-top:15px">Wählen Sie dafür einfach die entsprechenden Optionen im Formular aus.</p>
+        </div>
+    </div>
+</div>//-->
+    
+<div id="footer">
+    <div style="text-align:center">
+        <img src="{!$Resource.cb_empfangsschreiben_habensienochfragen}" style="height:138px"/>
+    </div>
+    <h2><span>© {!$Organization.Name}</span></h2>
+    <p>curabox von pflege.de |
+    {!$Organization.Street} |
+    {!$Organization.PostalCode} {!$Organization.City} |
+    Fax {!FirmenInfo.Fax__c} | Telefon {!FirmenInfo.Telefon__c} |
+    E-Mail {!FirmenInfo.Email__c} |
+    IK #{!FirmenInfo.IK_Nummer__c}<br />Registergericht Amstgericht {!FirmenInfo.Amtsgericht__c} |
+    Geschäftsführung&nbsp;<apex:outputText value="{!SUBSTITUTE(FirmenInfo.GF__c, '<br />', ', ')}" escape="false"/></p>
+</div>
+</body>
+</HTML>
+</apex:page>

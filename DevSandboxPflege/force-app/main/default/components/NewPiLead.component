@@ -1,0 +1,90 @@
+<!--
+//  Erstellt 13.07.2017 von BT
+//  Klose und Srocke Gesellschaft für kreative Konfliktlüsungen mbH
+//  Mindelweg 11
+//  22393 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+// Pflegeimmobilien component of the new lead tool
+//
+//****************************************************************************************************************************
+//Änderungen:
+//****************************************************************************************************************************
+-->
+<apex:component >
+<br/>
+    <apex:attribute name="formObj" description="form object" type="Lead" required="true"/>
+    <apex:attribute name="productGroupOptions" description="productGroupOptions" type="List"/>
+    <apex:attribute name="locationOptions" description="locationOptions" type="List"/>
+    
+                    
+                <h3 class="slds-text-heading--small slds-m-bottom--smalll slds-m-top--large">Pflegeimmobilien Konfigurator Antworten</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                     <div class="hidden slds-col--padded slds-size--1-of-2" >
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Produkt</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                           <apex:selectList multiselect="true"  value="{!formObj.TL_Treppenliftart__c}" label="" styleClass="slds-select"> 
+                               <apex:selectOptions value="{!productGroupOptions}" /> 
+                             </apex:selectList> 
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Standort Richtung</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                           <apex:selectList multiselect="true"  value="{!formObj.location_direction__c}" label="" styleClass="slds-select"> 
+                               <apex:selectOptions value="{!locationOptions}" /> 
+                             </apex:selectList> 
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Finanzierungsmodell</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.financing_model__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Postleitzahl für Suche</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TL_Postleitzahl_f_r_Suche__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Eigenbedarf</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.own_use__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>
+                
+                
+</apex:component>

@@ -1,0 +1,33 @@
+<apex:page controller="Notification_Leads_anzeigen_PI">
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+
+    <apex:form id="LDForm" >
+    <apex:Pageblock id="pb" >
+    <apex:pageBlockTable value="{!LDList}" var="LD1" width="90%" >  
+                    <apex:column headerValue="Name" > 
+                    <apex:outputLink value="/{!LD1.ID}" >{!LD1.Name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Kategorie" > 
+                   <apex:outputfield value="{!LD1.Company}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>                 
+                <apex:column headerValue="Produkt" > 
+                    <apex:outputfield value="{!LD1.TL_Treppenliftart__c}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield> 
+                </apex:column>  
+                <apex:column headerValue="Telefon" > 
+                   <apex:outputfield value="{!LD1.Phone}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="RR Wunsch" > 
+                    <apex:outputfield value="{!LD1.Preferred_timeframe__c}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="Email" > 
+                    <apex:outputfield value="{!LD1.Email}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="Erstelldatum" > 
+                    <apex:outputfield value="{!LD1.OM_created_at__c}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+
+
+    </apex:pageBlockTable>  
+    </apex:Pageblock>
+    </apex:form>
+</apex:page>

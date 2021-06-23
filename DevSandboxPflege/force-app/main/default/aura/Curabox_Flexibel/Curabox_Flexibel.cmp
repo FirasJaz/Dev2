@@ -1,0 +1,161 @@
+<!--
+/****************************************************************************************************************************
+// Created 16.05.2019 von  AD
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.: 04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// 	Order
+//  Contact Id
+//
+//****************************************************************************************************************************
+//
+// Description:
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" controller="Product_List">
+    
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="totalPrice" type="Integer" default="0"/>
+    <aura:attribute name="orderLines" type="Object[]" />
+    <aura:attribute name="gloves" type="Product__c[]" />
+    <aura:attribute name="gloveQuantity1" type="Integer" default="0"/>
+    <aura:attribute name="gloveQuantity2" type="Integer" default="0"/>
+    <aura:attribute name="glovePrice1" type="Integer" default="0"/>
+    <aura:attribute name="glovePrice2" type="Integer" default="0"/>
+    <aura:attribute name="gloveTotal1" type="Integer" default="0"/>
+    <aura:attribute name="gloveTotal2" type="Integer" default="0"/>
+    <aura:attribute name="selectedGlove" type="String" />
+    <aura:attribute name="euro" type="String" default="€"/>
+    <!-- to manage the display-->
+    <aura:attribute name="isFlexibel" type="boolean" default="false"/>
+    <aura:attribute name="isZweiEH" type="boolean" default="true"/>
+    <!-- init handler -->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+
+    <aura:html tag="style">
+        .slds-modal__container{
+            width: 80%;
+            max-width: 80rem;
+        }
+        .cuf-content {
+            padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+            padding: 0rem !important;
+        }
+        .slds-modal__content {
+            overflow-y: hidden !important;
+            height: unset !important;
+            max-height: unset !important;
+        }        
+    </aura:html>
+
+    <div class="slds-col modal-header slds-modal__header">
+        <h2 class="title slds-text-heading--medium">CB-Flexibel erfassen</h2>
+    </div>
+    <div class="artikel_contener">
+        <aura:if isTrue="{!v.isFlexibel}">
+            <div class="total_price">
+                <lightning:formattedText value="Gesamtpreis:"/>
+            </div>
+            <div class="total_price">
+                <lightning:formattedNumber value="{!v.totalPrice}" aura:id="totalPriceColor"/>
+            </div>
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-7 ">
+                    <lightning:formattedText value="Artikelgruppe" class="product_header"/>
+                </div>
+                <div class="slds-size_3-of-7 ">
+                    <lightning:formattedText value="Artikel" class="product_header_name"/>
+                </div> 
+                <div class="slds-size_1-of-7 ">
+                    <lightning:formattedText value="Einzelpreis" class="product_header_price"/>
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:formattedText value="Menge" class="product_header"/>
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:formattedText value="Preis" class="product_header_price"/>
+                </div>        
+            </div>
+            <aura:iteration items="{!v.orderLines}" var="item">
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-size_1-of-7 ">
+                        <lightning:input readonly="true" value="{! item.groupe }" />
+                    </div>
+                    <div class="slds-size_3-of-7 ">
+                        <lightning:input readonly="true" value="{! item.name }" class="product_name"/>
+                    </div> 
+                    <div class="slds-size_1-of-7 ">
+                        <lightning:input readonly="true" value="{! item.price + v.euro}" formatter="currency" step="0.01" class="product_price"/>
+                    </div>
+                    <div class="slds-size_1-of-7">
+                        <lightning:input type="number" value="{! item.menge }" onblur="{! c.calculatePrice }" min="0" max="10"/>
+                    </div>
+                    <div class="slds-size_1-of-7">
+                        <lightning:input readonly="true" value="{! item.summe + v.euro}" class="product_price"/>
+                    </div>         
+                </div>
+            </aura:iteration>
+        </aura:if>
+        <div class="slds-grid slds-wrap">
+            <div class="slds-size_1-of-7 ">         
+                <lightning:input name="input4" readonly="true" value="Einmalhandschuhe" />
+            </div>
+            <div class="slds-size_3-of-7 ">
+                <lightning:select class="product_name" name="Einmalhandschuhe" aura:id="glove_1" onchange="{! c.onChange}">
+                    <aura:iteration items="{!v.gloves}" var="Hschuhe">
+                        <option text="{!Hschuhe.Name}" value="{!Hschuhe.Name}" selected="{!Hschuhe.Name==v.selectedGlove}"/>
+                    </aura:iteration>
+                </lightning:select>
+            </div>
+            <div class="slds-size_1-of-7 ">
+                <lightning:input readonly="true" value="{! v.glovePrice1 + v.euro}" class="product_price"/>
+            </div>
+            <div class="slds-size_1-of-7">
+                <lightning:input type="number" value="{! v.gloveQuantity1 }" aura:id="glove_quantity" onblur="{! c.calculatePrice}" min="0" max="2"/>
+            </div>
+            <div class="slds-size_1-of-7">
+                <lightning:input readonly="true" value="{! v.gloveTotal1 + v.euro}" class="product_price"/>
+            </div>
+        </div>
+        <aura:if isTrue="{!v.isZweiEH}">
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-7 ">
+                    <lightning:input name="input4" readonly="true" value="Einmalhandschuhe" />
+                </div>
+                <div class="slds-size_3-of-7 ">
+                    <lightning:select class="product_name" name="Einmalhandschuhe" aura:id="glove_2" onchange="{! c.onChangeGlove2 }">
+                        <aura:iteration items="{!v.gloves}" var="Hschuhe">
+                            <option text="{!Hschuhe.Name}" value="{!Hschuhe.Name}" selected="{!Hschuhe.Name==v.selectedGlove}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:input readonly="true" value="{! v.glovePrice2 + v.euro}" class="product_price"/>
+                </div>
+                <div class="slds-size_1-of-7">
+                    <lightning:input type="number" value="{! v.gloveQuantity2 }" aura:id="glove_quantity2" onblur="{! c.calculatePrice}" min="0" max="2"/>
+                </div>
+                <div class="slds-size_1-of-7">
+                    <lightning:input readonly="true" value="{! v.gloveTotal2 + v.euro}" class="product_price"/>
+                </div>
+            </div>
+        </aura:if>
+    </div>
+    <div class="slds-col modal-footer slds-modal__footer">        
+        <lightning:button variant="neutral" label="Cancel" onclick="{! c.cancelClick }" />      
+        <lightning:button variant="brand" label="Save" aura:id = "btn_save" onclick="{! c.saveClick }" />
+    </div>
+</aura:component>

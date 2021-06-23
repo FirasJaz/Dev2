@@ -1,0 +1,77 @@
+<!--
+//****************************************************************************************************************************
+// Created   12.05.2020    by DZ
+//                         
+//
+//****************************************************************************************************************************
+//
+// Description:
+//                      
+// Page for a multilead form an opportunity
+//
+//
+//****************************************************************************************************************************
+//Changes:
+//
+
+//****************************************************************************************************************************
+-->
+<apex:page sidebar="false" showHeader="false" showQuickActionVfHeader="false"  title="Generierung von Multileads aus einer Opportunity" controller="OpportunityToMultiLead">
+
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+<script type="text/javascript">
+
+</script>
+
+<apex:pageMessages id="showmsg"/>
+<apex:form >
+<div class="slds">
+    <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+         <!-- LAYOUT GRID -->
+           <div class="slds-grid" id="id" >
+               <!-- GRID COL -->
+               <div class="slds-col" style="color: white;">
+               <!-- HEADING AREA -->
+               <h1 class="slds-text-heading--medium" style="text-align: center;">Generierung von Multileads aus einer Opportunity</h1> 
+               </div>
+           </div>
+    </div>
+    
+    <!-- Message -->
+    <div class="slds-notify_container" style="text-align: center; display: {!message_display};">
+       <div class="slds-notify slds-notify--alert slds-theme--alert-texture" role="alert">    
+        <h2>{!message}</h2>
+       </div>
+     
+    </div>
+    <!-- Message -->
+    
+             <br/>
+             
+             <div  style="text-align: center;">
+                 <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Opportunity" action="{!zuOpportunity}" /> 
+                 <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!Speichern}" />
+             </div>
+            
+             
+    <div class="slds-theme--default slds-container--medium slds-container--center">
+        <apex:outputLabel value="" for="rtList" styleClass="slds-form-element__label">Lead-Recordtype</apex:outputLabel>
+        <apex:selectList id="rtList" value="{!selectedRt}" size="1" styleClass="slds-select">
+            <apex:selectOptions value="{!rtItems}" />
+        </apex:selectList>
+        <br/> <br/> 
+        <apex:inputCheckbox value="{!leadUebernehmen}"/>        
+        <apex:outputLabel value="" for="rtList" styleClass="slds-form-element__label">&nbsp; Lead übernehmen</apex:outputLabel>
+    </div>
+    
+    <br/>
+        
+             <div  style="text-align: center;">
+                 <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Opportunity" action="{!zuOpportunity}" /> 
+                 <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!Speichern}" />
+             </div>
+             <br/>
+</div>
+</apex:form>
+
+</apex:page>

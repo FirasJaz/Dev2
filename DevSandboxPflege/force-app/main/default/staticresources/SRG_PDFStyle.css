@@ -1,0 +1,196 @@
+/**
+* Custom CSS Stylesheet that utilizes CSS 3.0 techniques to create repeating headers
+* when applied to a PDF that is rendered from a Salesforce Visualforce page.
+*
+* @author	John De Santiago
+* @version	2010-09-23
+*
+* Liability and Warranty Disclaimer: This script is provided "as is" and without any warranties 
+* as to performance or merchantability, or any other warranties, whether expressed or implied. 
+* All scripts are supplied free but are unsupported. Do enjoy!
+*/
+@page { 
+	size: A4 portrait;
+	
+	margin-top: 100px;
+	margin-bottom: 80px;
+	
+	@top-left {
+		content: element(header_left);
+	}
+	
+	@top-center {
+		content: element(header_center);
+	}
+	
+	@top-right {
+		content: element(header_right);
+	}
+	
+	@bottom-left {
+		content: element(footer_left);
+	}
+	
+	@bottom-center {
+		content: element(footer_center);
+	}
+	
+	@bottom-right {
+		content: element(footer_right);
+	}
+}
+
+.header_left {
+	text-align: left;
+    position: running(header_left);
+}
+
+.header_center{
+	text-align: center;
+	position: running(header_center);
+}
+
+.header_right {
+	text-align: right;
+	position: running(header_right);
+}
+
+.footer_left {
+	text-align: left;
+	position: running(footer_left);
+}
+
+.footer_center {
+	text-align: center;
+	position: running(footer_center);
+}
+
+.footer_right {
+	text-align: right;
+	position: running(footer_right);
+}
+
+.pageNumber:before {
+	content: counter(page); 
+}
+
+.pageCount:before {
+	content: counter(pages);  
+}
+
+
+            
+body,table { font-family: Verdana,sans-serif; font-size:14px; }
+#inoxision {
+font-size:5px;
+color:white;
+}      
+.own_adress {
+    font-size:9px;
+    font-style:italic;
+}
+.underita {
+    font-style:italic;
+    text-decoration:underline;
+}
+#Belegnr {
+    position:absolute;
+    top:3px;
+    left:20px;  
+    line-height:16p;
+    font-size:12px;
+}
+#kopie_label {
+    position:absolute;
+    top:170px;
+    right:50px;
+}
+#bearbeiter {
+    position:absolute;
+    top:220px;
+    right:50px;
+}      
+#Anlage4summe {
+    position:absolute;
+    top:750px;
+    right:50px;
+}
+#bearbeiter td {
+    font-size:14px;
+    text-align:right;
+    padding-left:10px;
+}      
+
+#document_info {
+    padding-top:5px;
+    position:absolute;
+    top:250px;
+    left:20px;
+}
+#document_info h1 {
+    margin:0;
+    padding:0;
+    font-size:16px;
+}
+#document_info p {
+    margin-top:10px;
+}
+#document_info table{
+    border-spacing:0;
+}
+#document_info table td{
+    padding-right:22px;
+    padding-top:3px;
+}
+#document_info table th {
+    text-align:left;
+    padding-right:22px;
+}
+#content {
+    position:absolute;
+    top:380px;
+    left:20px;
+    width:1000px;
+}
+#content .anrede {
+    font-weight:bold;
+}
+#content p {
+    line-height:20px;
+}
+#content #text {
+    margin-top: 170px;
+}
+#content table td {
+    font-size:14px;
+}     
+      
+.ctab {
+    border-collapse: collapse;
+}
+    #address_s {
+        position:absolute;
+        width:300px;
+        top:60px;
+        left:20px;
+    }  
+    #kunde_s {
+        position:absolute;
+        width:270px;
+        top:60px;
+        right:20px;
+    }
+ 
+#content #sum_table  {
+    width:660px;
+}
+
+#content #sum_table .align_right{
+    text-align:right;
+    padding-right:10px;
+}
+
+#sum_table_last_td{
+    border-top: 1px double black;
+    border-bottom: 4px double black;
+}          

@@ -1,0 +1,42 @@
+<apex:page sidebar="false" showHeader="false" showQuickActionVfHeader="false"  title="Nachtelefonie Abbruch" controller="NachtelefonieAbbruch">
+<script type="text/javascript">
+    
+    function closeWindow(){
+        parent.window.close();
+        window.close();
+    }
+
+</script>
+
+<apex:outputPanel >
+<apex:pageMessages id="showmsg" escape="false"/>
+<apex:form >
+<apex:actionFunction action="{!Speichern}" name="saveNachtelefonie">
+</apex:actionFunction>
+<apex:actionFunction action="{!uncheckKat2}" name="uncheckKat2" reRender="cat2Checkbox">
+</apex:actionFunction>
+        <apex:pageBlock title="Bitte wähle den Abbruchgrund" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Nachtelefonie" action="{!zuNachtelefonie}" />
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!checkAnzahlDerVersuche}" /> 
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection id="abbruchBlock" columns="2">
+            
+                <apex:outputLabel value="Abruchgrund auswählen" for="ZeitList"/>
+                <apex:selectList id="grundList" value="{!abbruchGrund}" size="1">
+                <apex:selectOptions value="{!items}" />
+                <apex:actionSupport event="onchange" action="{!grundSelected}" reRender="cat2Checkbox"></apex:actionSupport>
+                </apex:selectList>
+                
+                <apex:outputLabel value="In Nachtelefonie Kat. 2 schieben" for="cat2Checkbox" rendered="{!showCat2Checkbox}"/>
+                <apex:inputCheckbox id="cat2Checkbox" value="{!cat2Checkbox}" rendered="{!showCat2Checkbox}">
+                <apex:actionSupport event="onchange" action="{!kat2Selected}" reRender="grundList" ></apex:actionSupport>    
+                </apex:inputCheckbox>   
+                
+            </apex:pageBlockSection>                       
+        </apex:pageBlock>
+
+</apex:form>
+</apex:outputPanel>            
+</apex:page>

@@ -1,0 +1,29 @@
+<apex:page action="{!createtask}" renderas="PDF" standardStylesheets="false" controller="sendefaxanPHAG_pdf" sidebar="FALSE" showHeader="False" >
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Autor:          WDS
+//      Stand:          30.08.2015
+//      Version:        1.0
+//      geändert:       
+//      Beschreibung:   Diese Seie ist für das Info Fax für PHAG
+//
+//   
+//  
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--><HTML>
+<head>
+<apex:stylesheet value="{!$Resource.CSS_For_FAX}" />
+</head>
+<body>
+<div id="head">    
+     
+</div>    
+                                       
+    
+     <apex:outputText value="{!mText.RichText__c}" label="Text:" escape="false" style="width:500px; height:30pt" id="body"/>
+
+</body>
+</HTML>
+</apex:page>

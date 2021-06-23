@@ -1,0 +1,9 @@
+<apex:component controller="PDFFooterController">
+  <table width="99%" id="footer">
+            <tr>
+            <td style="text-align:left">IK.: <apex:outputtext value="{!FirmenInfo.IK_Nummer__c}"/><br />USt-ID: <apex:outputtext value="{!FirmenInfo.Ust_id__c}"/></td>
+            <td style="text-align:center"><apex:outputtext value="{!FirmenInfo.HRA__c}"/><br/>BIC: <apex:outputtext value="{!FirmenInfo.Bank__c}"/><br />IBAN:&nbsp;<apex:outputtext value="{!FirmenInfo.Kontonummer__c}"/> * BLZ:&nbsp;<apex:outputtext value="{!FirmenInfo.BLZ__c}"/></td>
+            <td style="text-align:right">Gesch&auml;ftsf&uuml;hrung:<br/><apex:outputtext escape="false" value="{!FirmenInfo.GF__c}"/></td>
+            </tr>
+          </table>
+</apex:component>

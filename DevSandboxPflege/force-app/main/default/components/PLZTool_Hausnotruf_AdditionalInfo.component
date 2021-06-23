@@ -1,0 +1,170 @@
+<!--
+/********************************************************************************************************************************************
+//  Erstellt 11.04.2017 von MZ
+//  Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//  Mindelweg 11
+//  22393 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//
+//********************************************************************************************************************************************
+//
+// Beschreibung: additional info for "Direktvertrieb" : Bankdaten + Versandadresse
+//
+//********************************************************************************************************************************************
+// Änderungen:
+//
+//********************************************************************************************************************************************
+*/
+-->
+
+<apex:component id="cmp_additionalInfo" allowDML="true">
+    <apex:includeScript value="{!URLFOR($Resource.IBAN)}"/>
+    <script>
+        function checkIBAN(Fid) {
+            
+            var tocheck = document.getElementById(Fid).value;
+            if (tocheck != '') {
+            if(IBAN.isValid(tocheck)) {
+                document.getElementById('notification').innerHTML = 'IBAN';
+                document.getElementById('notification').setAttribute("style", "color:grey;");
+                document.getElementById(Fid).value = IBAN.printFormat(tocheck, ' ');
+            }
+            else {
+                 document.getElementById('notification').innerHTML = 'IBAN ist falsch';
+                 document.getElementById('notification').setAttribute("style", "color:red;");
+                 document.getElementById(Fid).focus();
+            }   
+            }           
+        }
+
+    </script>
+    <apex:attribute name="AIController" description="to support additional info functionality" type="AdditionalInfoController" required="true"/>
+ 
+                
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-modal--large slds-fade-in-open" id="AI_layout" style="display: {!AIController.layout}">
+      <div class="slds-modal__container">
+        <div class="slds-modal__header">
+            <h2 id="header43" class="slds-text-heading--small">Zusätzliche Information</h2>
+        </div>
+
+        <div class="slds-modal__content slds-p-around--medium" >
+        <apex:pageMessages id="showmsgdialogAdditionalInfo"/>
+        <div class="slds-theme--default slds-container--large">
+        
+            <apex:outputPanel id="SendingAddressPanel" rendered="{!AIController.showSendingAddress}">
+             <h3 class="slds-text-heading--small slds-m-bottom--medium">Versandadresse</h3>
+             <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-6">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Anrede</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                             <apex:inputField value="{!AIController.opp.Versandadresse_Anrede__c}" label="" styleClass="slds-select" />
+                          </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Vorname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                            <apex:inputText value="{!AIController.opp.Versandadresse_Vorname__c}" label="" styleClass="slds-input"/>
+                          </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Nachname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                              <apex:inputText value="{!AIController.opp.Versandadresse_Name__c}" label="" styleClass="slds-input"/>
+                          </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent slds-m-top--small slds-m-bottom--medium">
+                        <span class="slds-form-element__label">Straße</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                              <apex:inputText value="{!AIController.opp.Versandadresse_Stra_e__c}" label="" styleClass="slds-input"/>
+                          </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-6">
+                      <div class="slds-form-element slds-hint-parent slds-m-top--small slds-m-bottom--medium">
+                        <span class="slds-form-element__label">Postleitzahl</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                              <apex:inputText value="{!AIController.opp.Versandadresse_PLZ__c}" label="" styleClass="slds-input"/>
+                          </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent slds-m-top--small slds-m-bottom--medium">
+                        <span class="slds-form-element__label">Stadt</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                              <apex:inputText value="{!AIController.opp.Versandadresse_Ort__c}" label="" styleClass="slds-input"/>
+                          </span>
+                        </div>
+                      </div></div>
+                </div>
+            </apex:outputPanel>
+            
+            <apex:outputPanel id="bankdataPanel" rendered="{!AIController.showBankdata}">
+              <h3 class="slds-text-heading--small slds-m-bottom--medium">Bankdaten</h3>
+              <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label" id="notification">IBAN</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                             <apex:inputField value="{!AIController.cont.IBAN__c}" label="" styleClass="slds-select" onblur="checkIBAN(this.id);" />
+                          </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">BIC</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                            <apex:inputText value="{!AIController.cont.BIC__c}" label="" styleClass="slds-input"/>
+                          </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Kreditinstitut</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                              <apex:inputText value="{!AIController.cont.Kreditinstitut__c}" label="" styleClass="slds-input"/>
+                          </span>
+                        </div>
+                      </div></div>
+                </div>
+             </apex:outputPanel>
+        </div>
+        </div>
+        <div class="slds-modal__footer" style="text-align: center;">
+           <apex:commandButton styleClass="slds-button slds-button--neutral" value="abbrechen" action="{!AIController.abbruch}"/>
+           <apex:commandButton styleClass="slds-button slds-button--brand" value="speichern" action="{!AIController.saveAI}"/>
+           <apex:commandButton styleClass="slds-button slds-button--brand" value="weiter" onClick="partnerSelectWeiter();return false;" />        
+        </div>
+      </div>
+    </div>    
+    <div class="slds-backdrop slds-backdrop--open" id="backdrop" style="display: {!AIController.layout}"></div>        
+    
+</apex:component>

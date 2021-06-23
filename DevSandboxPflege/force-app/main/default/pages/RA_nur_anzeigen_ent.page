@@ -1,0 +1,101 @@
+<apex:page renderas="PDF" standardStylesheets="false" controller="RA_nur_anzeigen_ent_controller_class" sidebar="FALSE" showHeader="False" action="{!addTask}">
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Autor:          WDS
+//      Stand:          06.12.2012
+//      Version:        1.0
+//      geändert:       
+//      Beschreibung:   Diese Seite ist die Eingangsbestätigung für den Antrag an Angehörige und Pflegedienste
+//
+//
+//  wds        am 15.06.2014 Layout bearbeitet durch MS
+//  wds        am 19.06.2014 Nach email SB Korrigiert
+//  wds        am 28.01.2015 Variablen aus den Company-Settings für Web-Adresse und Handelsregister geholt
+//  wds        am 04.03.2015 Verscheidene Änderungen für pflege.de
+//  ms			27.10.18 No changes, but basically (together with RA_nur_anzeigen_ent_kd) replaced by curabox_empfangsschreiben.vfp
+//  
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<HTML>
+<head>
+<apex:stylesheet value="{!$Resource.CSS_For_PDF}" />
+</head>
+<body>
+<div id="head">    
+    <div id="logo">
+           <apex:image url="{!$Resource.Logo_Small}" />
+    </div>
+                
+    <div id="address">
+           <span class="own_address">{!$Organization.Name} &bull; {!$Organization.Street} &bull; {!$Organization.PostalCode} {!$Organization.City}</span>
+           <br />
+           <br />
+           {!Kdaddr.Anrede}<br />
+           {!kdAddr.vorname_name}<br />
+           {!kdAddr.strasse}<br />
+           {!kdAddr.plz_ort}
+    </div>
+        
+    <div id="right">
+       {!$Organization.Name}<br />
+       {!$Organization.Street}<br />
+       {!$Organization.PostalCode} {!$Organization.City}<br />
+       <br />
+       T {!FirmenInfo.Telefon__c}<br />
+       F {!FirmenInfo.Fax__c}<br />
+       E {!FirmenInfo.Email__c}<br />
+       {!FirmenInfo.WEB2__c}<br />
+       {!FirmenInfo.WEB1__c}<br />
+       <br />
+       Sitz der Gesellschaft:<br />
+       {!FirmenInfo.HRA__c}<br />
+       {!FirmenInfo.HRA__c}<br />
+<br />
+       Geschäftsführung<br />
+       <apex:outputtext escape="false" value="{!FirmenInfo.GF__c}"/><br />
+       <br />
+<br />
+<!--      {!FirmenInfo.Bank__c}<br />
+       BIC: {!FirmenInfo.BLZ__c}<br />
+       IBAN: {!FirmenInfo.Kontonummer__c}<br />
+<br />
+IK {!FirmenInfo.IK_Nummer__c}<br /> //-->
+
+    </div>
+</div>    
+    
+<!-- Header is done //-->
+      <div id="content">
+          <div id="subject">
+              <p><strong>Ihre Bestellung der curabox</strong><br/> 
+              Hamburg,&nbsp;<apex:outputtext value="{0,date,dd.MM.yyyy}">
+                        <apex:param value="{!Now()}" /></apex:outputtext><br />
+                        <br />
+              Name Versicherter: &nbsp;&nbsp;&nbsp;<b>{!Kunde.Name__c}, {!Kunde.Vorname__c}</b> <br />   
+              Ihre Kundennummer: <b>{!Kunde.Kundennummer_abena__c}</b></p>
+          </div>   
+          <div id="text">
+               
+      <br />   
+       <p><apex:outputtext value="{!Anredeformel}"/></p>   
+      <p>hiermit bestätigen wir Ihnen den Eingang Ihres curabox Formulars. Wir bedanken uns für Ihr Vertrauen und freuen uns Sie dabei zu unterstützen, Ihren Anspruch auf Pflegehilfsmittel im Wert von bis zu 40,- Euro geltend zu machen.</p>      
+      <p>Wir haben Ihren Antrag bereits an Ihre Pflegekasse weitergeleitet und kümmern uns durch unseren ständigen Austausch mit den zuständigen Ansprechpartnern um eine schnellstmögliche Bearbeitung. Bitte beachten Sie, dass die Bearbeitung bei den Kassen dennoch bis zu 4 Wochen in Anspruch nehmen kann</p>        
+      <p>Sobald die Genehmigung für die Kostenübernahme Ihrer curabox bei uns eingegangen ist, erhalten Sie umgehend Ihre erste Lieferung kostenfrei an die gewünschte Lieferadresse.</p>
+      <p>Sollte die zu pflegende Person privatversichert sein, erhalten Sie oder Ihr Angehöriger von uns eine Rechnung in Höhe von bis zu 40,- Euro pro Lieferung separat per Post. Die Kosten sind bei Ihrer Kasse voll erstattungsfähig. Für Beihilfeberechtigte ist die Rechnung zum Beihilfebemessungssatz erstattungsfähig.</p>
+      <p>Falls Sie die wiederverwendbaren Bettschutzeinlagen (PG 51) zusätzliche beantragt haben, senden wir Ihnen die genehmigte Anzahl einmal jährlich direkt zu Ihnen nach Hause. Sollten Sie nicht von der gesetzlichen Zuzahlung befreit sein, erhalten Sie eine Rechnung über den Zuzahlungsanteil von 10%.</p>
+      <p>Haben Sie noch Fragen? Wir beraten Sie gern unter <b>0800 666 222 141</b>.</p>
+      <br/><br/>
+      </div>
+
+              <div id="unterschrift">Mit herzlichen Grüßen<br/> 
+              <br/>
+              Ihr curabox Team<br/>
+             
+              </div>
+              </div>
+
+</body>
+</HTML>
+</apex:page>

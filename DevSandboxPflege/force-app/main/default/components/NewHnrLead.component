@@ -1,0 +1,178 @@
+<apex:component >
+  <apex:attribute name="formObj" description="form object" type="Lead" required="true"/>
+  <apex:attribute name="productGroupOptions" description="productGroupOptions" type="List"/>
+  <br/>
+                  <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent slds-lookup">
+                        <span class="slds-form-element__label">Partner</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Partner__c}" label="" styleClass="slds-select">
+                          </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Nächster Schritt</span>
+                        <div class="slds-form-element__control">
+                         <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.next_Step__c}" label="" styleClass="slds-select">
+                          </apex:inputField>
+                        </span>
+                        </div>
+                      </div>
+                     </div>
+                </div>
+  <br/>
+                <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Notrufsystem-Konfigurator Antworten</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Produkt</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                            <apex:selectList multiselect="true"  value="{!formObj.TL_Treppenliftart__c}" label="" styleClass="slds-select"> 
+                               <apex:selectOptions value="{!productGroupOptions}" /> 
+                             </apex:selectList> 
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Pflegegrad</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.pflegegrad__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>                
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Postleitzahl für Suche</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TL_Postleitzahl_f_r_Suche__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                     
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Pflegestufe</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Pflegestufe__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>                       
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Wohnort der Suche</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Wohnort_der_Suche__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Bedarf besteht für</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Person_des_Bedarfs__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Alleine außer Haus</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.alleine_au_er_Haus__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Körperlicher Zustand</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.koerperlicher_Zustand__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                </div>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">In letzter Zeit gestürzt</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.in_letzter_Zeit_gest_rzt__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Soforthilfe vor Ort</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.soforthilfe_vor_ort__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                </div>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Notfallkontakt</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.emergency_contact__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Zeitpunkt der Versorgung</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Zeitpunkt_der_Versorgung__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                </div>
+</apex:component>

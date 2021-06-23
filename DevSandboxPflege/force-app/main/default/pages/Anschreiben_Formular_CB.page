@@ -1,0 +1,334 @@
+<!--
+/****************************************************************************************************************************
+// Created 09.09.2019 von  AM
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+//  opportunity Id 
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//  Diese Seite ist das Anschreiben für neue Patienten (Interessent)  bei PflegeDe. 
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
+-->
+<apex:page renderas="pdf" standardStylesheets="false" controller="RA_nur_anzeigen_ent_controller_class" sidebar="FALSE" showHeader="False" action="{!addTask}" applyHtmlTag="false">
+    <HTML>
+        <head>
+            <apex:stylesheet value="{!$Resource.CSS_Anschreiben}" />
+            <style>
+                @page {
+                margin-bottom:0;
+                }
+                div.page-break {
+                page-break-after:always;
+                }
+                
+                
+                #right {
+                    position:absolute;
+                    top:300px;
+                    width:150px;
+                    
+                }
+                #right h1 {
+                font-size:12px;
+                margin-bottom:20px;
+                color:#646464;
+                }
+                #right .right_box {
+                    background-color:#f2f2f2;
+                    border: 1px solid #b0b0b0;
+                    text-align:center;
+                    margin:20px auto;
+                    width:130px;
+                }
+                .right_box h2 {
+                margin:7px 3px;
+                color:#9AB900;
+                font-size:12px;
+                }
+                
+                #right .right_box p {
+                color:#808080;
+                font-weight:normal;
+                margin:7px 3px;
+                font-size:12px;
+                }
+                
+                .right_box_line {
+                    width:70px;
+                    border-bottom:1px solid #b0b0b0;
+                    margin:0 auto;
+                    height:1px;
+                }
+                
+                #content {
+                top:300px;
+                }
+                
+                ol {
+                    list-style:none;
+                    padding:0;
+                    margin:0;
+                    background-image: url({!$Resource.anschreiben_home_box2});
+                    background-repeat:no-repeat;
+                    background-position:right bottom;
+                    padding-bottom:30px;
+                }
+                ol li {
+                    background-image: url({!$Resource.anschreiben_li_bg_1});
+                    background-repeat:no-repeat;
+                    background-position:left center;
+                    margin:0;
+                    padding:15px 0 15px 40px;
+                }
+                ol li.element1 {
+                    background-image: url({!$Resource.anschreiben_li_bg_1});}
+                ol li.element2 {
+                    background-image: url({!$Resource.anschreiben_li_bg_2});}
+                ol li.element3 {
+                    background-image: url({!$Resource.anschreiben_li_bg_3});}
+                
+                
+                #bottom_box {
+                    background-image: url({!$Resource.anschreiben_bettschutz});
+                    background-size:110px;
+                    background-repeat:no-repeat;
+                    background-position:465px 45px;
+                    position:absolute;
+                    top:815px;
+                    left:25px;
+                    border: 3px solid #9AB900;
+                    margin-top: 1em;
+                    width:650px;
+                }
+                #bottom_box h1 {
+                font-size: 14px;
+                text-align: center;
+                margin-bottom:5px;
+                }
+                
+                #bottom_box h1 span {
+                display: inline;
+                background: #fff;
+                padding: 5px 10px;
+                position: relative;
+                top:-10px;
+                color:#9AB900;
+                }
+                #bottom_box_content div {
+                    float:left;
+                    display:block;
+                }
+                #bottom_box_content #bottom_box_content_i {
+                    padding:0 20px;
+                    font-size:60px;
+                    font-family:Times;
+                    font-weight:bold;
+                    color: #9AB900;
+                    padding-top:15px;
+                }
+                #bottom_box_content #bottom_box_content_text {
+                    line-height:1.5;
+                    border-left:3px solid #9AB900;
+                    width:370px;
+                    margin-bottom: 20px;
+                    padding-left: 10px;
+                }
+                #bottom_box_content #bottom_box_content_text p {
+                margin:0;
+                }
+                #bottom_box_content #bottom_box_content_matte {
+                    width:190px;
+                    padding-right:10px;
+                }
+                #bottom_box_content #price_tag {
+                    border: 2px solid #9AB900;
+                    float:right;
+                }
+                #bottom_box_content #price_tag h1 {
+                    color: #9AB900;
+                    font-size:20px;
+                    margin:5px;
+                    padding:0;
+                }
+                #bottom_box_content #price_tag h2 {
+                    background-color: #9AB900;
+                    color: white;
+                    font-size: 10px;
+                    margin: 0;
+                    padding: 3px 10px 1px;
+                }
+                #footer {
+                    position:absolute;
+                    top:1000px;
+                    width:650px;
+                    left:27px;
+                }
+                #footer h2 {
+                font-size:8px;
+                width:100%; text-align:center; border-bottom: 1px solid #000;
+                line-height:0.1em; margin:10px 0 10px; } 
+                #footer h2 span { background:#fff; padding:0 10px; }
+                #footer p {
+                margin-top:0;
+                text-align:center;
+                font-size:8px;
+                }
+                
+                
+                #noch_fragen {
+                position:absolute;
+                top: 680px;
+                left:500px;
+                text-align:center;
+                }
+                #noch_fragen p {
+                font-size:12px;
+                margin: 7px auto;
+                }
+                #noch_fragen p.noch_fragen_nummer {
+                margin-top:0px;
+                font-size:15px;
+                color:#9AB900;
+                font-weight:bold;
+                letter-spacing: 1px;
+                }
+                #noch_fragen h2 {
+                font-size:14px;
+                color:#646464;
+                margin:7px auto;
+                }
+                #noch_fragen .noch_fragen_line {
+                    width:90px;
+                    border-bottom:1px solid #646464;
+                    margin:0 auto;
+                    height:1px;
+                }
+                
+                #text {
+                
+                    text-align: left;
+                }
+                
+                p.agb {
+                font-size:9px;
+                margin:0;
+                padding:0;
+                }
+            
+            </style>
+        </head>
+        <body>
+            <div id="head">    
+                <div id="logo">
+                    <apex:image url="{!$Resource.curabox_logo}" />
+                </div>
+                            
+                <div id="address">
+                    <span class="own_address">{!$Organization.Name} &bull; {!$Organization.Street} &bull; {!$Organization.PostalCode} {!$Organization.City}</span>
+                    <br />
+                    <br />
+                    {!KdaddrD.Anrede}<br />
+                    {!kdAddrD.vorname_name}<br />
+                    {!kdAddrD.strasse}<br />
+                    {!kdAddrD.plz_ort}
+                </div>
+                    
+                <div id="right">
+                    <h1>Bequemer Rückversand</h1>
+                    <div class="right_box">
+                        <h2>Portofrei per Post</h2>
+                        <div class="right_box_line">&nbsp;</div>
+                        <p>Frankierter Brief<br/>liegt bei</p>
+                    </div>
+                    <div class="right_box">
+                        <h2>Per Fax</h2>
+                        <div class="right_box_line">&nbsp;</div>
+                        <p>{!FirmenInfo.Fax__c}</p>
+                    </div>
+                    <div class="right_box">
+                        <h2>Per E-Mail</h2>
+                        <div class="right_box_line">&nbsp;</div>
+                        <p>Eingescannt an {!FirmenInfo.Email__c}</p>
+                    </div>
+                </div>
+            </div>    
+                
+            <!-- Header is done -->
+            <div id="content">
+                <div id="text">                   
+                    <p><apex:outputtext value="{!Anredeformel}"/></p>   
+                    <p>vielen Dank für Ihr Interesse an unserem curabox-Service.</p>
+                    <p>So einfach erhalten Sie in Zukunft <strong>monatlich kostenlose Pflegehilfsmittel</strong><br/>im Wert von 60 €:</p>
+                    <ol>
+                        <li class="element1">Füllen Sie das beiliegende Formular aus.<br/>Dank unserer praktischen <strong>Ausfüllhilfe</strong> geht das schnell &amp; einfach.</li>
+                        <li class="element2">Senden Sie uns <strong>beide</strong> Formularseiten unterschrieben<br/> zurück. Portofrei per Post, per Fax oder per E-Mail.</li>
+                        <li class="element3">Fertig. Wir kümmern uns um alles Weitere.<br/>Nach maximal 4 Wochen erhalten Sie die<br/>erste kostenfreie Lieferung.</li>
+                    </ol>
+                    <p>Wir freuen uns Sie mit unserem curabox-Service unterstützen zu können.</p>
+                    <p>Mit herzlichen Grüßen</p>
+                    <p><img src="{!$Resource.anschreiben_signature}" style="height:100px;"/></p>
+                </div>
+            </div>
+
+            <div id="bottom_box">
+                <h1><span>Unser Tipp: Wiederverwendbare Bettschutzeinlagen:</span></h1>
+                <div id="bottom_box_content">
+                    <div id="bottom_box_content_i">
+                    i
+                    </div>
+                    <div id="bottom_box_content_text">
+                        <p>Bis zu 300 Mal waschbar - praktisch und umweltschonend. Auf Wunsch erhalten Sie diese ebenfalls <strong>kostenlos</strong>.</p>
+                        <p style="margin-top:15px">Wählen Sie dafür einfach die entsprechenden Optionen im Formular aus.</p>
+                    </div>
+                    <div id="bottom_box_content_matte">
+                        <div id="price_tag">
+                            <h1>0,00 €</h1>
+                            <h2><span style="font-weight:normal">statt</span> 26,16 € UVP</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="noch_fragen">
+                <h2>Haben Sie noch Fragen?</h2>
+                <div class="noch_fragen_line">&nbsp;</div>
+                <p>Wir beraten Sie gern unter:</p>
+                <p class="noch_fragen_nummer">{!FirmenInfo.Telefon__c}</p>
+            </div>
+
+            <div id="footer">
+                <h2><span>© {!$Organization.Name}</span></h2>
+                <p>curabox von pflege.de |
+                {!$Organization.Street} |
+                {!$Organization.PostalCode} {!$Organization.City} |
+                Fax {!FirmenInfo.Fax__c} | Telefon {!FirmenInfo.Telefon__c} |
+                E-Mail {!FirmenInfo.Email__c} |
+                IK #{!FirmenInfo.IK_Nummer__c}<br />Registergericht Amstgericht {!FirmenInfo.Amtsgericht__c} |
+                Geschäftsführung&nbsp;<apex:outputText value="{!SUBSTITUTE(FirmenInfo.GF__c, '<br />', ', ')}" escape="false"/></p>
+            </div>
+
+            <div class="page-break">
+                &nbsp;
+            </div>
+            
+            <h3 style="text-align:center;">Allgemeine Geschäftsbedingungen für die Leistungen der curabox</h3>
+            <p class="agb">
+            <apex:outputtext value="{!AGB}"  escape="false"/>
+            </p>
+        </body>
+    </HTML>
+</apex:page>

@@ -1,0 +1,35 @@
+<apex:page controller="abrechnung_pflegekassen" tabStyle="Delivery_Note__c" sidebar="false" >
+
+    <apex:form id="auForm" >
+    <apex:Pageblock id="pb" title="Abrechnungen für die Krankenkasse {!mfKundenTitel}">
+    <apex:pagemessages id="Page_Message"  escape="false"/>
+    <apex:pageBlockButtons location="top">
+        <apex:outputPanel id="myButtons">   
+                <apex:CommandButton id="btnCreateSend" value="Abrechnung starten" action="{!createAndSend}"  rendered="{!IF((!Aufruf && (noOfRecords > 0)), true, false)}"/>                 
+                <apex:CommandButton id="btnCall" value="Start" action="{!startBatch}" rendered="{!Aufruf}"/>
+                <apex:CommandButton id="btnCancel" value="Abbrechen" action="{!goBack}"  rendered="{!!Aufruf}"/>   
+                </apex:outputPanel>   
+                <apex:outputPanel style="color:#4AA02C;font-weight:bold">
+                    <apex:actionStatus id="fetchStatus" startText="Fetching..." stopText="" />
+                </apex:outputPanel>
+
+        
+    </apex:pageBlockButtons>
+    <apex:PageBlocksection title="Auswahl" rendered="{!Aufruf}" collapsible="false" id="kkPbs" >
+        <apex:pageBlockSectionItem id="pbsiKkID"> 
+             Krankenkasse / Gruppe   
+            <apex:outputPanel id="opID">
+                <apex:inputtext value="{!kkName}" title="Krankenkasse" />
+            </apex:outputPanel> 
+        </apex:pageBlockSectionItem>
+            <apex:selectList value="{!mfKunden}" multiselect="false" styleclass="SelectOptions" size="1" label="Kunden">
+                <apex:selectOptions value="{!mfKundenSelect}"/>
+            </apex:selectList>
+    </apex:PageBlocksection>
+    
+    <apex:PageBlocksection title="Total Lieferscheine zum Abrechnen {!noOfRecords}" collapsible="false" id="lposPbs" rendered="{!!Aufruf}" columns="1">    
+
+    </apex:PageBlocksection>    
+    </apex:Pageblock>
+    </apex:form>
+</apex:page>

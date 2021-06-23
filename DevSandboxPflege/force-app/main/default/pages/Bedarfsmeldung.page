@@ -1,0 +1,398 @@
+<apex:page standardController="Lieferscheinposition__c" extensions="Bedarfsmeldung" renderAs="PDF" applyBodyTag="false" applyHtmlTag="false" showHeader="false">
+<html>
+<head>
+<apex:stylesheet value="{!$Resource.CSS_For_PDF}" />
+<style>
+@page{
+    size: A4 portrait;
+        
+    margin-top: 100px;
+    margin-bottom: 10px; 
+    font-family: Calibri, verdana, sans-serif;
+    font-size: 14px;
+    
+    @top-left {
+        content: element(header_left);
+    }
+    
+    @top-center {
+        content: element(header_center);
+    }
+    
+    @top-right {
+        content: element(header_right);
+    }
+    
+    @bottom-left {
+        content: element(footer_left);
+    }
+    
+    @bottom-center {
+        content: element(footer_center);
+    }
+    
+    @bottom-right {
+        content: element(footer_right);
+    }
+    
+}
+
+.header_left {
+    text-align: left;
+    position: running(header_left);
+}
+
+.header_center{
+    text-align: center;
+    position: running(header_center);
+}
+
+.header_right {
+    text-align: right;
+    position: running(header_right);
+}
+
+.footer_left {
+    text-align: left;
+    position: running(footer_left);
+}
+
+.footer_center {
+    text-align: center;
+    position: running(footer_center);
+}
+
+.footer_right {
+    text-align: right;
+    position: running(footer_right);
+}
+
+.pageNumber:before {
+    content: counter(page); 
+}
+
+.pageCount:before {
+    content: counter(pages);  
+}   
+
+.kopf_text {
+    font-family: Calibri, verdana, sans-serif;
+    font-size: 28px;
+    font-weight: normal;
+}
+
+
+.fuss_text {
+    text-align: right;
+    font-family: Calibri, verdana, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    color: #000;
+    padding-bottom: 0px;
+}
+
+.fuss_text_d {
+    text-align: center;
+    padding-top: 0.5px;
+    font-family: Calibri, verdana, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    color: #000;
+    margin-bottom: 0px;
+}
+
+.fuss_text_p7 {
+    text-align: left;
+    font-family: Calibri, verdana, sans-serif;
+    font-size: 8.9px;
+    font-weight: normal;    
+    color: #000;
+}
+
+.brief {
+    page-break-after:always;
+    padding-left:0px;
+    padding-top:20px;
+    padding-bottom:20px;
+    font-size: 14px;
+    font-family: Calibri, verdana, sans-serif;
+}
+
+.adresse {
+    font-size: 10px;
+    font-family: Calibri, verdana, sans-serif;
+}
+
+.partner {
+    padding-left:0px;
+
+}
+.pt {
+    padding-left:0px;
+
+}
+
+.pb_table {
+    border-top : black solid 1px;
+    border-left : black solid 1px;
+}
+.pb_b {
+    border-bottom : black solid 1px;
+    width : 60px;
+}
+.pb_t {
+    border-right : black solid 1px;
+    border-bottom : black solid 1px;
+    width: 200px;
+    font-size: 9.2px;
+    font-family: Calibri, verdana, sans-serif;
+}
+
+.bs_div {
+    padding-top:0px;
+    padding-left:0px;
+    font-family: Calibri, verdana, sans-serif;
+    font-size: 12px;
+    margin-left: 15px;
+}
+
+.bs_tab {
+    border-collapse:collapse;
+}
+
+.bs_td {
+    
+    border-bottom : black solid 1px;
+    border-right : black solid 1px;
+    color: #000; 
+    background-color : #fff;
+    padding: 6px;
+}
+
+.bs_ll {
+    border-collapse:collapse;
+    border-bottom : black solid 0px;
+    border-right : black solid 0px;
+    border-top : #fff solid 1px;
+    border-left : #fff solid 1px;
+    color: #fff; 
+    padding: 6px;
+    background-color : #fff;    
+}
+
+.bs_th {
+    border-collapse:collapse;
+    border : black solid 1px;
+
+    color: #000; 
+    background-color : #DCDE51;
+    padding: 6px;
+}
+
+</style>
+</head>
+<body>
+
+    
+    <!-- All Pages Header -->
+   <c:PDFHeaderFooter type="header" position="left">
+        <div style="position: absolute; margin-top: 13px; margin-left: 25px">
+            <apex:image url="{!$Resource.Logo_Small}"/>
+        </div>      
+    </c:PDFHeaderFooter>   
+
+    <div class="bs_div">    
+    <table class="bs_tab" cellpadding="0" cellspacing="0" >
+    
+    <apex:repeat value="{!Zeilen}" var="p"> 
+    
+    <tr><td colspan="9">    
+
+    <!-- page 1 Brief -->
+<apex:outputPanel layout="block" rendered="{!p.brief}">  
+     
+
+
+    <table width="100%" class="partner">
+        <tr>
+            <td width="80%"  >
+ 
+                <table> 
+                    <tr>
+                        <td style="line-height: 1.2">                        
+                            <span class="own_address" >{!$Organization.Name} &bull; {!$Organization.Street} &bull; {!$Organization.PostalCode} {!$Organization.City}</span>
+                        </td>
+                    </tr>         
+                    <tr>
+                        <td class="pt" style="padding-top: 40px; line-height: 1.2">
+                        {!p.pbName}<br/>
+                        {!p.pbStr}<br/><br/>
+                        {!p.pbPlzOrt}
+                        </td>
+                    </tr>    
+                                
+                </table>
+            </td>    
+                             
+            <td style="color: #808080; font-size: 9px; margin-top: 40px; margin-right: 70px; line-height:1.4">                      
+                <b>{!$Organization.Name}</b><br/>
+                {!$Organization.Street}<br/>
+                {!$Organization.PostalCode} {!$Organization.City}<br/>
+                <br/>
+                T {!FirmenInfo.Telefon__c}<br/>
+                F {!FirmenInfo.Fax__c}<br/>
+                E {!FirmenInfo.Email__c}<br/>
+                {!FirmenInfo.web1__c}<br/>
+                {!FirmenInfo.web2__c}<br/>
+                <br/>
+                Sitz der Gesellschaft: {!FirmenInfo.Amtsgericht__c} <br/>
+                {!FirmenInfo.HRA__c}<br/>
+                <br/>                
+                Geschäftsführung:<br/>
+                <apex:outputtext escape="false" value="{!FirmenInfo.GF__c}"/><br />
+                <br/>
+                <br/>               
+                {!FirmenInfo.Bank__c}<br />
+                BIC: {!FirmenInfo.BLZ__c}<br />
+                IBAN: {!FirmenInfo.Kontonummer__c}
+                <br/> 
+            </td> 
+                    
+        </tr>
+        <tr >
+            <td class="brief" style="line-height:1.2">
+            
+<b>Bedarfsmeldung {!bedarfMonat} {!bedarfJahr}</b><br/>
+Hamburg,&nbsp;<apex:outputtext value="{0,date,dd.MM.yyyy}">
+                        <apex:param value="{!Now()}" /></apex:outputtext>
+              <div id="text" style="line-height:1.2"> 
+<p>Sehr geehrte Damen und Herren,</p>
+                
+<p>als Anlage übersenden wir Ihnen die Bedarfsmeldung für den Monat {!bedarfMonat} {!bedarfJahr}.</p>
+                
+<p>Sofern die Patienten, abweichend vom Vormonat, eine andere curabox bekommen sollen, tragen Sie dies bitte in der Spalte „Abweichende Bestellung“ ein. Für die mit einem Sternchen gekennzeichneten Kunden, liegt noch keine Genehmigung vor. Daher werden wir die Belieferung bis zur Kostenübernahme der Pflegekasse aussetzen. Wir bemühen uns um eine baldige Bewilligung und liefern gegebenenfalls nach.</p>
+                
+<p><b>Bitte senden Sie uns die Liste einfach per Fax an die  Fax-Nr.: 040 / 226 161 645. </b></p>
+                
+<p>Sollten wir bis zum 27. {!currentMonat} {!currentJahrStr} die Bedarfsmeldung nicht zurück erhalten, werden wir die Belieferung analog zum Vormonat veranlassen. Patienten, denen zum ersten Mal eine curabox geliefert wird, erhalten dann das im Antrag gewählte Sortiment.</p>
+                
+<p>Bitte beachten Sie, dass Kunden die merhmals aufgeführt sind im abwechselnden Lieferrhythmus ihre gewünschte curabox erhalten. Bei evtl. Rückfragen erreichen sie mich gerne unter der Tel.-Nr.: 0800 666 222 141.</p>                               
+                <br/>
+<p>Mit freundlichen Grüßen</p>                  
+                <br/>
+<p>Ihr curabox-Team</p>                
+           </div>
+          
+           </td>
+        </tr>
+        
+        <tr><td class="fuss_text" >           
+           <div class="fuss_text_d" >{!p.pbName}<br/>Seite {!p.curPage}/{!p.totPages}</div> 
+            </td>
+        </tr>
+    </table>
+</apex:outputPanel>
+</td></tr>
+<tr><td colspan="9">
+<apex:outputPanel layout="block" rendered="{!p.kopf}">  
+   <!-- Seite 2  -->
+     <table width="100%" cellpadding="0" cellspacing="0">
+        <tr style="page-break-before:always;">
+            <td width="85%" class="partner" style="padding-top: 70px">
+                <table class="pb_table">
+                    <tr>
+                        <td class="pb_b">
+                            <apex:image url="{!URLFOR($Resource.pb_logos, 'pb1.png')}" width="60" height="60" />
+                        </td>
+                        <td class="pb_t">
+                            25 Stck Bettschutzeinlagen<br/>
+                            100 Stck Einmalhandschuhe<br/>
+                            500 ml Händedesinfektionsmittel<br/>
+                            2x 500 ml Flächendesinfektionsmittel<br/>
+                        </td>
+                        <td class="pb_b">
+                            <apex:image url="{!URLFOR($Resource.pb_logos, 'pb2.png')}" width="60" height="60" />
+                        </td>
+                        <td class="pb_t">                            
+                            25 Stck Bettschutzeinlagen<br/>
+                            2x 100 Stck Einmalhandschuhe<br/>
+                            500 ml Händedesinfektionsmittel<br/>
+                            500 ml Flächendesinfektionsmittel<br/>
+                        </td>
+                        <td class="pb_b">
+                            <apex:image url="{!URLFOR($Resource.pb_logos, 'pb3.png')}" width="60" height="60" />
+                        </td>
+                        <td class="pb_t">
+                            --- Stck Bettschutzeinlagen<br/>
+                            2x 100 Stck Einmalhandschuhe<br/>
+                            2x 500 ml Händedesinfektionsmittel<br/>
+                            500 ml Flächendesinfektionsmittel<br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="pb_b">
+                            <apex:image url="{!URLFOR($Resource.pb_logos, 'pb4.png')}" width="60" height="60" />
+                        </td>
+                        <td class="pb_t">
+                            --- Stck Bettschutzeinlagen<br/> 
+                            2x 100 Stck Einmalhandschuhe<br/>
+                            500 ml Händedesinfektionsmittel<br/>
+                            2x 500 ml Flächendesinfektionsmittel<br/>
+                        </td>
+                        <td class="pb_b">
+                            <apex:image url="{!URLFOR($Resource.pb_logos, 'pb5.png')}" width="60" height="60" />
+                        </td>
+                        <td class="pb_t">
+                            25 Stck Bettschutzeinlagen<br/>
+                            --- Stck Einmalhandschuhe<br/>
+                            500 ml Händedesinfektionsmittel<br/>
+                            500 ml Flächendesinfektionsmittel<br/>
+                        </td>
+                        <td class="pb_b">
+                            <apex:image url="{!URLFOR($Resource.pb_logos, 'pb6.png')}" width="60" height="60" />
+                        </td>
+                        <td class="pb_t">
+                            Flexibel eingerichtete curabox<br/>
+                        </td>
+                    </tr>
+                </table>
+            </td>   
+        </tr>
+    </table>   
+<br/><br/>
+
+</apex:outputPanel>
+</td></tr>
+
+<!-- ab hier die variable Tabelle -->
+   
+        
+        <tr>
+            <td width="20" align="center" class="{!p.cssClass1}">{!p.pos}</td>
+            <td width="130px" class="{!p.cssClass}" >{!p.nachname}</td>
+            <td width="130" class="{!p.cssClass}" >{!p.vorname}</td>
+            <td width="60" class="{!p.cssClass}" align="right">{!p.kd_nr}</td>
+            <!-- <td width="80" class="{!p.cssClass}" >{!p.bsMonat}</td> -->
+            <td width="100" class="{!p.cssClass}" align="center" >{!p.pbVormonat}</td>
+            <td width="90" class="{!p.cssClass}" align="center" >{!p.abwBs}</td>
+            <td width="50" class="{!p.cssClass}" align="left" >{!p.gr_hs}</td>
+            <!-- <td width="120" class="{!p.cssClass}">{!p.anmerkung}</td> -->
+        </tr> 
+
+<!-- Fusszeilen -->
+    <tr style="{!p.seitenw} "><td colspan="9">
+    <apex:outputPanel layout="block" rendered="{!p.pb7}"> 
+        <div class="fuss_text_p7"><b>* Patienten mit einem Sternchen werden von pflege.de bereits beliefert, obwohl noch keine Zusage zur Kostenübernahme der Pflegekasse vorliegt.</b></div> 
+    </apex:outputPanel> 
+    <apex:outputPanel layout="block" rendered="{!p.fuss}">
+      <div class="fuss_text_d" >{!p.pbName}<br/>Seite {!p.curPage}/{!p.totPages}</div> 
+    </apex:outputPanel> 
+    </td></tr>
+   </apex:repeat>     
+ <!-- die Erste Tabelle -->
+    </table>    
+    </div>
+
+</body>
+</html>
+</apex:page>

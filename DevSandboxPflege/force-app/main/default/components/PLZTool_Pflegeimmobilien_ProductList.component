@@ -1,0 +1,67 @@
+<apex:component id="cmp_pl">
+    <apex:attribute name="productList" description="list of products" type="PLZTool_PartnerProduct[]" required="true"/>
+    
+    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+    <thead>
+        <tr class="slds-text-heading--label">
+          <th class="slds-cell-shrink"></th>
+          <th scope="col" title="Partner">
+            <div class="slds-truncate">Partner</div>
+          </th>
+          <th scope="col" title="CPL Kat. 1">
+            <div class="slds-truncate">CPL/CPO</div>
+          </th>
+          <th scope="col" title="Offenes Produkt-Kontingent">
+            <div class="slds-truncate">P.-Kont.</div>
+          </th>
+          <th scope="col" title="Offenes Firmen-Kontingent">
+            <div class="slds-truncate">F.-Kont.</div>
+          </th>
+          <th scope="col" title="Priorität">
+            <div class="slds-truncate">Prio</div>
+          </th>
+          <th scope="col" title="Liste">
+            <div class="slds-truncate">Liste</div>
+          </th>
+          <th scope="col" title="Standort Richtung">
+            <div class="slds-truncate">Standort Richtung</div>
+          </th>
+          <th scope="col" title="Anmerkungen">
+            <div class="slds-truncate">Anmerkungen</div>
+          </th>
+        </tr>
+    </thead>
+    <tbody>
+        <apex:repeat value="{!productList}" var="prdct" id="rep_id">
+        <tr onclick="zeigeDetailsAn('{!prdct.pp.Id}');">
+          <td class="slds-cell-shrink" data-label="Select Row">
+            <label class="slds-checkbox">
+
+              <apex:inputcheckbox id="opnum" onchange="partnerSelect();"/>
+              <apex:inputHidden value="{!prdct.pp.Id}" id="ophid"/>
+              <apex:inputHidden value="{!prdct.CPL_Exklusiv}" id="exhid"/>
+              <apex:inputHidden value="{!prdct.CPO_Exclusiv}" id="excpohid"/>
+              
+              <span class="slds-checkbox--faux"></span>
+            </label>
+          </td>
+          <td style="vertical-align:top"><div class="slds-truncate"><a href="/{!prdct.pp.Partner__c}"> <apex:outputtext value="{!prdct.pp.Partner__r.Name}" /></a></div>
+              <div id="{!prdct.pp.Id}" style="width:510px;margin-left:0px;margin-top:15px;display: none;">
+              <strong>Liste: </strong>{! prdct.pp.PLZ_Tool_Liste__c}<br/>
+              <strong>Standort Richtung: </strong>{! prdct.pp.location_direction__c}<br/>
+              <strong>Anmerkungen: </strong>{!prdct.pp.Anmerkung__c}<br/>
+              </div>
+          </td>
+          <!--<td style="vertical-align:top"><div class="slds-truncate"><a href="/{!prdct.pp.Id}"> <apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></a></div></td>-->
+          <td style="vertical-align:top"><div class="slds-truncate">{!prdct.CplCpo}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate">{!prdct.pp.Kontingent_offen_Produkt__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate">{!prdct.pp.Partner__r.Kontingent_offen_Partner__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate">{!prdct.pp.Priorit_t__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate">{!prdct.pp.PLZ_Tool_Liste__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate">{!prdct.pp.location_direction__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate">{!prdct.pp.Anmerkung__c}</div></td>
+        </tr>
+        </apex:repeat>
+    </tbody>
+    </table>
+</apex:component>

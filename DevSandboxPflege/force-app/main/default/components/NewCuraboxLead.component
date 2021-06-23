@@ -1,0 +1,308 @@
+<apex:component >
+  	<apex:attribute name="formObj" description="form object" type="Lead" required="true"/>
+    <apex:attribute name="curaboxOptions" description="curaboxOptions" type="List"/>
+    <apex:attribute name="handschuheOptions" description="handschuheOptions" type="List"/>
+    
+      <br/>
+                <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Versicherten Daten</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Pflegegrad</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                           <apex:inputField value="{!formObj.pflegegrad__c}" label="" styleClass="slds-select"> 
+                             </apex:inputField> 
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">IK Nummer des Trägers</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.IK_Nummer_des_traegers__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Pflegestufe</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Pflegestufe__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Kostenträger</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Kostentr_ger__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Versicherungsnummer</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Versicherungsnummer__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Geburtsdatum</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Geburtsdatum__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>
+                
+
+      <br/>
+                <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Angehörigen Daten</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Angehöriger Anrede</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                           <apex:inputField value="{!formObj.Angehoeriger_Anrede__c}" label="" styleClass="slds-input"> 
+                             </apex:inputField> 
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Angehöriger Telefon</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Angehoeriger_Telefon__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Angehöriger Vorname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Angehoeriger_Vorname__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Angehöriger Email</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Angehoeriger_Email__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Angehöriger Nachname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Angehoeriger_Nachname__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Angehöriger besitzt Vollmacht</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Angehoeriger_Vollmacht__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>                
+
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Angehöriger Straße</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Angehoeriger_Strasse__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Angehöriger PLZ</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Angehoeriger_PLZ__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>                 
+
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Angehöriger Ort</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Angehoeriger_Ort__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>
+                      
+                </div>
+
+      <br/>
+                <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Pflegedienst Daten</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Pflegedienst Name</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                           <apex:inputField value="{!formObj.CB_Pflegedienst_Name__c}" label="" styleClass="slds-input"> 
+                             </apex:inputField> 
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Pflegedienst PLZ</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.CB_Pflegedienst_PLZ__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Pflegedienst Straße</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.CB_Pflegedienst_Strasse__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Pflegedienst Ort</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.CB_Pflegedienst_Ort__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+
+      <br/>
+                <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Pflegedienst Daten</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">CB_Box</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                            <apex:selectList value="{!formObj.CB_Box__c}" label="" styleClass="slds-select" multiselect="false" size="1">
+                                <apex:selectOptions value="{!curaboxOptions}" />
+                            </apex:selectList>
+                           <!--apex:inputField value="{!formObj.CB_Box__c}" label="" styleClass="slds-input"> 
+                             </apex:inputField--> 
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">CB_Lieferung</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.CB_Lieferung__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">CB_Handschuh_Groesse</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element" >
+                            <apex:selectList value="{!formObj.CB_Handschuh_Groesse__c}" label="" styleClass="slds-select" multiselect="false" size="1">
+                                <apex:selectOptions value="{!handschuheOptions}" />
+                            </apex:selectList>
+                          <!--apex:inputField value="{!formObj.CB_Handschuh_Groesse__c}" label="" styleClass="slds-input">
+                            </apex:inputField-->
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">CB_Medifox</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.CB_Medifox__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                
+</apex:component>

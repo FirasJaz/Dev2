@@ -1,0 +1,52 @@
+<!--
+/****************************************************************************************************************************
+// Created 29.04.2019 von  AD
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.: 04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// 
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+
+<aura:component controller ="Curabox_Helper" access="global">
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="contact" type="Contact"/>
+
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <div class ="contact-data" > 
+        <div class ="slds-grid slds-wrap" >
+            <div class="slds-size_1-of-10 slds-p-around_x-small">
+                <lightning:icon iconName="standard:contact" alternativeText="Kontakt" size="medium"/>
+            </div>
+            <div class="slds-size_2-of-10 slds-p-around_x-small">
+                <lightning:formattedName class="contact-name"
+                aura:id="shortName"
+                firstName="{!v.contact.FirstName}"
+                lastName="{!v.contact.LastName}"
+                salutation="{!v.contact.Salutation}" />
+            </div>
+            <div class="slds-size_2-of-10 slds-p-around_x-small">
+                <lightning:button class="btn-zuruck" variant="success" label="Zurück zum Contact" title="Zurück zum Contact" onclick="{! c.zuruck }" />
+            </div>
+            <div class="slds-size_2-of-10 slds-p-around_x-small">
+                <lightning:button class="btn-auftrag" label="Zurück zur Auftragsübersicht" title="zur Auftragsübersicht" onclick="{! c.showOrders }" />
+            </div>
+        </div>  
+    </div>
+
+</aura:component>

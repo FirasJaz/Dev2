@@ -1,0 +1,345 @@
+<!--
+
+12.11.2015 wds #107904802
+               Auftragsbearbeitung entfernt! in dem ich den Butteon gelöscht habe, wirklich gewollt?
+               oder sollen nur CB AUfträge nicht bearbeitbar sein, dann ev. Steuerung über die 
+               Variablen aus dem Apex Pgm Auftrgasverwaltung! Achtung da entsteht bei Shop Aufträgen sowieso 
+               ein Fehler!!!!
+               
+06.06.2015 wds #?
+               Button "angehalten" wieder aktiviert! für die Bestandsliste!
+                              
+-->               
+<apex:page standardController="Kunde__c" id="auvPage" extensions="Auftragsverwaltung" tabStyle="Auftragsposition__c" sidebar="false">
+<apex:form ID="auvForm">
+<apex:PageBlock ID="pageBlockId">
+    <apex:pagemessages id="Page_Message"  escape="false"/>
+    <apex:pageBlockSection title="ausgewählter Kunde" collapsible="false" id="selectedKunde" columns="3">
+                <apex:pageBlockTable style="text-align:center;white-space:pre;"
+                    value="{!Kde}" var="kd" id="selectedPBTable"> 
+                    <apex:column headerValue="">
+                        <apex:commandButton action="{!zurueck}" value="Zurück zum Kunde"
+                            onclick="return confirmCancel()" immediate="true" />
+                    </apex:column>
+                    <apex:column headerValue="Name">
+                        <apex:outputField value="{!kd.Name}" />
+                    </apex:column>
+                    <apex:column headerValue="Geburtsdatum">
+                        <apex:outputField value="{!kd.Geburtsdatum_text__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Versichertennummer">
+                        <apex:outputfield value="{!kd.Versichertennummer__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Krankenkasse">
+                        <apex:outputfield value="{!kd.Krankenkasse__c}" />
+                    </apex:column>
+                    <apex:column headerValue="Straße">
+                        <apex:outputfield value="{!kd.komb_Adresse__c}" />
+                    </apex:column>
+
+                </apex:pageBlockTable>  
+
+    </apex:pageBlockSection>
+    
+    <apex:pageBlockSection title="Bestellte {!boxName}" columns="1"  collapsible="false" id="PBBlocksection" >
+                <apex:pageBlockTable style="text-align:center;white-space: pre; width:70%;" value="{!lAU}" var="AP" id="PBBlockTable" >
+                <apex:column >
+<!--                 
+                    <apex:commandButton id="LZPBBearb" action="{!PflegeBoxAuftragBearbeiten}" value="Auftrag bearbeiten" rerender="pageBlockId" disabled="{!AuftragEditMode || !!inkoAuftragEditMode}" >
+                        <apex:param name="LZGba" assignTo="{!applyAuId}" value="{!AP.id}" />  
+                    </apex:commandButton>
+-->                </apex:column>
+
+                <apex:column headerValue="{!boxName}">
+                    <apex:outputField value="{!AP.Bezeichnung__c}" />
+                </apex:column>
+                <apex:column headerValue="Auftrag">
+                    <apex:outputField value="{!AP.Name}" />
+                </apex:column>
+                <apex:column headerValue="von">
+                    <apex:outputfield value="{!AP.genehmigt_ab__c}" />
+                </apex:column> 
+                <apex:column headerValue="bis">
+                    <apex:outputfield value="{!AP.genehmigt_bis__c}" />
+                </apex:column> 
+                <apex:column headerValue="Lieferzeitraum">
+                    <apex:outputfield value="{!AP.Lieferzeitraum__c}" />
+                </apex:column>
+                <apex:column headerValue="Status" >
+                        <apex:outputtext value="{!AP.Genehmigungsstatus__c}" style="{!IF(AP.Genehmigungsstatus__c == 'angehalten', 'color:red;', 'color:black;')}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:commandButton id="auPause" action="{!PflegeBoxAuftragAnhalten}" value="Auftrag anhalten" styleClass="btn" rerender="pageBlockId" rendered="{!IF(AP.Genehmigungsstatus__c == 'genehmigt', true, false)}" disabled="{!AuftragEditMode}">
+                        <apex:param name="LZGbi" assignTo="{!applyAuId}" value="{!AP.id}" />
+                    </apex:commandButton>
+                    <apex:commandButton id="auActive" action="{!PflegeBoxAuftragAktivieren}" value="Auftrag aktivieren" styleClass="btn" rerender="pageBlockId" rendered="{!IF(AP.Genehmigungsstatus__c == 'angehalten', true, false)}" disabled="{!AuftragEditMode}">
+                        <apex:param name="LZGbi" assignTo="{!applyAuId}" value="{!AP.id}" />
+                    </apex:commandButton>
+                    <apex:commandButton id="auStop" action="{!PflegeBoxAuftragBeenden}" value="Auftrag beenden" styleClass="btn" rerender="pageBlockId" disabled="{!AuftragEditMode}">
+                        <apex:param name="LZGbi" assignTo="{!applyAuId}" value="{!AP.id}" />
+                    </apex:commandButton>
+                </apex:column>
+            </apex:pageBlockTable>
+
+            <apex:pageBlockSection title="Auftrag bearbeiten" id="abid" columns="7" rendered="{!AuftragEditMode}" collapsible="false" >
+                <apex:commandButton id="canZuAuf" action="{!boxEditAuftragAbbrechen}"  immediate="true" value="Abbrechen" styleClass="btn" rerender="pageBlockId">             
+                </apex:commandButton>   
+                
+                <apex:inputText value="{!eAU.Bezeichnung__c}" label=""/>
+
+                <apex:outputText label="Gesamtpreis:" value="{!box.gesamtPreisEdit} €" id="bGpe" style="{!box.gesamtPreisFarbe} white-space: nowrap;"/>
+    
+                <apex:inputfield label="von" value="{!eAU.genehmigt_ab__c}" style="white-space: nowrap;" />   
+                <apex:inputfield label="bis" value="{!eAU.genehmigt_bis__c}" style="white-space: nowrap;" />     
+                <apex:inputfield value="{!eAU.Lieferzeitraum__c}" style="white-space: nowrap;" />  
+                
+                <apex:commandButton id="createAuf" action="{!boxEditAuftragSpeichern}"  value="Speichern" styleClass="btn" rerender="pageBlockId">             
+                </apex:commandButton>                   
+            </apex:pageBlockSection>    
+
+            <apex:pageBlockSection title="Artikel auswählen" columns="1" id="pbse" rendered="{!AuftragEditMode}" collapsible="false">
+
+                <apex:pageBlockTable style="text-align:left;vertical-align:top;white-space: pre;" value="{!box.pbAgGnListEdit}" var="pbag" id="agarTab">                
+                    <apex:column headerValue="Artikelgruppe" value="{!pbag.agrp}" />
+                    <apex:column headerValue="Artikel">
+                        <apex:selectList value="{!pbag.selectedArtikel}" multiselect="false" styleclass="SelectOptions" size="1" >
+                            <apex:selectOptions value="{!pbag.artikelSelect}"/>
+                            <apex:actionsupport action="{!selectArtEdit}" event="onchange" rerender="pbse, bGpe">     
+                                <apex:param name="LZGb" assignTo="{!applyArID}" value="{!pbag.agid}" />  
+                            </apex:actionsupport>
+                        </apex:selectList>
+                    </apex:column>
+                    <apex:column headerValue="Einzelreis" value="{!pbag.preis}" />
+                    
+                    <apex:column headerValue="Menge" >
+                        <apex:actionregion immediate="True">
+                        <apex:inputtext value="{!pbag.bmenge}" style="width:20px;" rendered="{!(pbag.editierbar && !pbag.keineGenehmigung)}"> 
+                        <apex:actionsupport action="{!selectArtEdit}" event="onchange" rerender="pbse, bGpe">   
+                            <apex:param name="LZGt" assignTo="{!applyArID}" value="{!pbag.agid}" />   
+                        </apex:actionsupport>
+                        </apex:inputtext>
+                        </apex:actionregion>
+                        <apex:outputtext value="{!pbag.bmenge}"  rendered="{!(!pbag.editierbar || pbag.keineGenehmigung)}"/>   
+                    </apex:column>
+                    <apex:column headerValue="Preis" value="{!pbag.pospreis}" />
+                    
+                    <apex:column headerValue="Genehmigungsstatus" value="{!pbag.genStatus}" />
+                </apex:pageBlockTable>      
+            
+        </apex:pageBlockSection>            
+        
+            
+            <apex:variable var="Number" value="{!0}"/>
+            <apex:pageBlockSection title="Auftrag bearbeiten" columns="2" rendered="{!inkoAuftragEditMode}" collapsible="false" >
+                <apex:commandButton action="{!inkoZuAuftragAbbrechen}"  immediate="true" value="Abbrechen" styleClass="btn" rerender="pageBlockId">             
+                </apex:commandButton> 
+                <apex:inputText value="{!inko.selected}" style="width: 150px;"/>                
+                <apex:pageBlockTable style="text-align:left;vertical-align:top;white-space: pre;" value="{!inko.delattendeeList}" var="del" id="block">                                   
+                    <apex:column headerValue="Auftragsposition" style="width:20px; text-align:center;" headerClass="centertext"  rendered="false"> 
+                    <apex:outputText value="{0}" style="text-align:center;"> 
+                    <apex:param value="{!Number+1}" /> 
+                    </apex:outputText>
+                    </apex:column> 
+                    <apex:column >                        
+                        <apex:variable var="Number" value="{!Number+1}"/>
+                    </apex:column> 
+                    <apex:column headerValue="Artikel" value="{!del.name}" />                                     
+                    <apex:column headerValue="Einzelpreis" value="{!del.einzelpreis}" id="epreis"/>                    
+                    <apex:column headerValue="Menge">                   
+                    <apex:inputtext value="{!del.menge}" id="menge" />  
+                    <apex:actionSupport event="onmouseout" reRender="preis, menge"/>                                  
+                    </apex:column>
+                    <apex:column headerValue="preis"> 
+                    <apex:outputText value="{!del.preis}" id="preis"/>                    
+                    </apex:column>                                                                                                                                                                                          
+                </apex:pageBlockTable>
+                <apex:commandButton action="{!inkoEditAuftragSpeichern}"  value="Speichern" styleClass="btn" rerender="pageBlockId">             
+                </apex:commandButton>               
+            </apex:pageBlockSection>
+ 
+    </apex:pageBlockSection>
+    
+    
+    <apex:pageBlockSection title="Neuer Auftrag" collapsible="false" id="nPBBlocksection"  columns="1" rendered="{!!AuftragEditMode && !inkoAuftragEditMode}">  
+    
+            <apex:pageBlockSection title="{!sectionTitle}" columns="{!colNum}" rendered="{!ArtikelEditMode}" collapsible="false" >
+                <apex:commandButton id="canZuAuf" action="{!boxZuAuftragAbbrechen}"  immediate="true" value="Abbrechen" styleClass="btn" rerender="pageBlockId">             
+                </apex:commandButton>   
+                <apex:inputText value="{!box.selectedBoxName}" style="width: 150px;"/>
+                <apex:outputText value="x 2" style="width: 20px; text-align:left;color:red;" rendered="{!box.rLieferung}"/>
+                <apex:outputText label="Gesamtpreis:" value="{!box.gesamtPreis} €" id="bGp" style="{!box.gesamtPreisFarbe} white-space: nowrap;"/>
+                <apex:inputfield label="Bestellt von" value="{!box.nAU.genehmigt_ab__c}" style="white-space: nowrap;" rendered="{!!box.rLieferung}"/>   
+                <apex:inputfield label="Bestellt von" value="{!box.nAU.genehmigt_ab__c}" style="white-space: nowrap;" rendered="{!box.rLieferung}"> 
+                    <apex:actionsupport action="{!box.rechnenGesamtpreis}" event="onchange" rerender="bGp" />    
+                </apex:inputfield>
+                <apex:inputfield label="Bestellt bis" value="{!box.nAU.genehmigt_bis__c}" style="white-space: nowrap;" rendered="{!!box.rLieferung}" />  
+                <apex:inputfield label="Bestellt bis" value="{!box.nAU.genehmigt_bis__c}" style="white-space: nowrap;" rendered="{!box.rLieferung}"> 
+                    <apex:actionsupport action="{!box.rechnenGesamtpreis}" event="onchange" rerender="bGp" />    
+                </apex:inputfield>              
+                <apex:inputfield value="{!box.nAU.Lieferzeitraum__c}" style="white-space: nowrap;" rendered="{!!box.nur_einmalig_bestellbar}"/>  
+                <apex:outputText value="Einmalig" style="white-space: nowrap;" rendered="{!box.nur_einmalig_bestellbar}"/>  
+                <apex:commandButton id="createAuf" action="{!boxZuAuftragErstellen}"  value="Speichern" styleClass="btn" rerender="tstpopup, pageBlockId">             
+                </apex:commandButton>                   
+            </apex:pageBlockSection>
+            
+            <apex:variable var="Number" value="{!0}"/>
+            <apex:pageBlockSection title="{!sectionTitle}" columns="2" rendered="{!inkoEditMode}" collapsible="false" >
+                <apex:commandButton action="{!inkoZuAuftragAbbrechen}"  immediate="true" value="Abbrechen" styleClass="btn" rerender="pageBlockId">             
+                </apex:commandButton> 
+                <apex:inputText value="{!inko.selected}" style="width: 150px;"/>                
+                <apex:pageBlockTable style="text-align:left;vertical-align:top;white-space: pre;" value="{!inko.delattendeeList}" var="del" id="block">                                   
+                    <apex:column headerValue="Auftragsposition" style="width:20px; text-align:center;" headerClass="centertext"  rendered="false"> 
+                    <apex:outputText value="{0}" style="text-align:center;"> 
+                    <apex:param value="{!Number+1}" /> 
+                    </apex:outputText>
+                    </apex:column> 
+                    <apex:column >
+                        <apex:commandButton value="Löschen" action="{!inko.loeschen}" reRender="pageBlockId" >
+                        <apex:param name="Index" value="{!Number}"/>
+                        </apex:commandButton>
+                        <apex:variable var="Number" value="{!Number+1}"/>
+                    </apex:column> 
+                    <apex:column headerValue="Artikel" value="{!del.name}" />                                     
+                    <apex:column headerValue="Einzelpreis" value="{!del.einzelpreis}" id="epreis"/>                    
+                    <apex:column headerValue="Menge">                   
+                    <apex:inputtext value="{!del.menge}" id="menge" />  
+                    <apex:actionSupport event="onmouseout" reRender="preis, menge"/>                                  
+                    </apex:column>
+                    <apex:column headerValue="preis"> 
+                    <apex:outputText value="{!del.preis}" id="preis"/>                    
+                    </apex:column>                                                                                                                                                                                          
+                </apex:pageBlockTable>
+                <apex:commandButton action="{!inkoZuAuftragErstellen}"  value="Speichern" styleClass="btn" rerender="pageBlockId">             
+                </apex:commandButton>               
+            </apex:pageBlockSection>
+
+            <apex:variable var="rowNumber" value="{!0}"/> 
+            <apex:pageBlockSection title="Artikel auswählen" columns="1" id="inkopbs" rendered="{!inkoEditMode}" collapsible="false">
+
+                <apex:pageBlockTable style="text-align:left;vertical-align:top;white-space: pre;" value="{!inko.AusloeserList}" var="aus" id="inkoagarTab">                                   
+                    <apex:column headerValue="No." style="width:20px; text-align:center;" headerClass="centertext"  rendered="false">
+                    <apex:outputText value="{0}" style="text-align:center;" > 
+                    <apex:param value="{!rowNumber+1}" /> 
+                    </apex:outputText>
+                    </apex:column> 
+                    <apex:column >
+                        <apex:commandButton value="Auswählen" action="{!inko.auswaehlen}" reRender="pageBlockId" disabled="{!!inko.auswaehlbar}">
+                        <apex:param name="rowIndex" value="{!rowNumber}"/>
+                        </apex:commandButton>
+                        <apex:variable var="rowNumber" value="{!rowNumber+1}"/>
+                    </apex:column> 
+                    <apex:column headerValue="Artikel" value="{!aus.name}" />                                     
+                    <apex:column headerValue="Einzelpreis" value="{!aus.einzelpreis}" />                                                                                                                                      
+                                                                       
+                </apex:pageBlockTable>      
+                          
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="{!boxName}" columns="2" rendered="{!!ArtikelEditMode}" collapsible="false" >
+                <apex:selectList value="{!box.selectedBox}" multiselect="false" styleclass="SelectOptions" size="1"  disabled="{!AuftragEditMode}">
+                    <apex:selectOptions value="{!box.boxSelect}"/>
+                    <apex:actionsupport action="{!box.initPB}" event="onchange" rerender="nPBBlocksection">                                    
+                    </apex:actionsupport>
+                </apex:selectList>
+                
+                <apex:pageBlockTable style="text-align:left;vertical-align:top;white-space: pre;" value="{!box.pbAgGnList}" var="pbag">               
+                    <apex:column headerValue="Artikelgruppe" value="{!pbag.agrp}" />
+                    <apex:column headerValue="Menge" value="{!pbag.bmenge}" />
+                    <apex:column headerValue="Genehmigungsstatus" value="{!pbag.genStatus}" style="{!pbag.genstyle}"/>
+                </apex:pageBlockTable>
+                
+                <apex:commandButton id="pbZuAuf" action="{!boxZuAuftrag}"  value="Auswählen" styleClass="btn" rerender="nPBBlocksection" disabled="{!( (AuftragEditMode || (box.boxkeineGenehmigung && !box.editierbar) || keineAdresse)  && (!kandidat))}">
+                    <apex:param name="bza" assignTo="{!applyPBVlfdName}" value="{!box.selectedBox}" />
+                </apex:commandButton> 
+
+                <apex:commandButton id="pbZuAufR" action="{!boxZuAuftragR}"  value="Rückwirkende Lieferung" styleClass="btn" rerender="nPBBlocksection" disabled="{!(AuftragEditMode || box.boxkeineGenehmigung || keineAdresse || kandidat )}">
+                    <apex:param name="bza" assignTo="{!applyPBVlfdName}" value="{!box.selectedBox}" />
+                </apex:commandButton>               
+                            
+            </apex:pageBlockSection>                                           
+
+            <apex:pageBlockSection title="Artikel auswählen" columns="1" id="pbs" rendered="{!ArtikelEditMode}" collapsible="false">
+
+                <apex:pageBlockTable style="text-align:left;vertical-align:top;white-space: pre;" value="{!box.pbAgGnList}" var="pbag" id="agarTab">                
+                    <apex:column headerValue="Artikelgruppe" value="{!pbag.agrp}" />
+                    <apex:column headerValue="Artikel">
+                        <apex:selectList value="{!pbag.selectedArtikel}" multiselect="false" styleclass="SelectOptions" size="1" >
+                            <apex:selectOptions value="{!pbag.artikelSelect}"/>
+                            <apex:actionsupport action="{!selectArt}" event="onchange" rerender="pbs, bGp">     
+                                <apex:param name="LZGb" assignTo="{!applyArID}" value="{!pbag.agid}" />  
+                            </apex:actionsupport>
+                        </apex:selectList>
+                    </apex:column>
+                    <apex:column headerValue="Einzelreis" value="{!pbag.preis}" />
+                    
+                    <apex:column headerValue="Menge" >
+                        <apex:actionregion immediate="True">
+                        <apex:inputtext value="{!pbag.bmenge}" style="width:20px;" rendered="{!((pbag.editierbar && !pbag.keineGenehmigung) || pbag.keine_genehmigungspflicht)}"> 
+                        <apex:actionsupport action="{!selectArt}" event="onchange" rerender="pbs, bGp">   
+                            <apex:param name="LZGt" assignTo="{!applyArID}" value="{!pbag.agid}" />   
+                        </apex:actionsupport>
+                        </apex:inputtext>
+                        </apex:actionregion>
+                        <apex:outputtext value="{!pbag.bmenge}"  rendered="{!((!pbag.editierbar || pbag.keineGenehmigung) && !pbag.keine_genehmigungspflicht)}"/>   
+                    </apex:column>
+                    <apex:column headerValue="Preis" value="{!pbag.pospreis}" />
+                    
+                    <apex:column headerValue="Genehmigungsstatus" value="{!pbag.genStatus}" style="{!pbag.genstyle}"/>
+                </apex:pageBlockTable>      
+            
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Inkontinenz-Mittel" columns="2" rendered="{!!inkoEditMode}" collapsible="false" >
+                <apex:selectList value="{!inko.selected}" multiselect="false" styleclass="SelectOptions" size="1" >
+                        <apex:selectOptions value="{!inko.InkoSelect}"/>                                                                         
+                </apex:selectList>                               
+                 <apex:commandButton action="{!inkoZuAuftrag}" value="Auswählen" styleClass="btn" rerender="nPBBlocksection">                    
+                </apex:commandButton>  
+                             
+                            
+            </apex:pageBlockSection>
+    
+    </apex:pageBlockSection>            
+</apex:pageBlock>
+       <apex:outputPanel id="tstpopup">
+        <apex:outputPanel styleClass="popupBackground" layout="block" rendered="{!displayPopUp}"/>
+            <apex:outputPanel styleClass="custPopup" layout="block" rendered="{!displayPopUp}">                
+                Im angegebenen Lieferzeitraum erfolgte bereits eine Lieferung, soll eine weitere Lieferung wirklich erfolgen?<br/><br/><br/>
+                <apex:commandButton value="Ja" action="{!auftragNachMeldungErstellen}" rerender="tstpopup, pageBlockId"/>
+                <apex:commandButton value="Nein" action="{!boxZuAuftragAbbrechen}" rerender="tstpopup, pageBlockId"/>
+            </apex:outputPanel>
+        </apex:outputPanel>
+</apex:form>
+<style type="text/css">
+        .custPopup{
+            text-align: center;
+            background-color: white;
+            border-width: 2px;
+            border-style: solid;
+            z-index: 9999;
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            /* These are the 3 css properties you will need to change so the popup
+            displays in the center of the screen. First set the width. Then set
+            margin-left to negative half of what the width is. You can add
+            the height property for a fixed size pop up if you want.*/
+            width: 500px;
+            margin-left: -250px;
+            top:100px;
+        }
+        
+        .popupBackground{
+            background-color:black;
+            opacity: 0.20;
+            filter: alpha(opacity = 20);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+
+    </style>
+</apex:page>

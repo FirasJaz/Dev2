@@ -1,0 +1,174 @@
+<!--
+//  Created 20.03.2018 von MZ
+//  Klose und Srocke Gesellschaft für kreative Konfliktlüsungen mbH
+//  Nordkanalstraße 58
+//  20097 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Description:
+// Badumbau component of the new lead tool
+//
+//****************************************************************************************************************************
+// Changes:
+// 24.04.2018    MZ    new fields for Badumbau added.
+//****************************************************************************************************************************
+-->
+<apex:component >
+<br/>
+    <apex:attribute name="formObj" description="form object" type="Lead" required="true"/>
+    <apex:attribute name="productGroupOptions" description="productGroupOptions" type="List"/>
+
+
+<h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Angaben aus dem Wizard</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Was soll umbgebaut werden?</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.RemodelingSolution__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                    
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Wissen Sie bereits, welche Umbau-Lösung es sein soll?</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                            <apex:selectList multiselect="false" value="{!formObj.TL_Treppenliftart__c}" label="" styleClass="slds-select"> 
+                               <apex:selectOptions value="{!productGroupOptions}"/> 
+                             </apex:selectList> 
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>                
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                
+                     <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">{!$ObjectType.Lead.fields.EntryLevel__c.Label}</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.EntryLevel__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                      
+
+                    <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Für wen ist der Umbau gedacht?</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Person_des_Bedarfs__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+         
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">VMG vorhanden (verbal)?</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.LandlordOwnerAgreement__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div> 
+
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">{!$ObjectType.Lead.fields.HousingSituation__c.Label}</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.HousingSituation__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                     
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">{!$ObjectType.Lead.fields.pflegegrad__c.Label}</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.pflegegrad__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Stockwerk des Badezimmers/Wohnung</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.FloorOfRemodeling__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                     
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Kostenträger-Service gewünscht?</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TakeCareOfPossibleGrants__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>
+                </div>
+                 
+<!-- h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Wo soll Umgebaut werden</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Postleitzahl für Suche</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TL_Postleitzahl_f_r_Suche__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                 
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Wohnort der Suche</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Wohnort_der_Suche__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                 
+                 </div -->
+                
+</apex:component>

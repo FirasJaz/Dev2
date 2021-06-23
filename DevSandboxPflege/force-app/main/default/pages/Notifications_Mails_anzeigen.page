@@ -1,0 +1,86 @@
+<apex:page controller="Notifications_Mails_anzeigen">
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+    <apex:form id="tsForm" >
+    <apex:Pageblock id="pb" >
+   <apex:tabPanel switchType="client" selectedTab="name2" id="theTabPanel">
+
+      <apex:tab label="Ungelesen Inside Sales" >
+            <apex:pageBlockTable value="{!tsList}" var="TS1" width="90%" >  
+                    <apex:column headerValue="Betreff" > 
+                    <apex:outputLink value="/{!TS1.ID}" >{!TS1.subject}</apex:outputLink>
+                </apex:column>  
+                <apex:column headerValue="Grund der E-Mail" > 
+                    <apex:outputLink value="/{!TS1.ID}" >{!TS1.Reason_of_email__c}</apex:outputLink>
+                </apex:column>                  
+                <apex:column headerValue="Von" > 
+                    <apex:outputLink value="/{!TS1.WhoID}" style="white-space : nowrap; padding-right:40px;">{!TS1.Who.Name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Email" > 
+                    <apex:outputfield value="{!TS1.Email__c}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="CC" > 
+                    <apex:outputfield value="{!TS1.CC__c}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="Status" > 
+                    <apex:outputfield value="{!TS1.Status}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="Eingangsdatum" > 
+                    <apex:outputfield value="{!TS1.ActivityDate}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+            </apex:pageBlockTable>  
+        </apex:tab>
+        
+              <apex:tab label="Ungelesen Curabox" >
+            <apex:pageBlockTable value="{!tsList3}" var="TS3" width="90%" >  
+                    <apex:column headerValue="Betreff" > 
+                    <apex:outputLink value="/{!TS3.ID}" >{!TS3.subject}</apex:outputLink>
+                </apex:column> 
+                        <apex:column headerValue="Grund der E-Mail" > 
+                    <apex:outputLink value="/{!TS3.ID}" >{!TS3.Reason_of_email__c}</apex:outputLink>
+                </apex:column>  
+                <apex:column headerValue="Von" > 
+                    <apex:outputLink value="/{!TS3.WhoID}" style="white-space : nowrap; padding-right:40px;">{!TS3.Who.Name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Email" > 
+                    <apex:outputfield value="{!TS3.Email__c}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="CC" > 
+                    <apex:outputfield value="{!TS3.CC__c}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="Status" > 
+                    <apex:outputfield value="{!TS3.Status}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="Eingangsdatum" > 
+                    <apex:outputfield value="{!TS3.ActivityDate}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+            </apex:pageBlockTable>  
+        </apex:tab>
+
+        <apex:tab label="Gelesen">
+            <apex:pageBlockTable value="{!tsList2}" var="TS2" width="90%" >  
+                    <apex:column headerValue="Betreff" > 
+                    <apex:outputLink value="/{!TS2.ID}" >{!TS2.subject}</apex:outputLink>
+                </apex:column>  
+                <apex:column headerValue="Von" > 
+                    <apex:outputLink value="/{!TS2.WhoID}" style="white-space : nowrap; padding-right:40px;">{!TS2.Who.Name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Email" > 
+                    <apex:outputfield value="{!TS2.Email__c}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="CC" > 
+                    <apex:outputfield value="{!TS2.CC__c}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="Status" > 
+                    <apex:outputfield value="{!TS2.Status}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+                <apex:column headerValue="Eingangsdatum" > 
+                    <apex:outputfield value="{!TS2.ActivityDate}" style="white-space : nowrap; padding-right:40px;"></apex:outputfield>
+                </apex:column>
+            </apex:pageBlockTable>  
+        </apex:tab>
+
+        </apex:tabPanel>
+    </apex:Pageblock>
+</apex:form>
+
+</apex:page>

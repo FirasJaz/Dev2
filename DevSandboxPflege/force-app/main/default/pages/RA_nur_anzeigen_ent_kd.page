@@ -1,0 +1,104 @@
+<apex:page renderas="PDF" standardStylesheets="false" controller="RA_nur_anzeigen_ent_controller_class" sidebar="FALSE" showHeader="False" action="{!addTask}">
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Autor:          WDS
+//      Stand:          06.12.2012
+//      Version:        1.0
+//      geändert:       
+//      Beschreibung:   Diese Seite ist die Eingangsbestätigung für den Antrag an Angehörige und Pflegedienste
+//
+//
+//  wds        am 15.06.2014 Layout bearbeitet durch MS
+//  wds        am 19.06.2014 Nach email SB Korrigiert
+//  
+//  AM         am 12.01.2015 Text geänder gem. Vorlage "Vorlage_Willkommensanschreiben_gesetzlich_15.doc"
+//  wds        am 28.01.2015 Variablen aus den Company-Settings für Web-Adresse und Handelsregister geholt
+//  wds        am 04.03.2015 Verschiedene Änderungen für pflege.de
+//  TK         am 03.05.2016 Text und Design Anpassungen für pflege.de
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--><HTML>
+<head>
+<apex:stylesheet value="{!$Resource.CSS_For_PDF}" />
+</head>
+<body>
+<div id="head">    
+    <div id="logo">
+           <apex:image url="{!$Resource.Logo_Small}" />
+    </div>
+                
+    <div id="address">
+           <span class="own_address">{!$Organization.Name} &bull; {!$Organization.Street} &bull; {!$Organization.PostalCode} {!$Organization.City}</span>
+           <br />
+           <br />
+           {!Kdaddr.Anrede}<br />
+           {!kdAddr.vorname_name}<br />
+           {!kdAddr.strasse}<br />
+           {!kdAddr.plz_ort}
+    </div>
+        
+    <div id="right">
+       {!$Organization.Name}<br />
+       {!$Organization.Street}<br />
+       {!$Organization.PostalCode} {!$Organization.City}<br />
+       <br />
+       T {!FirmenInfo.Telefon__c}<br />
+       F {!FirmenInfo.Fax__c}<br />
+       E {!FirmenInfo.Email__c}<br />
+       {!FirmenInfo.WEB1__c}<br />
+       {!FirmenInfo.WEB2__c}<br />
+       <br />
+       Sitz der Gesellschaft:<br />
+       {!FirmenInfo.Amtsgericht__c}<br />
+       {!FirmenInfo.HRA__c}<br />
+<br />
+       Geschäftsführung<br />
+       <apex:outputtext escape="false" value="{!FirmenInfo.GF__c}"/><br />
+       <br />
+<br />
+<!--       {!FirmenInfo.Bank__c}<br />
+       BIC: {!FirmenInfo.BLZ__c}<br />
+       IBAN: {!FirmenInfo.Kontonummer__c}<br />
+<br />
+       IK {!FirmenInfo.IK_Nummer__c}<br />
+-->
+    </div>
+</div>    
+    
+      <!-- Header is done -->
+      <div id="content">
+          <div id="subject">
+              <p><strong>Ihre Bestellung der curabox</strong><br/> 
+              Hamburg,&nbsp;<apex:outputtext value="{0,date,dd.MM.yyyy}">
+                        <apex:param value="{!Now()}" /></apex:outputtext><br />
+                        <br />
+              Name Versicherter: &nbsp;&nbsp;&nbsp;<b>{!Kunde.Name__c}, {!Kunde.Vorname__c}</b> <br />   
+              Ihre Kundennummer: <b>{!Kunde.Kundennummer_abena__c}</b></p>
+          </div>   
+          <div id="text">
+               
+      <br />   
+      <p><apex:outputtext value="{!Anredeformel}"/></p>   
+<p>hiermit bestätigen wir Ihnen den Eingang des curabox Formulars für {!kdAddr.kdvorname} {!kdAddr.kdnachname}. Wir bedanken uns für Ihr Vertrauen und freuen uns Sie dabei zu unterstützen, den Anspruch auf Pflegehilfsmittel im Wert von bis zu 40 €/Monat geltend zu machen.</p>
+
+<p>Wir haben den Antrag bereits an Ihre Pflegekasse weitergeleitet und kümmern uns, durch unseren ständigen Austausch mit den zuständigen Ansprechpartnern, um eine schnellstmögliche Bearbeitung. Diese nimmt max. vier Wochen in Anspruch.</p>
+
+<p>Sobald die Genehmigung für die Kostenübernahme der curabox bei uns eingegangen ist, versenden wir die erste Lieferung umgehend und kostenfrei an die gewünschte Lieferadresse.</p>
+
+<p>Sollte die zu pflegende Person privatversichert sein, erhält der Versicherte von uns eine Rechnung pro Lieferung separat per Post. Nachdem er in Vorleistung getreten ist, werden die Kosten von der Kasse voll erstattet. Für Beihilfeberechtigte ist die Rechnung zum Beihilfebemessungssatz voll erstattungsfähig.</p>
+
+<p>Haben Sie noch Fragen? Wir beraten Sie gern unter <b>0800 666 222 141</b>.</p>
+
+      </div>
+
+              <div id="unterschrift">Mit herzlichen Grüßen<br/> 
+              <br/>
+              Ihr curabox Team<br/>
+             
+              </div>
+              </div>
+
+</body>
+</HTML>
+</apex:page>

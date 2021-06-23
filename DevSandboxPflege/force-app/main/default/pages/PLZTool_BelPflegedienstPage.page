@@ -1,0 +1,33 @@
+<apex:page id="page_id" controller="PLZTool_Betreuungsleistungen" sidebar="false" showHeader="false" showQuickActionVfHeader="false">
+  
+  <apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+  <apex:form id="cmForm">
+
+<div class="slds">
+     <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+         <!-- LAYOUT GRID -->
+           <div class="slds-grid" id="id" >
+               <!-- GRID COL -->
+               <div class="slds-col" style="color: white;">
+               <!-- HEADING AREA -->
+               <h1 class="slds-text-heading--medium" style="text-align: center;">Email an das PWE Team  wurde verschickt !</h1> 
+               </div>
+           </div>
+    </div>   
+    
+    <apex:outputPanel >
+      <apex:pageMessages id="showmsg"/>
+    </apex:outputPanel>
+    <br/>
+  
+    <!-- Buttons -->  
+    <div style="text-align: center;">
+          <apex:commandButton styleClass="slds-button slds-button--brand" value="Zurück zum Opportunity" action="{!toOpportunity}"  />
+          <apex:commandButton styleClass="slds-button slds-button--brand" value="Zurück zur Leads" action="{!toLeads}" />
+    </div>
+    <!-- Buttons -->
+   <br/>
+ 
+</div>
+  </apex:form>
+</apex:page>

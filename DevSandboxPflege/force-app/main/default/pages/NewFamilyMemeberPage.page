@@ -1,0 +1,44 @@
+<!--
+//  Erstellt 27.02.2017 von MZ
+//      Klose und Srocke Gesellschaft für kreative Konfliktlösungen GmbH
+//      Mindelweg 11
+//      22393 Hamburg 
+//      Tel.:  04064917161
+//      Fax.: 04064917162
+//      Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+// Neues Familienmitglied hinzufügen          
+//
+//****************************************************************************************************************************
+// Änderungen:
+//    25.04.2017    MZ    changed to include the component "NewFamilyMemeberCmp". the controller changed to "NewFamilyMember_Opp"
+//****************************************************************************************************************************
+-->
+<apex:page id="page_id" sidebar="false" showHeader="false" showQuickActionVfHeader="false"  title="Neues Familienmitglied hinzufügen" controller="NewFamilyMember_Opp" docType="html-5.0" action="{! newMemberController.start}">
+
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+<div class="slds">
+            <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+
+                  <!-- LAYOUT GRID -->
+                  <div class="slds-grid" id="id" >
+                    <!-- GRID COL -->
+                    <div class="slds-col" style="color: white;">
+                      <!-- HEADING AREA -->
+                      <h1 class="slds-text-heading--medium">Neues Familienmitglied hinzufügen</h1> 
+                    </div>
+                  </div>
+             </div>
+             <br/>
+<apex:form id="cmForm" >
+<apex:Pageblock id="cm_block" >
+
+<c:NewFamilyMemeberCmp id="cm_newMember" newMemberCntlr="{!newMemberController}" rendered="{! newMemberController.showNewMember }" />
+
+</apex:Pageblock>
+</apex:form>
+</div>
+</apex:page>

@@ -1,0 +1,155 @@
+<!--
+/****************************************************************************************************************************
+// Created 27.06.2018 von  MZ
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// 	opportunity Id
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	to create comment in opportuniy + filter opportunity comments 
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" controller="OpportunityComment_Badumbau" >
+    
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="userId" type="Id"/>
+    <aura:attribute name="oppComment" type="OpportunityComments__c"/>
+    <aura:attribute name="correspondenceOptions" type="List"/>
+    
+    <aura:attribute name="commentList" type="List" />
+    <aura:attribute name="srchComment" type="String" />
+    <aura:attribute name="srchCorrespondence" type="String" />
+    
+    <aura:attribute name="modalDialogLayout" type="boolean" default="false"/>
+    <aura:attribute name="errorMessage" type="String" default="None"/>
+    
+    <aura:attribute name="showCommentRecord" type="boolean" default="false"/>
+    <aura:attribute name="selectedCommentId" type="Id" default=""/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    
+	<aura:if isTrue="{!v.errorMessage != 'None'}">
+    	<ui:message title="Error! " severity="error" closable="true">
+        	{!v.errorMessage}
+        </ui:message>
+    </aura:if>
+    
+    <div >
+    	<lightning:select name="correspondenceInput" label="Phase" aura:id="correspondenceId" value="{!v.oppComment.Correspondence__c}">
+                <aura:iteration items="{!v.correspondenceOptions}" var="cr">
+                    <option text="{!cr}" value="{!cr}"></option>
+                </aura:iteration>
+        </lightning:select>
+    	<lightning:textarea name="commentInput" label="Kommentar" value="{!v.oppComment.Comment__c }" maxlength="255"/>
+        
+        <lightning:buttonGroup>
+        	<lightning:button variant="Brand" label="Speichern" title="Speichern" onclick="{!c.saveComment}" />
+    	</lightning:buttonGroup>
+        <br/><br/>
+    </div> 
+    
+    <aura:if isTrue="{!v.modalDialogLayout}">
+              <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" id="notification" >
+              <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around--medium" style="text-align: center;">
+                  <div>
+                    <p>Kommentar erfolgreich hinzugefügt!</p>
+                  </div>
+                </div>
+                <div class="slds-modal__footer" style="text-align: right;">
+                  <ui:button class="slds-button slds-button--neutral" label="Ok" press="{!c.closeModalDialog}"/></div>
+              </div>
+              </div>
+              <div class="slds-backdrop slds-backdrop--open" id="backdrop"  ></div>
+    </aura:if>
+    
+    
+    <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer" >
+     <thead>
+      <tr class="slds-text-heading--label">
+        <th scope="col">
+            <lightning:select  name="srchCorrespondence" aura:id="correspondenceSrchId" value="{!v.srchCorrespondence}" onchange="{! c.onSearchFieldChanged}">
+                <option text="--keine--" value="--keine--" />
+                <aura:iteration items="{!v.correspondenceOptions}" var="srchCr">
+                    <option text="{!srchCr}" value="{!srchCr}"></option>
+                </aura:iteration>
+        	</lightning:select>
+        </th>
+        <th scope="col" colspan="2">
+            <lightning:input name="srchComment" value="{!v.srchComment}" onchange="{! c.onSearchFieldChanged}"/>
+        </th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+      </tr>
+      <tr class="slds-text-heading--label">
+        <th scope="col">
+          <span class="slds-truncate">Phase</span>
+        </th>
+        <th scope="col" colspan="2">
+          <span class="slds-truncate">Kommentar</span>
+        </th>
+        <th scope="col">
+          <span class="slds-truncate">Erstellungsdatum</span>
+        </th>
+        <th scope="col">
+          <span class="slds-truncate">Erstellt von</span>
+        </th>
+        <th>
+          <span class="slds-truncate">Öffnen</span>
+        </th>
+      </tr>
+    </thead>  
+    
+    <tbody>
+    <aura:iteration items="{!v.commentList}" var="cmnt">
+      <tr class="slds-hint-parent">
+        <td class="slds-truncate">
+            <span class="slds-truncate">{!cmnt.Correspondence__c}</span>
+        </td>
+        <td class="slds-truncate" colspan="2"  >
+            <span class="slds-truncate"><lightning:formattedText value="{!cmnt.Comment__c}"/></span>
+        </td>
+        <td class="slds-truncate">
+            <span class="slds-truncate"><ui:outputDateTime value="{!cmnt.CreatedDate}"/></span>
+        </td>
+        <td class="slds-truncate">
+            <span class="slds-truncate">{!cmnt.CreatedBy.Name}</span>
+        </td>
+        <td>
+            <lightning:button variant="base" label="Öffnen" title="Öffnen" value="{!cmnt.Id}" onclick="{!c.openCommentRecord}" />
+        </td>
+      </tr>    
+    </aura:iteration>
+	</tbody>
+    </table>
+        
+        <aura:if isTrue="{!v.showCommentRecord}">
+              <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" id="commentRecordView" >
+              <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around--medium">
+                  <div>
+                    <force:recordView recordId="{!v.selectedCommentId}" />
+                  </div>
+                </div>
+                <div class="slds-modal__footer" style="text-align: right;">
+                  <ui:button class="slds-button slds-button--neutral" label="Ok" press="{!c.closeCommentDialog}"/></div>
+              </div>
+              </div>
+              <div class="slds-backdrop slds-backdrop--open" id="backdrop"  ></div>
+    	</aura:if>
+
+	
+</aura:component>

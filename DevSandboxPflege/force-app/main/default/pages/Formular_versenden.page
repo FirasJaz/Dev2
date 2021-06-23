@@ -1,0 +1,87 @@
+<apex:page standardController="Kunde__c" id="fmPage" extensions="Formular_versenden" tabStyle="Kunde__c" sidebar="true">
+<!--
+//
+// Changelog:
+// 06.07.2018 MS #158424300/1576
+//             - in PageBlocksection:"eMail Vorschau" now using mailHtmlValue and mailSubject
+//             - button "Vorausgefüllt per Post" now opens directly the Kunden's attachment 
+//-->
+<script type="text/javascript"> 
+function fmDrucken(ta) {
+    // alert(ta);
+    var URL = ta ;
+    window.open(URL, "_blank");
+}
+function viewAtt(atid) {
+    var url = '/servlet/servlet.FileDownload?file=' + atid;  
+    window.open(url, "_blank");
+}
+
+</script>  
+    <apex:form id="fmForm">
+    <apex:pagemessages id="Page_Message"  escape="false"/>
+        <apex:Pageblock id="pblp" title="{!pageTitle}">
+        
+            <apex:pageBlockButtons >              
+                <apex:CommandButton id="btnzurueck" value="Zurück zu Kunde" immediate="True" action="{!zurueck}"/>
+                <apex:CommandButton id="btnzurueckt" value="Zurück" immediate="True" action="{!pageBack}" rendered="{!mailVorschau}"/>
+            </apex:pageBlockButtons>
+            
+            <apex:PageBlocksection title="Versandart" collapsible="false" id="fmPbs" columns="2" rendered="{!!mailVorschau}">
+                <apex:outputtext value="Versenden an"  />  
+                <apex:selectList value="{!selectedRcpt}" multiselect="false" styleclass="SelectOptions" size="1"  disabled="false">
+                    <apex:selectOptions value="{!selRCPT}"/>
+                    <apex:actionsupport action="{!changeRcpt}"  event="onchange" rerender="pblp " />      
+                </apex:selectList>      
+            
+            </apex:PageBlocksection>   
+            <apex:PageBlocksection title="Curabox" collapsible="false" columns="2" rendered="{!!mailVorschau}"> 
+                        <apex:commandButton onClick="javascript:fmDrucken('{!MainPageName}')" value="blanko per Post" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;"  />
+                        <apex:outputtext value="{!beschreibung}"  />
+                        
+                        <apex:commandButton action="{!perEmail}" value="blanko per Email" styleClass="btn" disabled="{!!hasMail}" immediate="true" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;" />
+                        <apex:outputtext value="Email mit Anhang {!mailHinweis}"  id="hinw"/>  
+                        
+                        <apex:commandButton onClick="javascript:viewAtt('{!pdfAttachmentId_Assistent}')" value="Vorausgefüllt per Post" disabled="{! not(hasAddr) || isnull(pdfAttachmentId_Assistent)}"  styleClass="btn" 
+                        style="padding:2px 5px 2px 5px; text-decoration:none; width:200;"  rendered="{!!eingBest}" />
+                        <apex:outputtext value="{!beschreibung_Assistent}"  rendered="{!!eingBest}" />
+                        
+                        <apex:commandButton action="{!perEmailAssistent}" value="Vorausgefüllt per Email" styleClass="btn" disabled="{!!hasMail}" immediate="true" 
+                        style="padding:2px 5px 2px 5px; text-decoration:none; width:200;" rendered="{!!eingBest}" />
+                        <apex:outputtext value="Vorausgefüllt per Email {!mailHinweis}" rendered="{!!eingBest}" />  
+                        
+    
+            </apex:PageBlocksection>        
+            <apex:PageBlocksection title="Inkontinenzmittel" collapsible="false" columns="2"  rendered="{!IF((!mailVorschau && !eingBest), true, false) }"> 
+                        <apex:commandButton onClick="javascript:fmDrucken('{!MainPageName_inko}')" value="per Post für Inko" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;"  />
+                        <apex:outputtext value="{!beschreibung_inko}"  />
+                        
+                        <apex:commandButton action="{!perEmailinko}" value="per Email inko"  styleClass="btn" disabled="{!!hasMail}" immediate="true" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;" />
+                        <apex:outputtext value="Email  {!mailHinweis}"  />
+            </apex:PageBlocksection>  
+            
+            <apex:PageBlocksection title="eMail Vorschau" collapsible="false" columns="1" rendered="{!mailVorschau}"> 
+                <apex:outputtext label="An:" value="{!mailTo}" />
+                <apex:outputtext label="Betreff:" value="{!mailSubject}" />
+                <apex:outputtext label="Text:" value="{!mailHtmlValue}" escape="false"/>
+            </apex:PageBlocksection>  
+            <apex:PageBlocksection title="Anhänge" collapsible="false" id="atPbs"  columns="1" rendered="{!mailVorschau}">
+                <apex:pageBlockTable value="{!Att}" var="AT" id="AtTab" rendered="{!!att.empty}"  >
+                    <apex:column headerValue="" >
+                        <apex:commandLink action="{!startMail}" value="Mail senden" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none;" >
+                            <apex:param name="mAtId" assignto="{!mAtId}" value="{!AT.id}" />
+                        </apex:commandLink>
+                        <apex:commandLink onClick="javascript:viewAtt('{!AT.id}')" value="anzeigen" style="white-space : nowrap; padding-left:10px;"/>
+                    </apex:column>                    
+                    <apex:column headerValue="Dokument" > 
+                        <apex:outputtext value="{!AT.Name}" style="white-space : nowrap; padding-right:40px;"/>
+                    </apex:column> 
+                    <apex:column headerValue="Typ" > 
+                        <apex:outputtext value="{!AT.ContentType}" style="white-space : nowrap; padding-right:40px;"/>
+                    </apex:column>                                                          
+                </apex:pageBlockTable>  
+                <apex:outputLabel value="Keine Datensätze zum Anzeigen vorhanden" rendered="{!att.empty}"   styleClass="noRowsHeader"></apex:outputLabel>               
+            </apex:PageBlocksection>            
+        </apex:Pageblock> 
+    </apex:form>           
+</apex:page>

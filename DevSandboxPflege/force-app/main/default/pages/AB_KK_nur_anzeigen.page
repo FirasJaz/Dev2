@@ -1,0 +1,199 @@
+<apex:page standardController="Lieferscheinposition__c" recordSetVar="lieferscheinpositionen"
+    action="{!processAB_KK}" extensions="AB_KK_nur_anzeigen_controller_class" applyBodyTag="false" applyHtmlTag="false" 
+    sidebar="false" showheader="false" renderas="pdf">
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Autor:          MS
+//      Stand:          11.9.12
+//      Version:        0.1
+//      geändert:       
+//      Beschreibung:   Rechnung für den Abrechner; kriegt die DAten aus AB_KK_nur_anzeigen_controller_class.processAB_KK
+//
+//  wds         am         noch nicht deployed
+// ms am 11.9.12 deployed
+// wds am 04.09.2013 Anpassung an den aktuellen Fuss und Druckersteuereung
+//
+//
+// am am 20.03.2014 Anpassen an Mehrseitige PDF 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+  <html>
+    <head>
+    <!-- Stylesheets -->
+
+    
+    <apex:stylesheet value="{!$Resource.CSS_Rechnung}"/>  
+    <apex:stylesheet value="{!$Resource.PDFDocumentStyle}" />       
+    </head>
+    <body>
+    <!-- First Page Header -->
+    <c:PDFHeaderFooter type="header" position="center"></c:PDFHeaderFooter>
+    
+    <!-- All Pages Header -->
+    <c:PDFHeaderFooter type="header" position="left">
+        <div style="padding-top: 40px; padding-left: 20px;">
+            <apex:image url="{!$Resource.curabox_logo}" width="203" height="58" />
+        </div>
+    </c:PDFHeaderFooter>    
+         
+         <div id="inoxision">
+            
+         </div>
+         <div id="head">
+            <div id="address">
+               <apex:outputText value="{!$Organization.Name}, {!$Organization.Street}, {!$Organization.PostalCode} {!$Organization.City}" styleClass="underita own_adress"/><br />
+               <br />          
+               <apex:outputtext value="{!Kunde.Name__c}"/><br />     
+                <apex:outputtext value="{!Kunde.Vorname__c}"/><br />                   
+               <apex:outputtext value="{!Kunde.Stra_e__c} {!Kunde.Hausnummer__c}"/><br /><br />
+               <apex:outputtext value="{!Kunde.PLZ__c} {!Kunde.Ort__c}"/>    
+           </div> 
+            <div id="bearbeiter">
+             <table>
+                <tr>
+                    <td style="text-align:left;">Rechnung: </td><td><apex:outputtext value="{!RG.Name}"/></td>
+                </tr>             
+                <tr>
+                    <td style="text-align:left;">Fälligkeit: </td><td><apex:outputtext value="{!faelligAm}" /></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td><td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;">Datum: </td><td><apex:outputtext value="{0,date,dd.MM.yyyy}">
+                        <apex:param value="{!Now()}" /></apex:outputtext></td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;">Bearbeiter: </td><td><apex:outputtext value="{!RG.createdby.name}" /></td>
+                </tr>
+                 <tr>
+                    <td style="text-align:left;">Kontakt: </td><td><apex:outputtext value="{!$Organization.Fax}" /></td>
+                </tr>               
+                <tr>
+                    <td style="text-align:left;">Telefon: </td><td><apex:outputtext value="{!$Organization.Phone}" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="border-bottom: black solid 2px;">&nbsp;</td>
+                </tr>
+                 <tr>
+                    <td colspan="2" style="color: #666666; text-align:left; ">Interne Angaben pflege.de:</td>
+                </tr>               
+                 <tr>
+                    <td colspan="2" style="color: #666666; text-align:left; ">&nbsp;</td>
+                </tr>  
+                 <tr>
+                    <td style="text-align:left;">Kostenstelle: </td><td><apex:outputtext value="4001" rendered="{!isMedifox}"/><apex:outputtext value="4000" rendered="{!!isMedifox}"/></td>
+                </tr>               
+                <tr>
+                    <td style="text-align:left;">Erlöskonto: </td><td><apex:outputtext value="4401" rendered="{!isMedifox}"/><apex:outputtext value="4400" rendered="{!!isMedifox}"/></td>
+                </tr>
+            </table>
+            </div>
+        </div>
+        
+        <div id="document_info">
+        <H2>Rechnung</H2> 
+            <p>Ausgelieferte Produkte:</p>       
+        </div>
+        <div id="content">
+              <table width="100%">   
+              
+                <apex:repeat value="{!Zeilen}" var="p"> 
+                    <apex:outputPanel layout="none" rendered="{!p.pos}" >
+                        <tr style="{!p.seitenw}">                        
+                            <td width="40"  align="right" style="{!p.th} padding-right:10px;">{!p.Rpos}</td>                         
+                            <td width="200" style="{!p.th}">{!p.FP}</td>
+                            <td width="120" align="left" style="{!p.th}">{!p.einheit}</td>
+                            
+                            <td width="50" align="right" style="{!p.th}">{!p.menge}</td>   
+                            <td width="80"  style="{!p.th} padding-left:10px;">{!p.LsNr}</td>
+                            <td width="150" align="right" style="{!p.th}">{!p.sEndbetrag}</td>                               
+                        </tr>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel layout="none" rendered="{!p.leer}" >
+                        <tr style="{!p.seitenw}">                        
+                            <td width="40"  align="right" style="{!p.th} padding-right:10px;">{!p.Rpos}</td>                         
+                            <td width="200" style="{!p.th}">{!p.FP}</td>
+                            <td width="120" align="left" style="{!p.th}">{!p.einheit}</td>
+                            
+                            <td width="50" align="right" style="{!p.th}">{!p.menge}</td>   
+                            <td width="80"  style="{!p.th} padding-left:10px;">{!p.LsNr}</td>
+                            <td width="150" align="right" style="{!p.th}">{!p.sEndbetrag}</td>                               
+                        </tr>
+                    </apex:outputPanel>
+                        
+                    <apex:outputPanel layout="inline" rendered="{!p.kdTopic}" >
+                        <tr style="{!p.seitenw}">  
+                             <td style="{!p.th} padding-right:10px;">Kunde:</td>
+                             <td style="{!p.th}">{!p.PatientenName}</td>
+                             <td style="{!p.th}">Geb. {!p.gbDat}</td>                         
+                             <td colspan="3" style="{!p.th} padding-left:10px;">Versichertennummer: {!p.FP}</td>                        
+                        </tr>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel layout="none" rendered="{!p.az}" >
+                        <tr style="{!p.seitenw}">  
+                             <td style="{!p.th} padding-right:10px;"></td>
+                             <td style="{!p.th}">{!p.PatientenName}</td>
+                             <td colspan="4" style="{!p.th}">{!p.FP}</td>                                              
+                        </tr>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel layout="none" rendered="{!p.kk}" >
+                        <tr style="{!p.seitenw}">  
+                             <td style="{!p.th} padding-right:10px;"></td>
+                             <td style="{!p.th}">IK-Nr.: {!p.PatientenName}</td>
+                             <td colspan="4" style="{!p.th}">Krankenkasse: {!p.FP}</td>                                              
+                        </tr>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel layout="inline" rendered="{!p.sum}" >
+                        <tr style="{!p.seitenw}">                        
+                            <td width="40"  align="right" style="{!p.th} padding-right:10px;">{!p.Rpos}</td>                         
+                            <td width="200" style="{!p.th}">{!p.FP}</td>
+                            <td width="120" align="left" style="{!p.th}">{!p.einheit}</td>
+                            
+                            <td width="50" align="right" style="{!p.th}">{!p.menge}</td>   
+                            <td width="80"  style="{!p.th} padding-left:10px;">{!p.LsNr}</td>
+                            <td width="150" align="right" style="{!p.th}">{!p.sEndbetrag}</td>                               
+                        </tr>
+                    </apex:outputPanel>
+                </apex:repeat>
+              </table>             
+       
+
+      
+      <br /><br />
+   <!-- <table id="sum_table">
+       <tr class="nobo">
+            <td>IBAN: {!FirmenInfo.Kontonummer__c}</td></tr>      
+       <tr class="nobo">
+            <td>BIC: DRESDEFF200</td></tr>      
+       </table>
+       -->
+      <p style="font-size: 10px;">
+        <br/><br/>
+        Wir danken Ihnen für Ihr Vertrauen und freuen uns auf die weitere zusammenarbeit!
+        <br/><br/>
+        Ihr Team von pflege.de
+      </p>
+
+      
+      
+      </div>
+      
+    <!-- All Pages Footer --> 
+    <c:PDFHeaderFooter type="footer" position="center" showPageNumbers="true" >       
+         <table width="99%" style="border-top: black solid 1px; line-height:0.8;">
+            <tr><td style="text-align:left; font-size:11px;"> <apex:outputText value="{!$Organization.Name}, {!$Organization.Street}, {!$Organization.PostalCode} {!$Organization.City}" styleClass="underita own_adress"/></td></tr>
+            <tr><td style="text-align:left; font-size:11px;">Gesch&auml;ftsf&uuml;hrer: <apex:outputtext escape="false" value="{!FirmenInfo.GF__c}"/></td></tr>
+            <tr><td style="text-align:left; font-size:11px;">HRB: <apex:outputtext value="{!FirmenInfo.HRA__c}"/> USt-IdNr: <apex:outputtext value="{!FirmenInfo.Ust_id__c}"/></td></tr>
+            <tr><td style="text-align:left; font-size:11px;">{!FirmenInfo.Bank__c}, IBAN: {!FirmenInfo.Kontonummer__c}, BIC: DRESDEFF200</td></tr> 
+
+         </table>  
+    </c:PDFHeaderFooter>
+    </body>
+  </html>
+</apex:page>

@@ -1,0 +1,291 @@
+<!--
+ * @author			BS @ Cloud Monsters GmbH
+ * @description 	This component is used for manually defining orders' delivery date and delivery frequency within screen flow. Copied from Curabox_Order.cmp and edited to fit flow needs.
+ * @date 			05.08.2020
+ -->
+<aura:component controller="Create_Order" access="global" implements="lightning:availableForFlowScreens">
+
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="paragraph" type="String"/>
+    <aura:attribute name="wunschbox" type="String"/>
+    <aura:attribute name="curabox" type="curabox__c[]"/>
+    <aura:attribute name="selectedCurabox" type="String"/>
+    <aura:attribute name="selectedRythmus" type="String"/>
+    <aura:attribute name="deliveryDay" type="date"/>
+    <aura:attribute name="lastDeliveryDay" type="date"/>
+    <aura:attribute name="today" type="date"/>
+    <aura:attribute name="deliveryFrequency" type="String[]" />
+    <!-- Attribute for the order line table -->
+    <aura:attribute name="product" type="Object" />
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="ifOrderExists" type="boolean" default="false"/>
+    <!-- spruhkopf attribute-->
+    <aura:attribute name="spruehkopf" type="Object" />
+    <aura:attribute name="isSpruehkopf" type="boolean" default="true"/>
+    <!-- Attribute für CB6 -->
+    <aura:attribute name="isCBFlexibel" type="boolean" default="false"/>
+    <aura:attribute name="contact" type="Object" />
+    <aura:attribute name="isErsteEH" type="boolean" default="true"/>
+    <aura:attribute name="isZweiEH" type="boolean" default="true"/>
+    <aura:attribute name="totalPrice" type="Integer" default="0"/>
+    <aura:attribute name="orderLines" type="Object[]" />
+    <aura:attribute name="gloves" type="Product__c[]" />
+    <aura:attribute name="selectedGlove" type="String" />
+    <aura:attribute name="selectedGlove2" type="String" />
+    <aura:attribute name="gloveQuantity1" type="Integer" default="0"/>
+    <aura:attribute name="gloveQuantity2" type="Integer" default="0"/>
+    <!-- Genehmigte Menge für Handschuhe-->
+    <aura:attribute name="gloveGenehmigt" type="Integer" default="0"/>
+    <aura:attribute name="glovePrice1" type="Integer" default="0"/>
+    <aura:attribute name="glovePrice2" type="Integer" default="0"/>
+    <aura:attribute name="gloveTotal1" type="Integer" default="0"/>
+    <aura:attribute name="gloveTotal2" type="Integer" default="0"/>
+    <aura:attribute name="euro" type="String" default="€"/>
+    <!-- attribute to handle a confirmation mail -->
+    <aura:attribute name="toSendMail" type="boolean" default="true" />
+    <!-- init handler -->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+     <!-- if the contact gets the temporary face mask.-->
+    <aura:if isTrue="{!v.contact.without_temp_product__c}">
+        <!-- <ui:outputText value="{!$Label.c.Message}" /> -->
+        <ui:outputText value="{!$Label.c.CONTACT_NOT_GET_MASK_MESSAGE}" class="redtext"/>
+    <aura:set attribute="else">
+         <ui:outputText value="{!$Label.c.CONTACT_GET_MASK_MESSAGE}" class="greentext"/>
+    </aura:set>
+    </aura:if>  
+    <div class="details-order">
+        <div class="slds-p-around_x-small">
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-8 slds-p-around_x-small">
+                    <lightning:select name="wunschbox" label="Wunschbox" aura:id="cura_box" onchange="{! c.onChangeCurabox }">
+                        <aura:iteration items="{!v.curabox}" var="box">
+                            <option text="{!box.Name}" value="{!box.Name}" selected="{!box.Name==v.selectedCurabox}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                <div class="slds-size_2-of-8 slds-p-around_x-small">
+                    <lightning:input type="date"
+                                     name="lieferdatum"
+                                     aura:id="abDatum"
+                                     label="Lieferdatum von"
+                                     required="true"
+                                     min="{!v.today}"
+                                     max="{! v.lastDeliveryDay}"
+                                     value="{! v.deliveryDay}"
+                    />
+
+                </div>
+                <div class="slds-size_2-of-8 slds-p-around_x-small">
+                    <lightning:input type="date"
+                                     name="bis"
+                                     aura:id="bisDatum"
+                                     label="Bestellt bis"
+                                     min="{! v.today}"
+                                     value="{! v.lastDeliveryDay}"
+                    />
+
+                </div>
+                <div class="slds-size_2-of-8 slds-p-around_x-small">
+                    <lightning:select name="lieferrhythmus" label="Lieferrhythmus" aura:id="frequency" required="true">
+                        <aura:iteration items="{!v.deliveryFrequency}" var="rythmus">
+                            <option text="{!rythmus}" selected="{!rythmus==v.selectedRythmus}" />
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                <div class="slds-size_1-of-8 slds-p-around_x-small">
+                    <div class="btn-speichern">
+                        <lightning:button variant="brand"
+                                          aura:id="btn_save"
+                                          label="Speichern"
+                                          title="Speichern"
+                                          onclick="{! c.onSave}" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Here add order lines Component-->
+    <div class="slds-p-around_x-small">
+        <aura:if isTrue="{!v.isCBFlexibel}">
+            <div class="order_info_flexibel">
+                <div class="total_price">
+                    <lightning:formattedText value="Gesamtpreis:"/>
+                </div>
+                <div class="total_price">
+                    <lightning:formattedNumber value="{!v.totalPrice}" aura:id="totalPriceColor"/>
+                </div>
+            </div>
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-7 ">
+                    <lightning:formattedText value="Artikelgruppe" class="product_header"/>
+                </div>
+                <div class="slds-size_2-of-7 ">
+                    <lightning:formattedText value="Artikel" class="product_header"/>
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:formattedText value="Einzelpreis" class="product_header_price"/>
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:formattedText value="Menge" class="product_header"/>
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:formattedText value="Preis" class="product_header_price"/>
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:formattedText value="Genehmigte Menge" class="product_header"/>
+                </div>
+            </div>
+            <aura:iteration items="{!v.orderLines}" var="item">
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-size_1-of-7 ">
+                        <lightning:input readonly="true" value="{! item.groupe }" />
+                    </div>
+                    <div class="slds-size_2-of-7 ">
+                        <lightning:input readonly="true" value="{! item.name }" />
+                    </div>
+                    <div class="slds-size_1-of-7 ">
+                        <lightning:input readonly="true" value="{! item.price + v.euro}" class="product_price"/>
+                    </div>
+                    <div class="slds-size_1-of-7">
+                        <lightning:input type="number" value="{! item.menge }" onblur="{! c.calculatePrice}" min="0" max="10"/>
+                    </div>
+                    <div class="slds-size_1-of-7">
+                        <lightning:input readonly="true" value="{! item.summe + v.euro}" class="order_line_price"/>
+                    </div>
+                    <div class="slds-size_1-of-7">
+                        <lightning:input readonly="true" value="{! item.genehmigteMenge}" class="{! item.genehmigungstatus}"/>
+                    </div>
+                </div>
+            </aura:iteration>
+            <aura:set attribute="else">
+                <!-- the container element determine the height of the datatable -->
+                <div style="height: 180px">
+                    <lightning:datatable columns="{! v.columns }"
+                                         data="{! v.product }"
+                                         draftValues="{! v.draftValues }"
+                                         keyField="id"
+                                         hideCheckboxColumn="true"
+                                         aura:id="orderLinesDatatable"
+                                         errors="{! v.errors }"
+                                         onsave="{! c.handleSave }"
+                    />
+                </div>
+            </aura:set>
+        </aura:if>
+        <!-- add sprühkopf product -->
+        <aura:if isTrue="{!v.isSpruehkopf}">
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-7 ">
+                    <lightning:input readonly="true" value="{!v.spruehkopf.groupe}" />
+                </div>
+                <div class="slds-size_2-of-7 ">
+                    <lightning:input readonly="true" value="{!v.spruehkopf.name}" />
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:input readonly="true" value="{! v.spruehkopf.price + v.euro}" class="product_price"/>
+                </div>
+                <div class="slds-size_1-of-7">
+                    <lightning:input type="number" value="{! v.spruehkopf.menge }" aura:id="spruehkopf_quantity" max="10"/>
+                </div>
+                <div class="slds-size_1-of-7">
+                    <lightning:input readonly="true" value="{! v.spruehkopf.summe + v.euro}" class="order_line_price"/>
+                </div>
+            </div>
+        </aura:if>
+        <!-- end sprühkopf-->
+        <aura:if isTrue="{!v.isErsteEH}">
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-7 ">
+                    <lightning:input name="input4" readonly="true" value="Einmalhandschuhe" />
+                </div>
+                <div class="slds-size_2-of-7 ">
+                    <lightning:select class="product_name" name="Einmalhandschuhe" aura:id="glove_1" onchange="{! c.onChangeGlove1}">
+                        <aura:iteration items="{!v.gloves}" var="Hschuhe">
+                            <option text="{!Hschuhe.Name}" value="{!Hschuhe.Name}" selected="{!Hschuhe.Name==v.selectedGlove}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:input readonly="true" value="{! v.glovePrice1 + v.euro}" class="product_price"/>
+                </div>
+                <div class="slds-size_1-of-7">
+                    <lightning:input type="number" value="{! v.gloveQuantity1 }" aura:id="glove_quantity" onblur="{! c.calculatePrice}" min="0" max="2"/>
+                </div>
+                <div class="slds-size_1-of-7">
+                    <lightning:input readonly="true" value="{! v.gloveTotal1 + v.euro}" class="order_line_price"/>
+                </div>
+                <aura:if isTrue="{!v.isCBFlexibel}">
+                    <div class="slds-size_1-of-7">
+                        <lightning:input readonly="true" value="{! v.gloveGenehmigt}"/>
+                    </div>
+                </aura:if>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.isZweiEH}">
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-7 ">
+                    <lightning:input name="input4" readonly="true" value="Einmalhandschuhe" />
+                </div>
+                <div class="slds-size_2-of-7 ">
+                    <lightning:select class="product_name" name="Einmalhandschuhe" aura:id="glove_2" onchange="{! c.onChangeGlove2 }">
+                        <aura:iteration items="{!v.gloves}" var="Hschuhe">
+                            <option text="{!Hschuhe.Name}" value="{!Hschuhe.Name}" selected="{!Hschuhe.Name==v.selectedGlove2}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                <div class="slds-size_1-of-7 ">
+                    <lightning:input readonly="true" value="{! v.glovePrice2 + v.euro}" class="product_price"/>
+                </div>
+                <div class="slds-size_1-of-7">
+                    <lightning:input type="number" value="{! v.gloveQuantity2 }" aura:id="glove_quantity2" onblur="{! c.calculatePrice}" min="0" max="2"/>
+                </div>
+                <div class="slds-size_1-of-7">
+                    <lightning:input readonly="true" value="{! v.gloveTotal2 + v.euro}" class="order_line_price"/>
+                </div>
+            </div>
+        </aura:if>
+    </div>
+    <!-- Lieferdatum prüfen-->
+    <aura:if isTrue="{!v.ifOrderExists}">
+        <!-- Pop up to set the delivery date-->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- MODAL BOX HEADER Start -->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Hinweis</h2>
+                </header>
+                <!-- MODAL BOX BODY Part Start -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Im angegebenen Lieferzeitraum erfolgte bereits eine Lieferung, soll eine weitere Lieferung wirklich erfolgen ?</p>
+                    <br/>
+                    <div class="modal-btn">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-size_2-of-8 ">
+                                <lightning:button variant="neutral"
+                                                  label="Nein"
+                                                  title="Nein"
+                                                  onclick="{! c.closeModel }"/>
+                            </div>
+                            <div class="slds-size_2-of-8 ">
+                                <lightning:button variant="brand"
+                                                  label="Ja"
+                                                  title="Ja"
+                                                  aura:id="save-btn-hinweis"
+                                                  onclick="{! c.onSaveHinweis}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+</aura:component>

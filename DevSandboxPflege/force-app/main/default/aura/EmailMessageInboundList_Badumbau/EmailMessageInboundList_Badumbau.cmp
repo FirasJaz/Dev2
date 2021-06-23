@@ -1,0 +1,90 @@
+<!--
+/****************************************************************************************************************************
+// Created 24.07.2018 von  MZ
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	component shows all inbound emails for Badumabu team. user can assign each email to an opportunity and mark the email as read.
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+<aura:component implements="flexipage:availableForAllPageTypes" controller="EmailMessageInboundList_Badumbau">
+    
+    <aura:attribute name="newEmails" type="List"
+                    description="list of all new emails" />
+    <aura:attribute name="emailMessageDataTableColumns" type="List"
+                    description="description of columns for DataTable with emailmessages" />
+	<aura:attribute name="isOpen" type="boolean" default="false"
+                    description="Defines whether modal is open or not" />
+    <aura:attribute name="emailMessageId" type="Id" default=""
+                    description="id of emailmessage which is then shown in modal-dialog" />
+    <!-- oppId not used anymore? 19.10.18 MS //-->
+    <aura:attribute name="oppId" type="Id" />
+    <aura:attribute name="selectedOpportunity" type="sObject" default="{}"
+                    description="holds the selected opportunity from customLookup-component" />
+    
+    <aura:attribute name="errorMessage" type="String" default="None"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <lightning:datatable keyField="id"
+                         data="{!v.newEmails}" 
+                         columns="{!v.emailMessageDataTableColumns}" 
+                         onrowaction="{!c.openModal}" 
+                         hideCheckboxColumn="true" />
+    
+    <div class="slds-m-around_xx-large">
+        <!--Use aura:if tag to display Model Box, on the bese of conditions. [isOpen boolean attribute] -->
+        <aura:if isTrue="{!v.isOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModal }" alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">E-Mail</h2>
+                        
+                        <aura:if isTrue="{!v.errorMessage != 'None'}">
+                            <ui:message title="Error! " severity="error" closable="true">
+                                {!v.errorMessage}
+                            </ui:message>
+                        </aura:if>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        
+                        <!--
+						19.10.18 MS:
+						here something went wrong when setting v.oppId via c.getOpportunityId
+						Therefore exchanging this standardcomponent-lookup with the customLookup-component below
+                        <lightning:recordEditForm aura:id="commentNewForm" 
+                                             objectApiName="OpportunityComments__c">
+                                    <lightning:inputField fieldName="Opportunity__c" value="{!v.oppId}" aura:id="commentOppId" onchange="{!c.getOpportunityId}" />
+                        </lightning:recordEditForm>
+						//-->
+                        <c:customLookup
+                                        objectAPIName="opportunity"
+                                        IconName="standard:opportunity"
+                                        selectedRecord="{!v.selectedOpportunity}"
+                                        label="Opportunity"/>
+                        <br/>
+                        <force:recordView recordId="{!v.emailMessageId}" />
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="brand" label="Als gelesen markieren" title="Als gelesen markieren" onclick="{! c.markAsRead }" />
+                        <lightning:button variant="neutral" label="Schließen" title="Schließen" onclick="{! c.closeModal }" />
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </div>
+    
+</aura:component>

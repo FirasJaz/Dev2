@@ -1,0 +1,15 @@
+<apex:page controller="Lpos_bereinigen" >
+    <apex:form id="auForm" >
+    <apex:pagemessages id="Page-Messages"/>
+    <apex:Pageblock title="Lieferungen">
+    <apex:pageBlockButtons location="top">
+    <apex:commandButton value="Los" action="{!Lpos_bereinigen_los}" />
+    </apex:pageBlockButtons>
+    <apex:PageBlocksection title="XML" collapsible="false" id="lposPbs" columns="1">    
+        <apex:inputtext value="{!lsinput}" style="width:400px" />
+    </apex:PageBlocksection>
+    
+    
+    </apex:Pageblock>
+    </apex:form>
+</apex:page>

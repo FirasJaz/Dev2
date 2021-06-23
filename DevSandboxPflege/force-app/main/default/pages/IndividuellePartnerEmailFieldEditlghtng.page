@@ -1,0 +1,112 @@
+<apex:page sidebar="false" showHeader="false" showQuickActionVfHeader="false"  title="Anzuzeigende Felder in der Partner-E-Mail definieren" controller="IndividuellePartnerEmailFieldEdit_lghtng">
+
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+
+<script type="text/javascript">
+    function productTabSelected(){
+        document.getElementById("tab-scoped-1__li").className = "slds-tabs--scoped__item slds-text-heading--label slds-active";
+        document.getElementById("tab-scoped-2__li").className = "slds-tabs--scoped__item slds-text-heading--label";
+        
+        document.getElementById("tab-scoped-1").className = "slds-tabs--scoped__content slds-show";
+        document.getElementById("tab-scoped-2").className = "slds-tabs--scoped__content slds-hide";        
+    }
+    
+    function contactTabSelected(){
+        document.getElementById("tab-scoped-1__li").className = "slds-tabs--scoped__item slds-text-heading--label";
+        document.getElementById("tab-scoped-2__li").className = "slds-tabs--scoped__item slds-text-heading--label slds-active";
+        
+        document.getElementById("tab-scoped-1").className = "slds-tabs--scoped__content slds-hide";
+        document.getElementById("tab-scoped-2").className = "slds-tabs--scoped__content slds-show";        
+    }
+</script>
+
+<apex:outputPanel >
+<apex:pageMessages id="showmsg"/>
+<apex:form >
+
+<div class="slds">
+            <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+
+                  <!-- LAYOUT GRID -->
+                  <div class="slds-grid" id="id" >
+                    <!-- GRID COL -->
+                    <div class="slds-col" style="color: white;">
+                      <!-- HEADING AREA -->
+                      <h1 class="slds-text-heading--medium">Bitte wählen anzuzeigende Felder in der Partner-Email</h1> 
+                    </div>
+                  </div>
+             </div>
+             <br/>
+             
+             <div  style="text-align: center;">
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="Abbruch" action="{!Abbruch}" />
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!Speichern}" />
+             </div>
+             <br/> 
+
+<div class="slds-tabs--scoped">
+  <ul class="slds-tabs--scoped__nav" role="tablist">
+    <li class="slds-tabs--scoped__item slds-text-heading--label slds-active" title="Produkte" role="presentation" id="tab-scoped-1__li">
+        <a class="slds-tabs--scoped__link" href="javascript:productTabSelected();" role="tab" tabindex="0" 
+        aria-controls="tab-scoped-1" id="tab-scoped-1__item">Produkte</a></li>
+    <li class="slds-tabs--scoped__item slds-text-heading--label" title="Kontakt-Daten" role="presentation" id="tab-scoped-2__li">
+        <a class="slds-tabs--scoped__link" href="javascript:contactTabSelected();" role="tab" tabindex="-1" 
+        aria-controls="tab-scoped-2" id="tab-scoped-2__item">Kontakt-Daten</a></li>
+  </ul>
+
+  <div id="tab-scoped-1" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+
+             <!--apex:outputLabel value="Produktgruppe" for="recordTypeList"/-->
+             <!--apex:selectList id="recordTypeList" value="{!selectedRecordtype}" size="1"-->
+                <!--apex:selectOptions value="{!items}" /-->
+                <!--apex:actionSupport event="onchange" action="{!onRecordTypeChange}" reRender="oppBlock" --><!--/apex:actionSupport-->
+             <!--/apex:selectList-->
+             
+       <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+               
+                <apex:repeat value="{!opportunityFields }" var="oppField" >
+                    <apex:repeat value="{!opportunityFields[oppField]}" var="fieldValue" >
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                        <apex:inputCheckbox value="{!fieldValue.selected}" styleClass="slds-checkbox slds-checkbox--faux">
+                        </apex:inputCheckbox> &nbsp;
+                        <apex:outputLabel value="{!fieldValue.field.Name}" styleClass="slds-form-element__label"/>
+                        </div>                       
+
+                    </apex:repeat>
+                </apex:repeat> 
+           
+      </div>
+       
+  </div>
+  
+  <div id="tab-scoped-2" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-2__item">
+       <div class="slds-grid slds-wrap slds-grid--pull-padded"> 
+
+                <apex:repeat value="{!contactFields }" var="conField" >
+                    <apex:repeat value="{!contactFields [conField]}" var="conFieldValue" >
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                        <apex:inputCheckbox value="{!conFieldValue.selected}" styleClass="slds-checkbox slds-checkbox--faux">
+                        </apex:inputCheckbox> &nbsp;
+                        <apex:outputLabel value="{!conFieldValue.field.Name}" styleClass="slds-form-element__label"/>
+                        </div>                       
+
+                    </apex:repeat>
+                </apex:repeat> 
+           
+       </div>
+  </div>
+  
+</div>
+     <br/>
+             <div  style="text-align: center;">
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="Abbruch" action="{!Abbruch}" />
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!Speichern}" />
+             </div>
+             <br/>
+
+</div>
+</apex:form>
+</apex:outputPanel>
+</apex:page>

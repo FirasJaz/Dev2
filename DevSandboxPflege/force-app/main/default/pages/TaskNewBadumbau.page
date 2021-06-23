@@ -1,0 +1,150 @@
+<!--
+/****************************************************************************************************************************
+// Created 04.06.2018 von  MZ
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// 	opportunity Id 
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	to create a new Bad-umbau task
+//
+//****************************************************************************************************************************
+// Changes: 
+// 27.06.2018     MZ     Assigned-To added as a field. default value is IT-Support 
+// 10.07.2018	  MZ	 new fields added
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
+-->
+<apex:page standardController="Opportunity"  extensions="TaskNewBadumbau"  showHeader="false"  tabStyle="Opportunity">
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="de">
+<head>
+	<meta charset="utf-8" />
+  	<meta http-equiv="x-ua-compatible" content="ie=edge" />
+  	<meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <apex:slds />
+	<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+
+</head>  
+<body>
+    <apex:form id="cmForm" >
+        <apex:pagemessages id="Page_Message" escape="false"/>
+        <div class="slds">
+        	<apex:pageBlock id="pb">
+                <div class="slds-box slds-theme--default slds-container--large slds-container--center">
+                    <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                        <div class="slds-col--padded slds-size--1-of-2">
+                          <div class="slds-form-element slds-hint-parent">
+                            <apex:outputLabel value="{!$ObjectType.Task.fields.Task_Phase__c.Label}" styleClass="slds-form-element__label"/> 
+                            <div class="slds-form-element__control">
+                              <apex:inputField value="{!formTask.Task_Phase__c}" styleClass="slds-select">
+                                <apex:actionSupport event="onchange" action="{!phaseChanged}" reRender="pb">
+                                  </apex:actionSupport>
+                                </apex:inputField>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="slds-col--padded slds-size--1-of-2">
+                          <div class="slds-form-element slds-hint-parent">
+                            <apex:outputLabel value="{!$ObjectType.Task.fields.Task_SubPhase__c.Label}" styleClass="slds-form-element__label"/> 
+                            <div class="slds-form-element__control">
+                              <apex:inputField value="{!formTask.Task_SubPhase__c}" styleClass="slds-select">
+                                <apex:actionSupport event="onchange" action="{!subPhaseChanged}" reRender="pb">
+                                  </apex:actionSupport>
+                                </apex:inputField>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="slds-col--padded slds-size--1-of-2">
+                          <div class="slds-form-element slds-hint-parent">
+                            <apex:outputLabel value="{!$ObjectType.Task.fields.ownerId.Label}" styleClass="slds-form-element__label"/> 
+                            <div class="slds-form-element__control">
+                              <apex:inputField value="{!formTask.ownerId}" styleClass="slds-select"></apex:inputField>
+                            </div>
+                          </div>
+                        </div> 
+                        
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element slds-hint-parent">
+                            <apex:outputLabel value="{!$ObjectType.Task.fields.Priority.Label}" styleClass="slds-form-element__label"/> 
+                            <div class="slds-form-element__control">
+                              <apex:inputField value="{!formTask.Priority}" styleClass="slds-select"></apex:inputField>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="slds-col--padded slds-size--1-of-4">
+                          <div class="slds-form-element slds-hint-parent">
+                            <apex:outputLabel value="{!$ObjectType.Task.fields.ActivityDate.Label}" styleClass="slds-form-element__label"/> 
+                            <div class="slds-form-element__control">
+                              <apex:inputField value="{!formTask.ActivityDate}" styleClass="slds-input"></apex:inputField>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="slds-col--padded slds-size--1-of-4"></div>
+                        
+                        <div class="slds-col--padded slds-size--1-of-4">
+                          <div class="slds-form-element slds-hint-parent">
+                            <apex:outputLabel value="{!$ObjectType.Task.fields.ActivityTime__c.Label}" styleClass="slds-form-element__label"/> 
+                            <div class="slds-form-element__control">
+                              <apex:inputField value="{!formTask.ActivityTime__c}" styleClass="slds-select"></apex:inputField>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="slds-col--padded slds-size--1-of-4"></div>
+                            
+                        
+                        <div class="slds-col--padded slds-size--1-of-2">
+                        </div>
+                        
+                        <div class="slds-col--padded slds-size--1-of-1">
+                          <div class="slds-form-element slds-hint-parent">
+                            <apex:outputLabel value="{!$ObjectType.Task.fields.Subject.Label}" styleClass="slds-form-element__label"/> 
+                            <div class="slds-form-element__control">
+                              <apex:inputText value="{!taskSubject}" styleClass="slds-input"></apex:inputText>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="slds-col--padded slds-size--1-of-1">
+                          <div class="slds-form-element slds-hint-parent">
+                            <apex:outputLabel value="{!$ObjectType.Task.fields.Description.Label}" styleClass="slds-form-element__label"/> 
+                            <div class="slds-form-element__control">
+                              <apex:inputField value="{!formTask.Description}" styleClass="slds-input"></apex:inputField>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!--div class="slds-col--padded slds-size--1-of-1">
+                          <div class="slds-form-element slds-hint-parent">
+                            <apex:outputLabel value="{!$ObjectType.Task.fields.whoId.Label}" styleClass="slds-form-element__label"/> 
+                            <div class="slds-form-element__control">
+                              <apex:inputField value="{!formTask.whoId}" styleClass="slds-select"></apex:inputField>
+                            </div>
+                          </div>
+                        </div-->
+                    </div>
+                </div>
+            <br/>
+                <div style="text-align: Right;">
+                	<apex:commandButton styleClass="slds-button slds-button--brand" value="speichern" action="{!saveTask}"/>
+             	</div>
+                
+        	</apex:pageBlock>
+    	</div>
+    </apex:form> 
+</body>
+</html>
+</apex:page>

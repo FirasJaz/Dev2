@@ -1,0 +1,800 @@
+<!--
+// Erstellt 21.04.2016 von BT
+//  Klose und Srocke Gesellschaft für kreative Konfliktlösungen GmbH
+//  Mindelweg 11
+//  22393 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+// Konvertierung von Leads zu Opportunities              
+//
+//****************************************************************************************************************************
+// Änderungen:
+// 26.07.2016    BT In der Überschrift wird 'Kunde' durch 'CB-Kunde' ersetzt
+// 17.08.2016    BT Das Erstelldatum und der StageName werden bei bestehenden Opportunities angezeigt
+// 18.08.2016    BT Lookup Familie: Es werden nur Accounts mit RecordType 'Pflege.de - Familien' vorgeschlagen
+// 18.08.2016    BT Gibt es in einer Maske nur eine Auswahl, wird diese standardmäßig vorausgewählt.
+// 19.08.2016    BT Waehlt man einen neuen Kontakt aus, werden Familiem nach Familien-Namen gesucht.
+// 19.08.2016    BT Es werden alle Opportunities der bestehenden Familie angezeigt. 
+// 19.08.2016    BT Waehlt man eine bestehende Opportunity aus, wird eine neue Opportunity im Hintergrund erstellt.
+// 22.08.2016    BT Notification bei bereits konvertierten Leads
+// 24.08.2016    BT Gibt es in einer Maske nur eine Auswahl, wird diese standardmäßig vorausgewählt.
+// 25.08.2016    BT 'Stage' wird durch 'Status' ersetzt
+// 29.08.2016    BT Schlusstermin und Betrag wurden aus Opportunity Details entfernt.
+// 26.10.2016    BT Automastische Auswahl der Checkbox, wenn bestehende Familien oder Ausschuss-Gründe ausgewählt werden
+// 08.11.2016    TK Wording-Anpassung: von "Treffen auf Grund von" geändet auf "Abgleich auf Grund von"
+// 16.06.2017    BT Am Ende der Konvertierung wird das Button "Speichern" inaktiv gesetzt.
+// 08.02.2018    MZ #154991989 - raise a warning message if a contact with same OM_User_ID already exists.
+//****************************************************************************************************************************
+-->
+<apex:page standardStylesheets="false" sidebar="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0" StandardController="Lead" extensions="Lead_zu_Opportunity">    
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">    
+
+     <head>
+        <apex:form id="form" >
+           <apex:actionFunction id="ft" name="home" action="{!zuLeads}" />
+           <apex:actionFunction name="back" action="{!zurueck}" />
+           <apex:actionFunction name="next" action="{!weiter}" />
+           <apex:actionFunction name="waehleKontaktAus" action="{!waehleKontaktAus}" rerender="form">
+              <apex:param name="kontaktId" value=""/>
+           </apex:actionFunction>         
+           <apex:actionFunction name="waehleFamilieAus" action="{!waehleFamilieAus}" rerender="form">
+               <apex:param name="famId" value=""/>
+           </apex:actionFunction>
+           <apex:actionFunction name="waehleZweiterKontaktAus" action="{!waehleZweiterKontaktAus}" rerender="form">
+              <apex:param name="contactId" value=""/>
+           </apex:actionFunction>
+           <apex:actionFunction name="waehleOpportunityAus" action="{!waehleOpportunityAus}" rerender="form">
+               <apex:param name="oppId" value=""/>
+           </apex:actionFunction>           
+           <apex:actionFunction name="waehleGrundAus" action="{!waehleGrundAus}" rerender="form">
+               <apex:param name="grd" value=""/>
+           </apex:actionFunction>
+           <apex:actionFunction name="familieZuOrdnen" action="{!familieZuOrdnen}" rerender="form">
+                  <apex:param name="fmName" value=""/>
+           </apex:actionFunction>
+           <apex:actionFunction action="{!acceptDuplicate}" name="acceptDuplicate" />
+           <apex:actionFunction action="{!denyDuplicate}" name="denyDuplicate" />
+           <apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+
+           <!-- jQuery CDN -->
+           <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+           <!-- Declare SessionId Variable For AJAX Toolkit -->           
+           <script type="text/javascript">
+           var __sfdcSessionId = '{!GETSESSIONID()}';
+           </script>
+           
+           <!-- Salesforce AJAX Toolkit Source -->
+           <script src="../../soap/ajax/36.0/connection.js" type="text/javascript"></script>
+           
+           <script>
+       
+           var j$ = jQuery.noConflict();
+       
+           function searchActs(key){
+                j$('#'+key.attr('aria-activedescendant')).show();
+                //Grabbing The Input Field Value
+                searchKey = key.val();
+                if(searchKey == '')
+                j$('#'+key.attr('aria-activedescendant')).hide();
+                j$('#searchText').text(searchKey);
+                
+                //Querying For Records In Accounts Name Matching The Input in The Text Field
+                    var recordtypeResult = sforce.connection.query("Select Id, sObjectType FROM RecordType WHERE Name='Pflege.de - Familien' and sObjectType='Account'");
+                    var recordType = recordtypeResult.getArray("records");
+                    result = sforce.connection.query("Select Id, Name, RecordTypeId from Account WHERE Name LIKE '%"+searchKey+"%' and RecordTypeId='"+recordType[0].Id +"'");                    
+                    records = result.getArray("records");    
+                    var searchLis ="<li class=\"slds-list__item slds-has-divider--bottom-space\" style=\"padding-left: 5px; font-weight: 600; margin-bottom:3px; padding-bottom:3px; font-size: 18px;\">Accounts</li>";
+                
+                //Creating List Elements Based on Query Results
+                if(records.length > 0){
+                for(var i=0; i<records.length; i++){
+                
+                //List Elements With Onclick and ID Attributes
+                 searchLis += '<li onclick="accInfo(\''+records[i].Id+'\'); familieZuOrdnen(\''+records[i].Name+'\');" class="slds-lookup__item"><a id="'+records[i].Id+'" href="#" role="option"><svg aria-hidden="true" class="slds-icon slds-icon-standard-account slds-icon--small">'
+                     +'<use xlink:href="{!$Resource.SLDS0122}/assets/icons/standard-sprite/svg/symbols.svg#account"></use></svg>'+records[i].Name+'</a></li>';
+                 }
+                 }else{
+                    searchLis += '<li class="slds-lookup__item">No Records Found</li>';
+                 }
+                
+                //Appending All The Created Result List Elements To the UL Tag
+                    j$('#searchResultsUL').html(searchLis);
+          }
+          
+          //Function To Get Account Records Details on Record Click
+          function accInfo(actId){
+                       j$('#SrchDrpDwn').fadeOut();                                               
+                       
+                       //ID Based Retrieval Instead Of Query to Get Record Details Of The Selected Record
+                       result = sforce.connection.retrieve("Name,BillingCountry", "Account", [actId]);
+                       j$('#searchInput').val(result[0].Name);    
+                       
+                       document.getElementById('fmz').checked = true;                                                
+          }       
+          
+          function zeigeDetailsAn(input){
+             if(document.getElementById(input).style.display === "none") {
+                 document.getElementById(input).style.display = "initial";
+             }
+             else{
+                 document.getElementById(input).style.display = "none";
+             }
+          }   
+          
+          function closeModalDialog(){
+                 document.getElementById('notification').style.display = "none";
+                 document.getElementById('backdrop').style.display = "none";
+          }   
+          
+          function updateCheckbox(){              
+              document.getElementById('aus').checked = true;
+          }      
+          
+          function inaktivSetzen() {
+                document.getElementById('speichern_1').disabled = true;
+                document.getElementById('speichern_2').disabled = true;
+          }
+          
+          function openBlanko(contactId, nextstep){
+            if(nextstep.includes('blanko per Post')){
+              var url = '/apex/' + 'Anschreiben_Formular_Neu' + '?id=' + contactId + '&rcpt=' + contactId;   
+              window.open(url, "_blank");
+            }
+          }
+          </script>           
+        </apex:form>                
+     </head> 
+
+     <body >
+     <apex:pageBlock >
+          <!-- REQUIRED SLDS WRAPPER -->
+          <div class="slds" >    
+  
+              <!-- PAGE HEADER -->
+             <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+
+                  <!-- LAYOUT GRID -->
+                  <div class="slds-grid" id="id" >
+
+                    <!-- GRID COL -->
+                    <div class="slds-col" style="color: white;">
+                      <!-- HEADING AREA -->
+                      <h1 class="slds-text-heading--medium">Lead zu Opportunity</h1> 
+                      <br/>
+                      <p class="slds-text-heading--label" style="color: white;" >{!title}</p>
+
+                    </div>
+
+                  </div>
+
+
+             </div>
+             <br/>
+
+<!-- PRIMARY CONTENT WRAPPER -->
+<div class="myapp">   
+
+<!-- Notification -->
+<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" id="notification" style="display: {!modalDialogLayout}">
+  <div class="slds-modal__container">
+    <div class="slds-modal__content slds-p-around--medium" style="text-align: center;">
+      <div>
+        <p>Dieses Lead wurde bereits konvertiert.</p>
+        <p>Möchten Sie dieses Lead trotzdem nochmal konvertieren ?</p>
+      </div>
+    </div>
+    <div class="slds-modal__footer" style="text-align: center;">
+      <button class="slds-button slds-button--neutral" onclick="home();" >Nein</button>
+      <button class="slds-button slds-button--neutral slds-button--brand" onclick="closeModalDialog();">Ja</button>
+    </div>
+  </div>
+</div>
+<div class="slds-backdrop slds-backdrop--open" id="backdrop" style="display: {!modalDialogLayout}"></div>
+<!-- Notification -->
+
+<!-- Owner Error Notification -->
+<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" id="ownerErrorNotification" style="display: {!ownerErrorDialog}">
+  <div class="slds-modal__container">
+    <div class="slds-modal__content slds-p-around--medium" style="text-align: center;">
+      <div>
+        <p>Zur Weiterverarbeitung musst du Inhaber des Datensatzes sein.</p>
+      </div>
+    </div>
+    <div class="slds-modal__footer" style="text-align: center;">
+      <button class="slds-button slds-button--neutral" onclick="home();" >Ok</button>
+    </div>
+  </div>
+</div>
+<div class="slds-backdrop slds-backdrop--open" id="backdrop2" style="display: {!ownerErrorDialog}"></div>
+<!-- Owner Error Notification -->
+
+<!-- Duplicate UserId Notification -->
+<div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" id="notification" style="display: {!duplicateDialog}">
+  <div class="slds-modal__container">
+    <div class="slds-modal__content slds-p-around--medium" style="text-align: center;">
+      <div>
+        <p>Sie erstellen gerade einen doppelten Datensatz. Es wird empfohlen, dass Sie stattdessen den vorhandenen Datensatz verwenden!</p>
+      </div>
+    </div>
+    <div class="slds-modal__footer" style="text-align: center;">
+      <button class="slds-button slds-button--neutral" onclick="acceptDuplicate();inaktivSetzen();" >doppelten Datensatz erstellen</button>
+      <button class="slds-button slds-button--neutral slds-button--brand" onclick="denyDuplicate();">Abbruch</button>
+    </div>
+  </div>
+</div>
+<div class="slds-backdrop slds-backdrop--open" id="backdrop" style="display: {!duplicateDialog}"></div>
+<!-- Duplicate UserId Notification -->
+
+<!-- Message -->
+<div class="slds-notify_container" style="display: {!message_layout}">
+  <div class="slds-notify slds-notify--alert slds-theme--alert-texture" role="alert">    
+    <h2>{!message}</h2>
+  </div>
+  <br/>
+</div>
+<!-- Message --> 
+
+<div class="slds-grid">
+  <div class="slds-tabs--path" role="application">
+    <ul class="slds-tabs--path__nav" role="tablist">
+      <li class="slds-tabs--path__item {!layout1}" role="presentation">
+        <a class="slds-tabs--path__link" id="tabs-path-1" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+          <span class="slds-tabs--path__stage">
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+                <use xlink:href="{!URLFOR($Resource.SLDS0122, '/assets/icons/utility-sprite/svg/symbols.svg#check')}"></use>              
+            </svg>
+            <span class="slds-assistive-text">Stage Complete</span>
+          </span>
+         <span class="slds-tabs--path__title">Kontakt anlegen</span>
+        </a>
+      </li>
+      <li class="slds-tabs--path__item {!layout5}" role="presentation">
+        <a class="slds-tabs--path__link" id="tabs-path-1" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+          <span class="slds-tabs--path__stage">
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+                <use xlink:href="{!URLFOR($Resource.SLDS0122, '/assets/icons/utility-sprite/svg/symbols.svg#check')}"></use>              
+            </svg>
+            <span class="slds-assistive-text">Stage Complete</span>
+          </span>
+         <span class="slds-tabs--path__title">Pflegebedürftige anlegen</span>
+        </a>
+      </li>
+      <li class="slds-tabs--path__item {!layout3}" role="presentation">
+        <a class="slds-tabs--path__link" id="tabs-path-1" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+          <span class="slds-tabs--path__stage">
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+              <use xlink:href="{!URLFOR($Resource.SLDS0122, '/assets/icons/utility-sprite/svg/symbols.svg#check')}"></use>
+            </svg>
+            <span class="slds-assistive-text">Stage Complete</span>
+          </span>
+          <span class="slds-tabs--path__title">Familie anlegen</span>
+        </a>
+      </li>
+      <li class="slds-tabs--path__item {!layout4}" role="presentation">
+        <a class="slds-tabs--path__link" id="tabs-path-1" aria-controls="content-path-1" aria-selected="false" tabindex="-1" role="tab" href="javascript:void(0);" aria-live="assertive">
+          <span class="slds-tabs--path__stage">
+            <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+              <use xlink:href="{!URLFOR($Resource.SLDS0122, '/assets/icons/utility-sprite/svg/symbols.svg#check')}"></use>
+            </svg>
+          </span>
+          <span class="slds-tabs--path__title">Opportunity anlegen</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+<br/><br/>
+
+<!-- Buttons -->
+<div  style="text-align: center;">
+  <button class="slds-button slds-button--neutral" onclick="back();" style="display: {!button_layout}" >zurück</button>
+  <button class="slds-button slds-button--neutral" onclick="home();" >zurück zu Lead</button>
+  <button class="slds-button slds-button--neutral" id="{!button_value}_1" onclick="next();inaktivSetzen();javascript:openBlanko('{!lead.Id}', '{!lead.next_step__c}');">{!button_value}</button>
+</div>
+<!-- Buttons -->
+
+<br/>
+
+<!-- Seite 1 -->
+<div style="display: {!seite1_layout}">
+<span class="slds-badge">Neuen Kontakt anlegen</span>
+<br/><br/>
+<table class="slds-table slds-table--bordered" style="table-layout: fixed;">
+  <thead>
+    <tr class="slds-text-heading--label">
+      <th class="slds-cell-shrink" style="width: 50px;">
+      </th> 
+      <th scope="col">
+        <div class="slds-truncate">Kontakt Name</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate" >Email</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Telefonnummer</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">PLZ</div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="slds-hint-parent">
+      <td class="slds-cell-shrink" data-label="Select Row">
+        <label class="slds-radio" style="display: {!uncheckedRadio1Layout}">                
+          <input type="radio"  name="options1" onclick="waehleKontaktAus('neuerKontakt')"/>                   
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+        <label class="slds-radio" style="display: {!checkedRadio1Layout}">                
+          <input type="radio"  checked="true" name="options1" onclick="waehleKontaktAus('neuerKontakt')"/>                   
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+      </td>
+      <apex:outputText rendered="{!isNormalProzess}">
+        <td class="slds-truncate" scope="row" data-label="Kontakt Name" >{!lead.Name}</td>
+        <td class="slds-truncate" data-label="Kontakt Email" >{!lead.Email}</td>
+        <td class="slds-truncate" data-label="Kontakt Telefonnummer" >{!lead.Phone}</td>
+        <td class="slds-truncate" data-label="Kontakt Telefonnummer" >{!lead.PostalCode}</td>
+      </apex:outputText>
+      <apex:outputText rendered="{!isCurabox}">   
+        <td class="slds-truncate" scope="row" data-label="Kontakt Name" >{!lead.Angehoeriger_Vorname__c +' '+lead.Angehoeriger_Nachname__c}</td>
+        <td class="slds-truncate" data-label="Kontakt Email" >{!lead.Angehoeriger_Email__c}</td>
+        <td class="slds-truncate" data-label="Kontakt Telefonnummer">{!lead.Angehoeriger_Telefon__c}</td>
+        <td class="slds-truncate" data-label="Kontakt Telefonnummer">{!lead.Angehoeriger_PLZ__c}</td>
+      </apex:outputText>  
+    </tr>
+  </tbody>
+</table>
+<div style="display: {!table1_layout}" > 
+<br/>
+<span class="slds-badge" >bestehenden Kontakt nutzen</span>
+<br/><br/>
+<table class="slds-table slds-table--bordered"  style="table-layout: fixed;">
+  <thead>
+    <tr class="slds-text-heading--label">
+      <th class="slds-cell-shrink" style="width: 50px;">
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Kontakt Name</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Email</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Telefonnummer</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">PLZ</div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+  <apex:repeat value="{!kontaktListe}" var="kontakt">
+    <tr class="slds-hint-parent" onclick="zeigeDetailsAn('{!kontakt.id}');">
+      <td class="slds-cell-shrink" data-label="Select Row" >
+        <label class="slds-radio">                
+          <input type="radio" name="options1" onclick="waehleKontaktAus('{!kontakt.Id}')"/>                   
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+      </td>
+      <td class="slds-truncate" scope="row" data-label="Kontakt Name">{!kontakt.Name}<br/>
+          <div  id="{!kontakt.id}" style="width:510px;margin-left:0px;margin-top:15px;display: none;">
+          <strong>Accountname : </strong><apex:outputField value="{!kontakt.AccountId}"/><br/>
+          <strong>Postanschrift : </strong>{!kontakt.MailingStreet}, {!kontakt.MailingPostalCode} {!kontakt.MailingCity}<br/>
+          <strong>Telefon : </strong>{!kontakt.Phone}<br/>
+          <strong>Email : </strong>{!kontakt.Email}<br/>
+          <strong>Mobiltelefon : </strong>{!kontakt.MobilePhone}<br/>
+          <strong>Art des Kontakts : </strong>{!kontakt.Art_des_Kontakts__c}<br/>
+          <strong>Familien-Zugehörigkeit : </strong>{!kontakt.Familien_Zugeh_rigkeit__c}<br/>
+          <strong>Von : </strong><apex:outputField value="{!kontakt.von__c}"/> 
+      </div>
+      </td>
+      <td class="slds-truncate" data-label="Kontakt Email">{!kontakt.Email}</td>
+      <td class="slds-truncate" data-label="Kontakt Telefonnummer">{!kontakt.Phone}</td>
+      <td class="slds-truncate" data-label="Kontakt Telefonnummer">{!kontakt.MailingPostalCode}</td>   
+    </tr>
+
+    </apex:repeat>   
+  </tbody>
+</table>
+</div> 
+</div>
+<!-- Seite 1 -->
+
+<!-- Seite 3 -->
+<div style="display: {!seite3_layout}">
+<span class="slds-badge">Neue Familie anlegen</span>
+<br/><br/>
+<table class="slds-table slds-table--bordered" style="table-layout: fixed;">
+  <thead>
+    <tr class="slds-text-heading--label">
+      <th class="slds-cell-shrink" style="width: 50px;">
+      </th> 
+      <th scope="col">
+        <div class="slds-truncate">Familien Name</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Ort</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Account Name</div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="slds-hint-parent">
+      <td class="slds-cell-shrink" data-label="Select Row">
+        <label class="slds-radio" style="display: {!uncheckedRadio3Layout}">    
+          <input type="radio" name="options3" onclick="waehleFamilieAus('neueFamilie')" />           
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+        <label class="slds-radio" style="display: {!checkedRadio3Layout}">    
+          <input type="radio" name="options3" checked="true" onclick="waehleFamilieAus('neueFamilie')" />           
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+      </td>
+      <apex:outputText rendered="{!isNormalProzess}">
+        <td class="slds-truncate" scope="row" data-label="Familien Name">{!lead.lastname}</td>
+        <td class="slds-truncate" data-label="Ort">{!lead.City}</td>
+        <td class="slds-truncate" data-label="Account Name">{!lead.lastname}</td>
+      </apex:outputText>
+      <apex:outputText rendered="{!isCurabox}">
+        <td class="slds-truncate" scope="row" data-label="Familien Name">{!lead.Angehoeriger_Nachname__c}</td>
+        <td class="slds-truncate" data-label="Ort">{!lead.Angehoeriger_Ort__c}</td>
+        <td class="slds-truncate" data-label="Account Name">{!lead.Angehoeriger_Nachname__c}</td> 
+      </apex:outputText>
+    </tr>
+  </tbody>
+</table> 
+<div style="display: {!table3_layout}" >
+<br/>
+<span class="slds-badge" >bestehende Familie nutzen</span>
+<br/><br/>
+<table class="slds-table slds-table--bordered" style="table-layout: fixed;">
+  <thead>
+    <tr class="slds-text-heading--label">
+      <th class="slds-cell-shrink" style="width: 50px;">
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Familien Name</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Ort</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Account Name</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Abgleich auf Grund von</div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+  <apex:repeat value="{!famListe}" var="fam">
+    <tr class="slds-hint-parent" onclick="zeigeDetailsAn('{!fam.id}');">
+      <td class="slds-cell-shrink" data-label="Select Row">
+        <label class="slds-radio">                
+          <input type="radio" name="options3" onclick="waehleFamilieAus('{!fam.Id}')"/>                   
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+      </td>
+      <td class="slds-truncate" scope="row" data-label="Familien Name">{!fam.Familien_Name__c}<br/>
+       <div  id="{!fam.id}" style="width:510px;margin-left:0px;margin-top:15px;display: none;">
+          <strong>Familien ID : </strong>{!fam.Familien_ID__c}<br/>
+          <strong>Familien_CRM_ID : </strong>{!fam.Familien_CRM_ID__c}<br/>            
+          <strong>Rechnungsanschrift : </strong>{!fam.BillingStreet}, {!fam.BillingPostalCode} {!fam.BillingCity}<br/>      
+      </div>
+      </td>
+      <td class="slds-truncate" data-label="Ort">{!fam.BillingCity}</td>
+      <td class="slds-truncate" data-label="Account Name">{!fam.Name}</td>
+      <td class="slds-truncate" data-label="Account Name">{!fmGrdMap[fam.id]}</td>
+    </tr>
+    </apex:repeat>
+  </tbody>
+</table> 
+</div>
+<div >
+<br/>
+<span class="slds-badge" >Bestehende Familie zuordnen</span>
+<br/><br/>
+<table class="slds-table slds-table--bordered" style="table-layout: fixed;">
+  <tbody>
+    <tr class="slds-hint-parent">
+      <td class="slds-cell-shrink" data-label="Select Row" style="width: 50px;">
+        <label class="slds-radio">                
+          <input type="radio" name="options3" id="fmz" onclick="waehleFamilieAus('famZuOrdnen')"/>                   
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+      </td>
+      <td>
+         <div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true">
+              <div class="slds-form-element">
+                 <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon--right">
+                   <svg aria-hidden="true" class="slds-input__icon slds-icon-text-default">
+                     <use xlink:href="{!$Resource.SLDS0122}/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
+                       </svg>
+                       <!-- Input With onkeyup Attribute To Search For Records For Every Value Entered -->
+                       <input id="searchInput" class="slds-input" type="text" placeholder="Familie suchen" onkeyup="searchActs(j$(this))" aria-autocomplete="list" role="combobox" aria-expanded="true" aria-activedescendant="SrchDrpDwn" />
+                 </div>
+               </div>                                           
+          </div>  
+          
+          <div class="slds-lookup__menu" role="listbox" id="SrchDrpDwn" style="display:none;">
+                <div class="slds-lookup__item">
+                   <button class="slds-button">
+                      <svg aria-hidden="true" class="slds-icon slds-icon-text-default slds-icon--small">
+                        <use xlink:href="{!$Resource.SLDS0122}/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
+                      </svg>&quot;<span id="searchText"></span>&quot; in Accounts</button>
+                </div>
+     
+                <!--Search Results UL--> 
+                <ul class="slds-lookup__list" role="presentation" id="searchResultsUL" style="max-height: 240px;">        
+                </ul>
+              
+          </div> 
+ </td>
+ </tr>
+  </tbody>
+</table> 
+</div>
+</div>
+<!-- Seite 3 -->
+
+<!-- Alex D ######################################### -->
+<!-- Seite 5 -->
+<div style="display: {!seite5_layout}">
+  <span class="slds-badge">PB anlegen</span>
+  <br/><br/>
+  <table class="slds-table slds-table--bordered" style="table-layout: fixed;">
+    <thead>
+      <tr class="slds-text-heading--label">
+        <th class="slds-cell-shrink" style="width: 50px;">
+        </th> 
+        <th scope="col">
+          <div class="slds-truncate">Kontakt Name</div>
+        </th>
+        <th scope="col">
+          <div class="slds-truncate" >Email</div>
+        </th>
+        <th scope="col">
+          <div class="slds-truncate">Telefonnummer</div>
+        </th>
+        <th scope="col">
+          <div class="slds-truncate">PLZ</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="slds-hint-parent">
+        <td class="slds-cell-shrink" data-label="Select Row">
+          <label class="slds-radio" style="display: {!uncheckedRadio5Layout}">                
+            <input type="radio"  name="options5" onclick="waehleZweiterKontaktAus('neuerKontakt')"/>                   
+            <span class="slds-radio--faux"></span>
+            <span class="slds-form-element__label"></span>
+          </label>
+          <label class="slds-radio" style="display: {!checkedRadio5Layout}">                
+            <input type="radio"  checked="true" name="options5" onclick="waehleZweiterKontaktAus('neuerKontakt')"/>                   
+            <span class="slds-radio--faux"></span>
+            <span class="slds-form-element__label"></span>
+          </label>
+        </td>
+        <td class="slds-truncate" scope="row" data-label="Kontakt Name">{!lead.Name}</td>
+        <td class="slds-truncate" data-label="Kontakt Email">{!lead.Email}</td>
+        <td class="slds-truncate" data-label="Kontakt Telefonnummer">{!lead.Phone}</td>
+        <td class="slds-truncate" data-label="Kontakt Telefonnummer">{!lead.PostalCode}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="display: {!table1_layout}" > 
+  <br/>
+  <span class="slds-badge" >bestehenden Kontakt nutzen</span>
+  <br/><br/>
+  <table class="slds-table slds-table--bordered"  style="table-layout: fixed;">
+    <thead>
+      <tr class="slds-text-heading--label">
+        <th class="slds-cell-shrink" style="width: 50px;">
+        </th>
+        <th scope="col">
+          <div class="slds-truncate">Kontakt Name</div>
+        </th>
+        <th scope="col">
+          <div class="slds-truncate">Email</div>
+        </th>
+        <th scope="col">
+          <div class="slds-truncate">Telefonnummer</div>
+        </th>
+        <th scope="col">
+          <div class="slds-truncate">PLZ</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+    <apex:repeat value="{!PBcontactList}" var="kontakt">
+      <tr class="slds-hint-parent" onclick="zeigeDetailsAn('{!kontakt.id}');">
+        <td class="slds-cell-shrink" data-label="Select Row" >
+          <label class="slds-radio">                
+            <input type="radio" name="options1" onclick="waehleZweiterKontaktAus('{!kontakt.Id}')"/>                   
+            <span class="slds-radio--faux"></span>
+            <span class="slds-form-element__label"></span>
+          </label>
+        </td>
+        <td class="slds-truncate" scope="row" data-label="Kontakt Name">{!kontakt.Name}<br/>
+            <div  id="{!kontakt.id}" style="width:510px;margin-left:0px;margin-top:15px;display: none;">
+            <strong>Accountname : </strong><apex:outputField value="{!kontakt.AccountId}"/><br/>
+            <strong>Postanschrift : </strong>{!kontakt.MailingStreet}, {!kontakt.MailingPostalCode} {!kontakt.MailingCity}<br/>
+            <strong>Telefon : </strong>{!kontakt.Phone}<br/>
+            <strong>Email : </strong>{!kontakt.Email}<br/>
+            <strong>Mobiltelefon : </strong>{!kontakt.MobilePhone}<br/>
+            <strong>Art des Kontakts : </strong>{!kontakt.Art_des_Kontakts__c}<br/>
+            <strong>Familien-Zugehörigkeit : </strong>{!kontakt.Familien_Zugeh_rigkeit__c}<br/>
+            <strong>Von : </strong><apex:outputField value="{!kontakt.von__c}"/> 
+        </div>
+        </td>
+        <td class="slds-truncate" data-label="Kontakt Email">{!kontakt.Email}</td>
+        <td class="slds-truncate" data-label="Kontakt Telefonnummer">{!kontakt.Phone}</td>
+        <td class="slds-truncate" data-label="Kontakt Telefonnummer">{!kontakt.MailingPostalCode}</td>    
+      </tr>
+  
+      </apex:repeat>   
+    </tbody>
+  </table>
+  </div> 
+</div>
+<!-- Seite 5 -->
+<!-- ############################################## -->
+
+<!-- Seite 4 -->
+<div style="display: {!seite4_layout}">
+<span class="slds-badge">Neue Opportunity anlegen</span>
+<br/><br/>
+<table class="slds-table slds-table--bordered" style="table-layout: fixed;">
+  <thead>
+    <tr class="slds-text-heading--label">
+      <th class="slds-cell-shrink" style="width: 50px;">
+      </th> 
+      <th scope="col">
+        <div class="slds-truncate">Opportunity Name</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Produkt</div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="slds-hint-parent">
+      <td class="slds-cell-shrink" data-label="Select Row">
+        <label class="slds-radio" style="display: {!uncheckedRadio4Layout}">    
+          <input type="radio" name="options4" onclick="waehleOpportunityAus('neueOpportunity')"/>           
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+        <label class="slds-radio" style="display: {!checkedRadio4Layout}">    
+          <input type="radio" name="options4" checked="true" onclick="waehleOpportunityAus('neueOpportunity')"/>           
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+      </td>
+      <apex:outputText rendered="{!isNormalProzess}">
+        <td class="slds-truncate" scope="row" data-label="Opportunity Name">{!lead.Name}</td>
+        <td class="slds-truncate" data-label="Produkt">{!lead.TL_Treppenliftart__c}</td> 
+      </apex:outputText>
+      <apex:outputText rendered="{!isCurabox}">
+        <td class="slds-truncate" scope="row" data-label="Opportunity Name">{!lead.Angehoeriger_Vorname__c +' '+lead.Angehoeriger_Nachname__c}</td>
+        <td class="slds-truncate" data-label="Produkt">{!lead.TL_Treppenliftart__c}</td>
+      </apex:outputText>
+    </tr>
+  </tbody>
+</table> 
+<div style="display: {!table4_layout}">
+<br/>
+<span class="slds-badge" >bestehende Opportunity nutzen</span>
+<br/><br/>
+<table class="slds-table slds-table--bordered" style="table-layout: fixed;">
+  <thead>
+    <tr class="slds-text-heading--label">
+      <th class="slds-cell-shrink" style="width: 50px;">
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Opportunity Name</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Produkt</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Erstelldatum</div>
+      </th>
+      <th scope="col">
+        <div class="slds-truncate">Status</div>
+      </th>            
+    </tr>
+  </thead>
+  <tbody>
+  <apex:repeat value="{!oppListe}" var="opp">
+    <tr class="slds-hint-parent" onclick="zeigeDetailsAn('{!opp.id}');">
+      <td class="slds-cell-shrink" data-label="Select Row">
+        <label class="slds-radio">                
+          <input type="radio" name="options4" onclick="waehleOpportunityAus('{!opp.Id}')" />                   
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+      </td>
+      <td class="slds-truncate" scope="row" data-label="Opportunity Name">{!opp.Name}<br/>
+       <div  id="{!opp.id}" style="width:510px;margin-left:0px;margin-top:15px;display: none;">
+          <strong>Accountname : </strong><apex:outputField value="{!opp.AccountId}"/><br/>
+          <strong>Alternative Postleitzahl : </strong>{!opp.Alternative_Postleitzahl__c}<br/>
+          <strong>Preis-Kategorie : </strong>{!opp.Kategorie__c}<br/>
+          <strong>Primary Campaign Source : </strong><apex:outputField value="{!opp.CampaignId}"/><br/>  
+          <strong>Opportunity-Inhaber : </strong><apex:outputField value="{!opp.OwnerId}"/><br/>       
+      </div>
+      </td>
+      <td class="slds-truncate" data-label="Produkt">{!opp.Produkt_Kategorie__c}</td>
+      <td class="slds-truncate" data-label="Produkt">
+              <apex:outputText value="{0,date,dd'/'MM'/'yyyy}">
+                      <apex:param value="{!opp.CreatedDate}" /> 
+              </apex:outputText>
+      </td>
+      <td class="slds-truncate" data-label="Produkt">{!opp.StageName}</td>
+    </tr>
+    </apex:repeat>
+  </tbody>
+</table> 
+</div>
+<br/>
+<span class="slds-badge">Lead in Ausschuss setzen</span>
+<br/><br/>
+<table class="slds-table slds-table--bordered" style="table-layout: fixed;">
+  <tbody>
+    <tr class="slds-hint-parent">
+      <td class="slds-cell-shrink" data-label="Select Row" style="width: 50px;">
+        <label class="slds-radio">                
+          <input type="radio" name="options4" id="aus" onclick="waehleOpportunityAus('Ausschuss')" />                   
+          <span class="slds-radio--faux"></span>
+          <span class="slds-form-element__label"></span>
+        </label>
+      </td>
+      <th class="slds-truncate" scope="row" data-label="Opportunity Name">
+        <div class="slds-form-element">
+          <label class="slds-form-element__label" for="select-01">Abbruchgrund</label>
+          <div class="slds-form-element__control">
+            <div class="slds-select_container">
+              <select id="select-01" class="slds-select">
+                <apex:repeat value="{!agList}" var="ag">
+                    <option onclick="updateCheckbox(); waehleGrundAus('{!ag}')">{!ag}</option>
+                </apex:repeat>
+              </select>
+            </div>
+          </div>
+        </div>
+      </th>
+    </tr>
+  </tbody>
+  </table>
+</div>
+<!-- Seite 4 -->
+<br/><br/>
+
+<div  style="text-align: center;">
+  <button class="slds-button slds-button--neutral" onclick="back();" style="display: {!button_layout}" >zurück</button>
+  <button class="slds-button slds-button--neutral" onclick="home();" >zurück zu Lead</button>
+  <button class="slds-button slds-button--neutral" id="{!button_value}_2" onclick="next();inaktivSetzen(); javascript:openBlanko('{!lead.Id}', '{!lead.next_step__c}');">{!button_value}</button>
+</div>
+</div>    
+</div> 
+</apex:pageBlock> 
+</body>
+</html>
+</apex:page>

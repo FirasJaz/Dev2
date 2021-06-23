@@ -1,0 +1,174 @@
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//		Autor: 			MS
+//		Stand:			13.05.2012
+//		Version:		0.1
+//		geändert:		MS
+//		Beschreibung:	Zusammenfassung der Stylsheets für die diversen Formulare 
+//						Rechnung, Lieferscheine, KVA, Kassierbeleg
+//	
+//	wds	13.05.2012		deployed
+//	wds 14.05.2012		deployed
+//						geändert: left angepaßt auf 20px für document_info
+//  ms 27.6.2012		#inoxision-style hinzugefügt: der text innerhalb dieses divs ist ganz klein und weiß
+//						außerdem die schriftgröße im table bei ab_nur_anzeigen verringert.
+//						noch nicht deployed
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--> 
+body {margin-top:0;padding-top:0;} 
+body,table { font-family: Verdana,sans-serif; font-size:16px; }
+.mon_sum {font-size:1.1 em; font-weight:bold;text-decoration:underline;}
+
+#pdf_id {
+	position:absolute;
+	top:5px;
+	left:50px;
+}
+#pdf_id h1 {
+	margin:0;
+	padding:0;
+	font-size:25px;
+}
+#inoxision {
+font-size:5px;
+color:white;
+}
+#logo {
+	position:absolute;
+	top:23px;
+	right:37px;
+}
+.own_adress {
+	font-size:9px;
+	font-style:italic;
+}
+.underita {
+	font-style:italic;
+ 	text-decoration:underline;
+}
+#address {
+	position:absolute;
+	width:300px;
+    top:95px;
+    left:50px;
+}
+#Belegnr {
+	position:absolute;
+	top:3px;
+	left:20px;	
+	line-height:16p;
+	font-size:12px;
+}
+#kopie_label {
+	position:absolute;
+	top:170px;
+	right:50px;
+}
+#bearbeiter {
+	position:absolute;
+	top:220px;
+	right:50px;
+}
+#bearbeiter td {
+	font-size:14px;
+	text-align:right;
+	padding-left:10px;
+}
+
+#document_info {
+	padding-top:50px;
+	position:absolute;
+	top:290px;
+	left:20px;
+}
+#document_info h1 {
+	margin:0;
+	padding:0;
+}
+#document_info p {
+	margin-top:10px;
+}
+#document_info table{
+	border-spacing:0;
+}
+#document_info table td{
+	padding-right:22px;
+	padding-top:3px;
+}
+#document_info table th {
+	text-align:left;
+	padding-right:22px;
+}
+
+#content {
+	position:absolute;
+	top:500px;
+	left:20px;
+	width:1000px;
+}
+#content .anrede {
+	font-weight:bold;
+}
+#content p {
+	line-height:20px;
+}
+#content #text {
+	margin-top: 170px;
+}
+#content table td {
+	font-size:14px;
+}
+.ab_nur_anzeigen #content table th {
+	font-size:12px
+}
+.ab_nur_anzeigen #content table td {
+	font-size:11px;
+}
+#content table {
+	margin-top:20px;
+	border-collapse:collapse;
+    margin-bottom:10px;
+}
+
+#content .content_table {
+	width:700px;
+}
+#content table tr.nobo td {
+	border:0;
+}
+                  
+#footer {
+	position:absolute;
+	top:950px;
+	left:6px;
+	font-size:12px;
+}
+
+.align_right {
+	text-align:right;
+	padding-right:10px;
+}
+#content #sum_table {
+	width:400px;
+}
+
+.summe td {
+	width:150px;
+	font-weight:bold;
+}
+
+.align_right {
+text-align:right;
+}
+@page {
+margin-bottom:0;
+}
+
+.h1navbar {
+font-family:verdana, sans-serif; 
+margin:0;
+font-size: 18px;
+font-weight: bold; 
+display: inline;
+}

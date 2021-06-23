@@ -1,0 +1,149 @@
+<!--
+/****************************************************************************************************************************
+// Created 02.07.2018 von  MZ
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// 	Email Message Id
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	to reply to an email
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" controller="EmailMessageActionController">
+    
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="caseId" type="Id"/>
+    <aura:attribute name="relatedToId" type="Id"/>
+	<aura:attribute name="userId" type="Id"/>
+    <aura:attribute name="emailSubject" type="String"/>
+    <aura:attribute name="emailReceiver" type="String"/>
+    <aura:attribute name="emailBody" type="String"/>
+    <!--aura:attribute name="templateList" type="List" /-->
+    <!--aura:attribute name="selectedTemplate" type="String" /-->
+    <!--aura:attribute name="disableCustomEmail" type="Boolean" default="false"/-->
+    <!--aura:attribute name="replyToEmail" type="String" /-->
+    <aura:attribute name="contactList" type="List" />
+    <aura:attribute name="selectedContact" type="String" />
+    <aura:attribute name="attachmentList" type="List" />
+    <aura:attribute name="selectedAttachment" type="String" />
+    <aura:attribute name="selectedAttachmentList" type="List" />
+    <aura:attribute name="showFileCard" type="Boolean" default="true"/>    
+    
+    <aura:attribute name="uploadDialogLayout" type="boolean" default="false"/>
+    <aura:attribute name="attachmentDialogLayout" type="boolean" default="false"/>
+    <aura:attribute name="modalDialogLayout" type="boolean" default="false"/>
+    <aura:attribute name="errorMessage" type="String" default="None"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    
+    <div class="slds-scrollable--x">
+       
+            <aura:if isTrue="{!v.errorMessage != 'None'}">
+                <ui:message title="Error! " severity="error" closable="true">
+                    {!v.errorMessage}
+                </ui:message>
+            </aura:if>
+        
+            <!--lightning:input name="receiverInput" label="Empfänger" value="{!v.emailReceiver}" /-->
+        
+        	<lightning:select name="contactSelect" label="Empfänger" aura:id="contactSelect" value="{!v.selectedContact}" >
+                <option text="--keine--" value="--keine--" />
+                <aura:iteration items="{!v.contactList}" var="option">
+                    <option text="{!option.Name + ' [' +option.Email + ']'}" value="{!option.Id}"/> <!-- selected="{!option.selected}" -->
+                </aura:iteration>
+            </lightning:select>
+            
+            <lightning:input name="subjectInput" label="Subject" value="{!v.emailSubject}" />
+        <br/>
+            <lightning:inputRichText value="{!v.emailBody}" />
+        <br/>
+            <lightning:buttonGroup>
+                <lightning:button variant="Neutral" label="Anhänge löschen" onclick="{!c.removeAttachments}" />
+                <lightning:button variant="Neutral" label="Datei hochladen" onclick="{!c.openUploadDialog}" />
+                <lightning:button variant="Neutral" label="Bestehendes Dokument hinzufügen" onclick="{!c.openAttachmentDialog}" />
+                <lightning:button variant="brand" label="senden" title="senden" onclick="{!c.sendEmail}" />
+            </lightning:buttonGroup>
+
+            <aura:if isTrue="{!v.modalDialogLayout}">
+              <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" id="notification" >
+              <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around--medium" style="text-align: center;">
+                  <div>
+                    <p>E-Mail wurde erfolgreich Versendet!</p>
+                  </div>
+                </div>
+                <div class="slds-modal__footer" style="text-align: right;">
+                  <ui:button class="slds-button slds-button--neutral" label="Ok" press="{!c.closeModalDialog}"/></div>
+              </div>
+              </div>
+              <div class="slds-backdrop slds-backdrop--open" id="backdrop"  ></div>
+            </aura:if>
+        
+        	<aura:if isTrue="{!v.attachmentDialogLayout}">
+              <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" id="attSelectDialog" >
+              <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around--medium" style="text-align: center;">
+                  <div>
+                    <p>Bitte wählen Sie eine Datei aus</p>
+                      <lightning:select name="attachmentList" label="Vorhandene Dokumente" aura:id="attachmentSelect" value="{!v.selectedAttachment}">
+                            <option text="--keine--" value="--keine--" />  
+                            <aura:iteration items="{!v.attachmentList}" var="option">
+                                <option text="{!option.ContentDocument.Title}" value="{!option.ContentDocumentId}" /> 
+                            </aura:iteration>
+                      </lightning:select>
+                  </div>
+                </div>
+                  <div class="slds-modal__footer" style="text-align: right;">
+                  <ui:button class="slds-button slds-button--neutral" label="Abbruch" press="{!c.closeAttachmentDialog}"/>
+                  <ui:button class="slds-button slds-button--brand" label="Ok" press="{!c.addSelectedAttachment}"/></div>
+                  
+              </div>
+              </div>
+              <div class="slds-backdrop slds-backdrop--open" id="backdrop"  ></div>
+            </aura:if>
+        
+        	<aura:if isTrue="{!v.uploadDialogLayout}">
+              <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" id="attSelectDialog" >
+              <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around--medium" style="text-align: center;">
+                  <div>
+                    <p></p>
+                      <lightning:fileUpload  name="fileUploader"
+                           label= "neue Datei hochladen"
+                           multiple="false"
+                           accept="['.jpg', '.jpeg', '.pdf', '.txt', '.png']"
+                           disabled="false"
+                           recordId="{!v.userId}"
+                           onuploadfinished="{!c.handleUploadFinished}"/> 
+                  </div>
+                </div>
+                  <div class="slds-modal__footer" style="text-align: right;">
+                  <ui:button class="slds-button slds-button--neutral" label="Abbruch" press="{!c.closeUploadDialog}"/>
+                  </div>                  
+              </div>
+              </div>
+              <div class="slds-backdrop slds-backdrop--open" id="backdrop"  ></div>
+            </aura:if>
+        
+        	<div>
+                <aura:iteration items="{!v.selectedAttachmentList}" var="option">
+                    <lightning:fileCard fileId="{!option}"/>
+                    <br/>
+                </aura:iteration>
+        	</div>
+        
+    </div>
+</aura:component>

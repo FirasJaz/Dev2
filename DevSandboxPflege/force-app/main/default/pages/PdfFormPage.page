@@ -1,0 +1,34 @@
+<!--
+/********************************************************************************************************************************************
+//  Created 24.05.2020 by BT
+//                          Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                          Nordkanalstraße 58
+//                          20097 Hamburg 
+//                          Tel.:  04064917161
+//                          Fax.: 04064917162
+//                          Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//
+//********************************************************************************************************************************************
+//
+// Description:    
+//							display pdf form                       
+//
+//********************************************************************************************************************************************
+// Changes:
+//
+//********************************************************************************************************************************************
+-->
+<apex:page controller="PDFForm" action="{!fillAntragFormular}" >
+    <apex:form rendered="{!pdfFormId == null}" >
+        <apex:pageBlock >
+            <div style="text-align:center;">
+               <apex:outputText >Das Antragsformular konnte nicht erstellt werden. Wenden Sie sich bitte an Ihren Salesforce-Administrator.</apex:outputText> 
+            </div>        	
+        </apex:pageBlock>
+    </apex:form>
+     <apex:iframe src="/sfc/servlet.shepherd/version/download/{!pdfFormId}" rendered="{!pdfFormId != null}" />     
+</apex:page>

@@ -1,0 +1,716 @@
+<!--
+/********************************************************************************************************************************************
+//  Erstellt 28.03.2017 von MZ
+//  Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//  Mindelweg 11
+//  22393 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//
+//********************************************************************************************************************************************
+//
+// Beschreibung: the first page of plz_tool which shows product list for Hausnotruf         
+//
+//********************************************************************************************************************************************
+// Änderungen:
+//
+//    14.06.2017    BT    Es dürfen maximal 3 Partner für die Weiterleitung ausgewählt werden.
+//     27.07.2017    AM   diese (von oben) rausgenommen (auf 400 gesetzt)
+//********************************************************************************************************************************************
+*/
+-->
+
+<apex:component id="cmp_pl" allowDML="true" >
+
+<script type="text/javascript">
+    
+    
+    
+    function hnrPartnerSelect(e) {
+        var key = e.id;
+        key = key.substring(0, key.length-5);
+        key = key + 'ophid';
+        var pa_id = document.getElementById(key).value;
+        document.getElementById('page_id:cmForm:sestr').value = pa_id;
+        setPosition();
+        keepSelected();
+    }
+    
+    function wlPartnerSelect(selId) {
+        selPart = '';
+        showExMsg = '';
+        productRtId = 'cm_hnr_ProductList';
+        
+        var anz_p = 0;
+                
+        var ls = document.getElementById('page_id:cmForm:cm_block:cm_hnr_ProductList:cmp_pl:wlsize').value;
+        
+        for(j=0; j<ls; j++) { 
+            if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:wl_rep_id:' + j + ':opnum') != null) { 
+                if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:wl_rep_id:' + j + ':opnum').checked == true) {                   
+                    anz_p = anz_p + 1;
+                }
+            }     
+        }        
+        
+        if(anz_p >= 400) {    
+            document.getElementById(selId).checked = false;            
+            alert('Sie dürfen nicht mehr als 400 Partner für die Weiterleitung auswählen.');        
+        }
+        else {            
+            for(i=0; i<ls; i++) { 
+                if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:wl_rep_id:' + i + ':opnum') != null) { 
+                    if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:wl_rep_id:' + i + ':opnum').checked == true) {
+                        var pa_id = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:wl_rep_id:' + i + ':ophid').value;  
+                        if(selPart == "") {
+                            selPart = pa_id;
+                        }
+                        else {
+                            selPart += "," + pa_id;
+                        }                        
+                    }
+                }     
+            }            
+            
+            document.getElementById('page_id:cmForm:sestr').value = selPart;
+            setPosition();
+            keepSelected();          
+        }
+    }  
+ 
+      
+</script> 
+    
+    <apex:attribute name="hnrController" description="the controller class for hnr recordType" type="PLZTool_Hausnotruf" required="true"/>
+
+    <apex:actionFunction action="{!keepSelected}" name="keepSelected" />
+    
+    <apex:inputHidden value="{!hnrController.WeiterleitungSize}" id="wlsize"/>
+
+    <h3 class="slds-text-heading--small slds-m-left--large slds-m-top--large">Kunden Interesse</h3>
+    <table id="tbl_p" class="slds-table slds-table--bordered slds-table--cell-buffer" >
+    <thead>
+        <tr class="slds-text-heading--label">
+          <th scope="col" title="Bedarf">
+            <div class="slds-truncate">Bedarf</div>
+          </th>
+          <th scope="col" title="Interessent" >
+            <div class="slds-truncate">Interessent</div>
+          </th>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="pName">
+              <th class="slds-text-align--center" scope="col" title="CPL Kat. 1">
+                <div class="slds-truncate">{!pName.name}</div>
+              </th>
+          </apex:repeat>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Tele. Beratungsgespräch gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.tele_Beratungsgespr_ch_gew_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.Telefonisches_Beratungsgespr_ch_gew_nsch__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Beratung vor Ort gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Beratung_vor_Ort_gewu_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.Beratung_vor_Ort_gew_nscht__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Infomaterial gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Infomaterial_gewu_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.Infomaterial_gew_nscht__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Inbetriebnahmeservice gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Inbetriebnahmeservice_gewu_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.Inbetriebnahmeservice_gew_nscht__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Selbstinstallation gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Selbstinstallation_gewu_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.Selbstinstallation_gew_nscht__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">stationäres Gerät gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.stationa_res_Gera_t_gewu_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.station_res_Ger_t_gew_nscht__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">mobiles Gerät gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.mobiles_Gera_t_gewu_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{!partnerCheck.mobiles_Ger_t_gew_nscht__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">24h besetzte Notrufzentrale gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.X24h_besetzte_Notrufzentrale_gewu_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.X24h_besetzte_Notrufzentrale_gew_nscht__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Hintergrunddienst gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Hintergrunddienst_gewu_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.Hintergrunddienst_gew_nscht__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">GPS Ortung gewünscht</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.GPS_Ortung_gewu_nscht__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.GPS_Ortung_gew_nscht__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Bezuschussung durch die Kasse möglich</td>
+          <td style="vertical-align:top"><div class="slds-truncate">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Bezuschussung_durch_die_Kasse_mo_glich__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></div></td>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td class="slds-text-align--center" style="vertical-align:top">
+                  <apex:outputText rendered="{! partnerCheck.Bezuschussung_durch_die_Kasse_m_glich__c}" value="X"/>
+              </td>
+          </apex:repeat>
+        </tr>
+        
+        <tr class="slds-text-heading--label">
+          <th scope="col" title="Bedarf">
+            <div class="slds-truncate">Bedarf</div>
+          </th>
+          <th scope="col" title="Interessent" >
+            <div class="slds-truncate">Interessent</div>
+          </th>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="pName">
+              <th class="slds-text-align--center" scope="col" title="CPL Kat. 1">
+                <div class="slds-truncate">{!pName.name}</div>
+              </th>
+          </apex:repeat>
+        </tr>
+        
+        <tr class="slds-text-heading--label">
+          <th scope="col" title="Zusatzprodukte gewünscht">
+            <div class="slds-m-top--large slds-truncate">Zusatzprodukte gewünscht</div>
+          </th>
+          <th scope="col" title="">
+            <div ></div>
+          </th>
+          <apex:repeat value="{!hnrController.hnr_partners}" var="partnerCheck">
+              <td style="vertical-align:top">&nbsp;</td>
+          </apex:repeat>
+        </tr>
+    
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">zweites Armband</td>
+          <td style="vertical-align:top">
+              <div class="slds-form-element__control">
+                  <span class="slds-form-element"><div class="slds-truncate">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.zweites_Armband__c}" >
+                      </apex:inputCheckbox>
+                  </div></span>
+              </div></td>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Fallsensor</td>
+          <td style="vertical-align:top">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Fallsensor__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></td>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Epilepsiematte</td>
+          <td style="vertical-align:top">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Epilepsiematte__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></td>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Rauchmelder</td>
+          <td style="vertical-align:top">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Rauchmelder__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></td>
+        </tr>
+        <tr class="slds-hint-parent">
+          <td style="vertical-align:top">Lebendkontrolle</td>
+          <td style="vertical-align:top">
+              <div class="slds-form-element__control slds-truncate">
+                  <span class="slds-form-element">
+                      <apex:inputCheckbox value="{!hnrController.new_ki.Lebendkontrolle__c}" >
+                      </apex:inputCheckbox>
+                  </span>
+              </div></td>
+        </tr>
+    </tbody>
+    </table>
+    <br/>
+    <!--
+    <h3 class="slds-text-heading--medium slds-m-left--small">Partnerauswahl</h3>
+    <br/> -->
+
+    <h3 class="slds-text-heading--small slds-m-left--large">Weiterleitung</h3>
+    <table id="tbl_p" class="slds-table slds-table--bordered slds-table--cell-buffer" >
+    <thead>
+        <tr class="slds-text-heading--label">
+          <th class="slds-cell-shrink"></th>
+          <th scope="col" title="Partner"  style="min-width:20%; width:20%;" >
+            <div class="slds-truncate">Partner</div>
+          </th>
+          <th scope="col" title="Produkt"  style="min-width:20%;width:20%;">
+            <div class="slds-truncate">Produkt</div>
+          </th>
+          <th scope="col" title="CPL Kat. 1" style="min-width:15%;width:15%;" >
+            <div class="slds-truncate">CPL/CPO</div>
+          </th>
+          <th scope="col" title="Offenes Produkt-Kontingent" style="min-width:10%;width:10%;">
+            <div class="slds-truncate">P.-Kont.</div>
+          </th>
+          <th scope="col" title="Offenes Firmen-Kontingent" style="min-width:10%;width:10%;">
+            <div class="slds-truncate">F.-Kont.</div>
+          </th>
+          <th scope="col" title="Priorität" style="min-width:10%;width:10%;">
+            <div class="slds-truncate">Prio</div>
+          </th>
+          <th scope="col" title="Anmerkung" style="min-width:15%;width:15%;">
+            <div class="slds-truncate">Anmerkung</div>
+          </th>
+        </tr>
+    </thead>
+    <tbody>
+        <apex:repeat value="{!hnrController.weiterleitungList }" var="prdct" id="wl_rep_id">
+        <tr class="slds-hint-parent" onclick="zeigeDetailsAn('{!prdct.pp.Id}');">
+          <td class="slds-cell-shrink" data-label="Select Row">
+            <label class="slds-checkbox">
+              <apex:inputcheckbox id="opnum" onchange="wlPartnerSelect(this.id);"/>
+              <apex:inputHidden value="{!prdct.pp.Id}" id="ophid"/>
+              <apex:inputHidden value="{!prdct.CPL_Exklusiv}" id="exhid"/>
+              <apex:inputHidden value="{!prdct.CPO_Exclusiv}" id="excpohid"/>
+              
+              <span class="slds-checkbox--faux"></span>
+            </label>
+          </td>
+          <td style="vertical-align:top"><div class="slds-truncate" ><a href="/{!prdct.pp.Partner__c}"> <apex:outputtext value="{!prdct.pp.Partner__r.Name}" /></a></div>
+              <div id="{!prdct.pp.Id}" style="width:510px;margin-left:0px;margin-top:15px;display: none;">
+              <strong> Produkt : </strong><apex:outputField value="{!prdct.pp.Produktgruppe__c}"/><br/>
+              <strong>CPL/CPO : </strong>{!prdct.CplCpo}<br/>
+              <strong>P.-Kont. : </strong><apex:outputField value="{!prdct.pp.Kontingent_offen_Produkt__c}"/><br/>
+              <strong>F.-Kont. : </strong><apex:outputField value="{!prdct.pp.Partner__r.Kontingent_offen_Partner__c}"/><br/>
+              <strong>Prio : </strong><apex:outputField value="{!prdct.pp.Priorit_t__c}"/><br/>
+              <strong>Anmerkungen: </strong>{!prdct.pp.Anmerkung__c}<br/>
+              </div>
+          </td>
+          <td style="vertical-align:top"><div class="slds-truncate" ><a href="/{!prdct.pp.Id}"> <apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></a></div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.CplCpo}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Kontingent_offen_Produkt__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Partner__r.Kontingent_offen_Partner__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Priorit_t__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Anmerkung__c}</div></td>
+        </tr>
+        </apex:repeat>
+    </tbody>
+    </table>
+    <br/>
+    
+    <h3 class="slds-text-heading--small slds-m-left--large">Exklusives Durchstellen</h3>
+    <table id="tbl_p" class="slds-table slds-table--bordered slds-table--cell-buffer" >
+    <thead>
+        <tr class="slds-text-heading--label">
+          <th class="slds-cell-shrink"></th>
+          <th scope="col" title="Partner"  style="min-width:20%; width:20%;">
+            <div class="slds-truncate">Partner</div>
+          </th>
+          <th scope="col" title="Produkt"  style="min-width:20%; width:20%;">
+            <div class="slds-truncate">Produkt</div>
+          </th>
+          <th scope="col" title="CPL Kat. 1" style="min-width:15%; width:15%;">
+            <div class="slds-truncate">CPL/CPO</div>
+          </th>
+          <th scope="col" title="Offenes Produkt-Kontingent" style="min-width:10%; width:10%;">
+            <div class="slds-truncate">P.-Kont.</div>
+          </th>
+          <th scope="col" title="Offenes Firmen-Kontingent" style="min-width:10%; width:10%;">
+            <div class="slds-truncate">F.-Kont.</div>
+          </th>
+          <th scope="col" title="Priorität" style="min-width:10%; width:10%;">
+            <div class="slds-truncate">Prio</div>
+          </th>
+          <th scope="col" title="Anmerkung" style="min-width:15%; width:15%;">
+            <div class="slds-truncate">Anmerkung</div>
+          </th>
+        </tr>
+    </thead>
+    <tbody>
+        <apex:repeat value="{!hnrController.exklusivList }" var="prdct" id="ex_rep_id">
+        <tr class="slds-hint-parent" onclick="zeigeDetailsAn('{!prdct.pp.Id}');">
+          <td class="slds-cell-shrink" data-label="Select Row">
+            <label class="slds-checkbox">
+
+              <apex:inputcheckbox id="opnum" onchange="hnrPartnerSelect(this);"/>
+              <apex:inputHidden value="{!prdct.pp.Id}" id="ophid"/>
+              <apex:inputHidden value="{!prdct.CPL_Exklusiv}" id="exhid"/>
+              <apex:inputHidden value="{!prdct.CPO_Exclusiv}" id="excpohid"/>
+              
+              <span class="slds-checkbox--faux"></span>
+            </label>
+          </td>
+          <td style="vertical-align:top"><div class="slds-truncate" ><a href="/{!prdct.pp.Partner__c}"> <apex:outputtext value="{!prdct.pp.Partner__r.Name}" /></a></div>
+              <div id="{!prdct.pp.Id}" style="width:510px;margin-left:0px;margin-top:15px;display: none;">
+              <strong> Produkt : </strong><apex:outputField value="{!prdct.pp.Produktgruppe__c}"/><br/>
+              <strong>CPL/CPO : </strong>{!prdct.CplCpo}<br/>
+              <strong>P.-Kont. : </strong><apex:outputField value="{!prdct.pp.Kontingent_offen_Produkt__c}"/><br/>
+              <strong>F.-Kont. : </strong><apex:outputField value="{!prdct.pp.Partner__r.Kontingent_offen_Partner__c}"/><br/>
+              <strong>Prio : </strong><apex:outputField value="{!prdct.pp.Priorit_t__c}"/><br/>
+              <strong>Anmerkungen: </strong>{!prdct.pp.Anmerkung__c}<br/>
+              </div>
+          </td>
+          <td style="vertical-align:top"><div class="slds-truncate" ><a href="/{!prdct.pp.Id}"> <apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></a></div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.CplCpo}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Kontingent_offen_Produkt__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Partner__r.Kontingent_offen_Partner__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Priorit_t__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Anmerkung__c}</div></td>
+        </tr>
+        </apex:repeat>
+    </tbody>
+    </table>
+    <br/>
+
+    <h3 class="slds-text-heading--small slds-m-left--large">Direktvertrieb</h3>
+    <table id="tbl_p" class="slds-table slds-table--bordered slds-table--cell-buffer" >
+    <thead>
+        <tr class="slds-text-heading--label">
+          <th class="slds-cell-shrink"></th>
+          <th scope="col" title="Partner" style="min-width:20%; width:20%;">
+            <div class="slds-truncate">Partner</div>
+          </th>
+          <th scope="col" title="Produkt" style="min-width:20%; width:20%;">
+            <div class="slds-truncate">Produkt</div>
+          </th>
+          <th scope="col" title="CPL Kat. 1" style="min-width:15%; width:15%;">
+            <div class="slds-truncate">CPL/CPO</div>
+          </th>
+          <th scope="col" title="Offenes Produkt-Kontingent" style="min-width:10%; width:10%;">
+            <div class="slds-truncate">P.-Kont.</div>
+          </th>
+          <th scope="col" title="Offenes Firmen-Kontingent" style="min-width:10%; width:10%;">
+            <div class="slds-truncate">F.-Kont.</div>
+          </th>
+          <th scope="col" title="Priorität" style="min-width:10%; width:10%;">
+            <div class="slds-truncate">Prio</div>
+          </th>
+          <th scope="col" title="Herkunftsland der Betreuer" style="min-width:15%; width:15%;">
+            <div class="slds-truncate">Anmerkung</div>
+          </th>
+        </tr>
+    </thead>
+    <tbody>
+        <apex:repeat value="{!hnrController.direktVertriebList }" var="prdct" id="dv_rep_id">
+        
+        <tr class="slds-hint-parent" onclick="zeigeDetailsAn('{!prdct.pp.Id}');">
+          <td class="slds-cell-shrink" data-label="Select Row">
+            <label class="slds-checkbox">
+
+              <apex:inputcheckbox id="opnum" onchange="hnrPartnerSelect(this);"/>
+              <apex:inputHidden value="{!prdct.pp.Id}" id="ophid"/>
+              <apex:inputHidden value="{!prdct.CPL_Exklusiv}" id="exhid"/>
+              <apex:inputHidden value="{!prdct.CPO_Exclusiv}" id="excpohid"/>
+              
+              <span class="slds-checkbox--faux"></span>
+            </label>
+          </td>
+          <td style="vertical-align:top"><div class="slds-truncate" ><a href="/{!prdct.pp.Partner__c}"> <apex:outputtext value="{!prdct.pp.Partner__r.Name}" /></a></div>
+              <div id="{!prdct.pp.Id}" style="width:510px;margin-left:0px;margin-top:15px;display: none;">
+              <strong> Produkt : </strong><apex:outputField value="{!prdct.pp.Produktgruppe__c}"/><br/>
+              <strong>CPL/CPO : </strong>{!prdct.CplCpo}<br/>
+              <strong>P.-Kont. : </strong><apex:outputField value="{!prdct.pp.Kontingent_offen_Produkt__c}"/><br/>
+              <strong>F.-Kont. : </strong><apex:outputField value="{!prdct.pp.Partner__r.Kontingent_offen_Partner__c}"/><br/>
+              <strong>Prio : </strong><apex:outputField value="{!prdct.pp.Priorit_t__c}"/><br/>
+              <strong>Anmerkungen: </strong>{!prdct.pp.Anmerkung__c}<br/>
+              </div>
+          </td>
+          <td style="vertical-align:top"><div class="slds-truncate" ><a href="/{!prdct.pp.Id}"> <apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></a></div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.CplCpo}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Kontingent_offen_Produkt__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Partner__r.Kontingent_offen_Partner__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Priorit_t__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Anmerkung__c}</div></td>
+        </tr>
+        </apex:repeat>
+    </tbody>
+    </table>
+    <br/>
+
+    <h3 class="slds-text-heading--small slds-m-left--large">Selfmailer</h3>
+    <table id="tbl_p" class="slds-table slds-table--bordered slds-table--cell-buffer" >
+    <thead>
+        <tr class="slds-text-heading--label">
+          <th class="slds-cell-shrink"></th>
+          <th scope="col" title="Partner"  style="min-width:20%; width:20%;">
+            <div class="slds-truncate">Partner</div>
+          </th>
+          <th scope="col" title="Produkt"  style="min-width:20%; width:20%;">
+            <div class="slds-truncate">Produkt</div>
+          </th>
+          <th scope="col" title="CPL Kat. 1" style="min-width:15%; width:15%;">
+            <div class="slds-truncate">CPL/CPO</div>
+          </th>
+          <th scope="col" title="Offenes Produkt-Kontingent" style="min-width:10%; width:10%;">
+            <div class="slds-truncate">P.-Kont.</div>
+          </th>
+          <th scope="col" title="Offenes Firmen-Kontingent" style="min-width:10%; width:10%;">
+            <div class="slds-truncate">F.-Kont.</div>
+          </th>
+          <th scope="col" title="Priorität" style="min-width:10%; width:10%;">
+            <div class="slds-truncate">Prio</div>
+          </th>
+          <th scope="col" title="Anmerkung" style="min-width:15%; width:15%;">
+            <div class="slds-truncate">Anmerkung</div>
+          </th>
+        </tr>
+    </thead>
+    <tbody>
+        <apex:repeat value="{!hnrController.selfmailerList }" var="prdct" id="sm_rep_id">
+        <tr class="slds-hint-parent" onclick="zeigeDetailsAn('{!prdct.pp.Id}');">
+          <td class="slds-cell-shrink" data-label="Select Row">
+            <label class="slds-checkbox">
+
+              <apex:inputcheckbox id="opnum" onchange="hnrPartnerSelect(this);"/>
+              <apex:inputHidden value="{!prdct.pp.Id}" id="ophid"/>
+              <apex:inputHidden value="{!prdct.CPL_Exklusiv}" id="exhid"/>
+              <apex:inputHidden value="{!prdct.CPO_Exclusiv}" id="excpohid"/>
+              
+              <span class="slds-checkbox--faux"></span>
+            </label>
+          </td>
+          <td style="vertical-align:top"><div class="slds-truncate" ><a href="/{!prdct.pp.Partner__c}"> <apex:outputtext value="{!prdct.pp.Partner__r.Name}" /></a></div>
+              <div id="{!prdct.pp.Id}" style="width:510px;margin-left:0px;margin-top:15px;display: none;">
+              <strong> Produkt : </strong><apex:outputField value="{!prdct.pp.Produktgruppe__c}"/><br/>
+              <strong>CPL/CPO : </strong>{!prdct.CplCpo}<br/>
+              <strong>P.-Kont. : </strong><apex:outputField value="{!prdct.pp.Kontingent_offen_Produkt__c}"/><br/>
+              <strong>F.-Kont. : </strong><apex:outputField value="{!prdct.pp.Partner__r.Kontingent_offen_Partner__c}"/><br/>
+              <strong>Prio : </strong><apex:outputField value="{!prdct.pp.Priorit_t__c}"/><br/>
+              <strong>Anmerkungen: </strong>{!prdct.pp.Anmerkung__c}<br/>
+              </div>
+          </td>
+          <td style="vertical-align:top"><div class="slds-truncate" ><a href="/{!prdct.pp.Id}"> <apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></a></div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.CplCpo}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Kontingent_offen_Produkt__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Partner__r.Kontingent_offen_Partner__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Priorit_t__c}</div></td>
+          <td style="vertical-align:top"><div class="slds-truncate" >{!prdct.pp.Anmerkung__c}</div></td>
+        </tr>
+        </apex:repeat>
+    </tbody>
+    </table>
+    
+    <br/>
+    <div class="slds-theme--default slds-container--large">
+        <div class="slds-grid slds-wrap slds-grid--pull-padded slds-m-left--large">
+            <div class="slds-col--padded slds-size--1-of-2">
+                 <div class="slds-form-element slds-hint-parent">
+                     <span class="slds-form-element__label">Produkte sollen versendet werden an</span>
+                     <div class="slds-form-element__control">
+                         <span class="slds-form-element">
+                              <apex:inputField value="{!hnrController.new_ki.Produkte_sollen_versendet_werden_an__c}" styleClass="slds-select"/>
+                         </span>
+                     </div>
+            </div></div>
+                          
+            <div class="slds-col--padded slds-size--1-of-2">
+            </div>
+            
+            <div class="slds-col--padded slds-size--1-of-2">
+                 <div class="slds-form-element slds-hint-parent slds-m-top--small">
+                     <span class="slds-form-element__label">Kontoinhaber</span>
+                     <div class="slds-form-element__control">
+                         <span class="slds-form-element">
+                              <apex:inputField value="{!hnrController.new_ki.Kontoinhaber__c}" styleClass="slds-select"/>
+                         </span>
+                     </div>
+            </div></div>
+            
+            <div class="slds-col--padded slds-size--1-of-2">
+            </div>
+            
+            <div class="slds-col--padded slds-size--1-of-2">
+                 <div class="slds-form-element slds-hint-parent slds-m-top--small">
+                     <span class="slds-form-element__label">Häusliche Situation</span>
+                     <div class="slds-form-element__control">
+                         <span class="slds-form-element">
+                              <apex:inputField value="{!hnrController.new_ki.H_usliche_Situation__c}" styleClass="slds-select"/>
+                         </span>
+                     </div>
+            </div></div>
+            
+            <div class="slds-col--padded slds-size--1-of-2">
+            </div>
+            
+            <div class="slds-col--padded slds-size--1-of-4">
+                 <div class="slds-form-element slds-hint-parent slds-m-top--small">
+                     <span class="slds-form-element__label">Pflegegrad vorhanden</span>
+                     <div class="slds-form-element__control">
+                         <span class="slds-form-element">
+                              <apex:inputCheckbox value="{!hnrController.new_ki.Pflegegrad_vorhanden__c}" />
+                         </span>
+                     </div>
+            </div></div>
+            
+            <div class="slds-col--padded slds-size--1-of-4">
+                 <div class="slds-form-element slds-hint-parent slds-m-top--small">
+                     <span class="slds-form-element__label">der Zuschuss für HNR ist genehmigt</span>
+                     <div class="slds-form-element__control">
+                         <span class="slds-form-element">
+                              <apex:inputCheckbox value="{!hnrController.new_ki.Der_Zuschuss_f_r_HNR_ist_genehmigt__c}" />
+                         </span>
+                     </div>
+            </div></div>
+            
+            <div class="slds-col--padded slds-size--1-of-4">
+                 <div class="slds-form-element slds-hint-parent slds-m-top--small">
+                     <span class="slds-form-element__label">ein Antrag für Zuschuss HNR zuschicken</span>
+                     <div class="slds-form-element__control">
+                         <span class="slds-form-element">
+                              <apex:inputCheckbox value="{!hnrController.new_ki.Antrag_f_r_Zuschuss_HNR_zuschicken__c}" />
+                         </span>
+                     </div>
+            </div></div>
+            
+            <div class="slds-col--padded slds-size--1-of-4">
+                 <div class="slds-form-element slds-hint-parent slds-m-top--small">
+                     <span class="slds-form-element__label">ein Antrag für Zuschuss PG zuschicken</span>
+                     <div class="slds-form-element__control">
+                         <span class="slds-form-element">
+                              <apex:inputCheckbox value="{!hnrController.new_ki.Antrag_Pflegegrad_zuschicken__c}" />
+                         </span>
+                     </div>
+            </div></div>
+            
+            <div class="slds-col--padded">
+                 <div class="slds-form-element slds-hint-parent slds-m-bottom--small slds-m-right--small">
+                     <span class="slds-form-element__label">Sonstiges</span>
+                     <div class="slds-form-element__control">
+                         <span class="slds-form-element">
+                              <apex:inputText value="{!hnrController.new_ki.Sonstiges__c}" styleClass="slds-input"/>
+                         </span>
+                     </div>
+            </div></div>
+                     
+        </div>
+    </div>
+    
+<c:Selfmailer id="cm_selfmailer" selfmailerCntlr="{! hnrController.selfmailerCntlr}" rendered="{! hnrController.selfmailerCntlr.showSelfmailer }" />
+
+<c:PLZTool_Hausnotruf_AdditionalInfo id="cm_additionalInfo" AIController="{! hnrController.AICntlr}" rendered="{! hnrController.AICntlr.showAdditionalInfo }" />
+
+</apex:component>

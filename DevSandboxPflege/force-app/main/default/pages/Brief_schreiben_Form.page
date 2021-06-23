@@ -1,0 +1,64 @@
+<apex:page standardController="Kunde__c" extensions="Brief_schreiben_controller_class" tabStyle="Kunde__c" action="{!processBriefSchreiben}">
+<!--
+//////////////////////////////////////////////////////////////////
+//
+//        Autor: Malte Srocke
+//        Erstellt: 7.11.14
+//        Beschreibung:
+//            Formular, um Betreff und Text für benutzerdefinierten
+//            Brief an Kunden einzugeben
+//
+//
+//        Änderungen:
+//            7.11.14, MS, Erste Version erstellt
+//                noch nicht deployed
+//            1.03.15, MS, Um E-Mail-Vorlagen-Auswahl erweitert
+//            31.8.2015 BT, Hinzufügen der Buttons "per Post" und "per Email"
+//
+//
+//////////////////////////////////////////////////////////////////
+//-->
+  <apex:form id="BriefForm">
+        <apex:pagemessages id="Page_Message"  escape="false"/>
+        <apex:pageBlock title="Brief erstellen" id="fmPbs">
+        <apex:pageBlockSection columns="2" collapsible="false" id="addr">
+        <apex:selectList label="Empänger"  value="{!selectedRcpt}" multiselect="false" styleclass="SelectOptions" size="1"  disabled="false">
+            <apex:selectOptions value="{!selRCPT}"/>
+            <apex:actionsupport action="{!changeRcpt}"  event="onchange" rerender="addr, pblp" />    
+        </apex:selectList>
+            <p>
+            {!adr.empAnrede}<br />
+            {!adr.empName}<br />
+            {!adr.empStrasse}<br />
+            {!adr.empPLZ} {!adr.empOrt}<br />
+        </p>
+
+         </apex:pageBlockSection>   
+    </apex:pageBlock>
+    <apex:pageBlock title="Inhalt">
+        <apex:pageBlockSection columns="1" collapsible="false" id="Inhalt">
+            <apex:commandLink action="{!GotoTemplateSelect}" value="Vorlage auswählen" />
+            <apex:inputText id="betreff" value="{!betreff}" label="Betreff"/>
+            <apex:inputTextarea id="schreiben" value="{!schreiben}" label="Schreiben" cols="50" rows="7" />
+        </apex:pageBlockSection>
+        <apex:pageBlockButtons location="bottom">
+        </apex:pageBlockButtons>
+    </apex:pageBlock>
+    
+    <apex:Pageblock id="pblp" title="Brief verschicken">
+        
+            <apex:pageBlockButtons >              
+                <apex:CommandButton id="btnzurueck" value="Zurück zu Kunde" immediate="True" action="{!zurueck}"/>
+            </apex:pageBlockButtons>
+            
+            <apex:PageBlocksection title="Versandart" collapsible="false" id="fmPbs" columns="2">                  
+                        <apex:commandButton action="{!Brief_schreiben_pdf}" value="per Post" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;" />
+                        <apex:outputtext value="Brief ausdrucken"  />                        
+                        <apex:commandButton action="{!perEmail}" value="per Email" styleClass="btn" disabled="{!hasMail}"  style="padding:2px 5px 2px 5px; text-decoration:none; width:200;"/>
+                        <apex:outputtext value="Email an {!adr.empName} ({!adr.empMail})"  rendered="{!!hasMail}"/>
+                        <apex:outputtext value="Achtung! Keine Email adresse erfasst!"  rendered="{!hasMail}"/>
+            </apex:PageBlocksection>           
+        </apex:Pageblock> 
+ 
+  </apex:form>
+</apex:page>

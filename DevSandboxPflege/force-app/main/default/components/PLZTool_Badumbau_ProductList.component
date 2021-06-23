@@ -1,0 +1,237 @@
+<!--
+/********************************************************************************************************************************************
+// Created  02.07.2018  von MZ
+//                      Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                      Nordkanalstraße 58
+//                      20097  Hamburg 
+//                      Tel.:  0423882986
+//                      Fax.:  0423882986
+//                      Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//
+//********************************************************************************************************************************************
+//
+// Description: the first page of plz_tool which shows product list for Badumabu
+//  list is based on partners. user can select one partner only
+//
+//********************************************************************************************************************************************
+// Changes:
+// 04.09.2018   MZ       #159952294 Badumbau Partners with no contingent left
+// 11.11.2020   DZ       Deleted onchange="BadumbauPartnerSelect(this);"
+// 13.01.2021   DZ       Added "Anmerkungen" and "CPL/CPO"
+//********************************************************************************************************************************************
+*/
+-->
+
+<apex:component id="cmp_pl">
+
+<script type="text/javascript"> 
+    
+    function showOptionalProducts(input){
+        var optionalMain = input + 'main';
+        var optionalService = input + 'service';
+        if(document.getElementById(optionalMain).style.display === "none") {
+            document.getElementById(optionalMain).style.display = "initial";
+            document.getElementById(optionalService).style.display = "initial";
+        }
+        else{
+            document.getElementById(optionalMain).style.display = "none";
+            document.getElementById(optionalService).style.display = "none";
+        }
+    }
+    
+    function BadumbauPartnerSelect(e){
+        var key = e.id;
+        key = key.substring(0, key.length-5);
+        key = key + 'ophid';
+        var pa_id = document.getElementById(key).value;
+        document.getElementById('page_id:cmForm:sestr').value = pa_id;
+        keepSelected();
+    }
+    
+</script> 
+    
+    <apex:attribute name="badController" description="the controller class for Bath recordType" type="PLZTool_Badumbau" required="true"/>
+    
+    <apex:actionFunction action="{!keepSelected}" name="keepSelected" />
+
+    <!--apex:input value="{!badController.selectedPartnerStr}" id="partnerstr"/-->
+    
+    <table class="slds-table slds-table--cell-buffer slds-table--bordered"> <!-- slds-table--bordered -->
+        <thead>
+            <tr class="slds-text-heading--label">
+              <th class="slds-cell-shrink"></th>
+              <th scope="col" title="Partner" class="slds-cell-shrink">
+                <div class="slds-truncate">Partner</div>
+              </th>
+              <th scope="col" title="">
+                <div class="slds-truncate">Produkt &nbsp;[ Prio ]</div>
+              </th>
+            <th scope="col" title="CPL Kat. 1">
+            <div class="slds-truncate">CPL/CPO</div>
+            </th>
+                <!--th scope="col" title="">
+                <div class="slds-truncate">Zusatzleistung</div>
+              </th-->
+              <th scope="col" title="Offenes Firmen-Kontingent">
+                <div class="slds-truncate">F.-Kont.</div>
+              </th>
+              <th scope="col" title="Anmerkungen">
+            <div class="slds-truncate">Anmerkungen</div>
+              </th>
+            </tr>
+        </thead>
+        <tbody>
+            <apex:repeat value="{!badController.BadumbauPartnerMapKeys}" var="partnerKey" id="rep_id">
+                <tr class="slds-hint-parent" onclick="showOptionalProducts('{!partnerKey}');">
+                    <td class="slds-cell-shrink" data-label="Select Row">
+                        <label class="slds-checkbox">
+                            <apex:inputcheckbox id="opnum" disabled="{!badController.BadumbauPartnerMap[partnerKey].disabled}" /> <!-- DZ 11.11.20 onchange="BadumbauPartnerSelect(this);" -->
+                            <apex:inputHidden value="{!badController.BadumbauPartnerMap[partnerKey].ticketProduct.pp.Id}" id="ophid"/>
+                            <apex:inputHidden value="{!badController.BadumbauPartnerMap[partnerKey].ticketProduct.CPL_Exklusiv}" id="exhid"/>
+                            <apex:inputHidden value="{!badController.BadumbauPartnerMap[partnerKey].ticketProduct.CPO_Exclusiv}" id="excpohid"/>
+                            <span class="slds-checkbox--faux"></span>
+                        </label>
+                    </td>
+                    <td>
+                        <div class="slds-truncate">
+                            <a href="/{!partnerKey}">
+                                <apex:outputtext value="{!badController.BadumbauPartnerMap[partnerKey].partner.Name}" rendered="{!!badController.BadumbauPartnerMap[partnerKey].disabled}"/>
+                                <apex:outputtext style="text-decoration: line-through" value="{!badController.BadumbauPartnerMap[partnerKey].partner.Name}" rendered="{!badController.BadumbauPartnerMap[partnerKey].disabled}"/>
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <apex:repeat value="{!badController.BadumbauPartnerMap[partnerKey].matchedMainProducts}" var="prdct" >
+                                <div ><a href="/{!prdct.pp.Id}"> <apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></a>
+                                &nbsp; [ {!prdct.pp.Priorit_t__c} ]
+                                </div>
+                            </apex:repeat>
+                        </div>
+                        <!--div id="{!partnerKey}main" style="display: none;">
+                            <apex:repeat value="{!badController.BadumbauPartnerMap[partnerKey].optionalMainProducts}" var="prdct" >
+                                <div ><apex:outputtext value="{!prdct.pp.Produktgruppe__c}" />
+                                &nbsp; [ {!prdct.pp.Priorit_t__c} ]
+                                </div >
+                                <!--div >
+                                    <table>
+                                        <tr>
+                                            <td><apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></td>
+                                            <td><div class="slds-truncate">{!prdct.pp.Priorit_t__c}</div></td>
+                                        </tr>
+                                    </table>                                    
+                                </div>
+                            </apex:repeat>
+                        </div-->
+                    </td>
+                    <!--td> DZ
+                        <div>
+                            <apex:repeat value="{!badController.BadumbauPartnerMap[partnerKey].matchedAdditionalServices}" var="prdct" >
+                                <div class="slds-truncate"><a href="/{!prdct.pp.Id}"> <apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></a></div>
+                            </apex:repeat>
+                        </div>
+                        <div id="{!partnerKey}service" style="display: none;">
+                            <apex:repeat value="{!badController.BadumbauPartnerMap[partnerKey].optionalAdditionalServices}" var="prdct" >
+                                <div class="slds-truncate"><apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></div>
+                            </apex:repeat>
+                        </div>
+                        
+                    </td-->
+                      <td style="vertical-align:top">
+                            <apex:repeat value="{!badController.BadumbauPartnerMap[partnerKey].matchedMainProducts}" var="prdct" >
+                             <div class="slds-truncate"> <apex:outputtext value="{!prdct.CplCpo}" /> </div>
+                            </apex:repeat>
+                    </td>
+                    
+                    <td style="vertical-align:top">
+                        <div class="slds-truncate">{!badController.BadumbauPartnerMap[partnerKey].Partner.Kontingent_offen_Partner__c}</div>
+                    </td>
+                 
+                      <td style="vertical-align:top">
+                            <apex:repeat value="{!badController.BadumbauPartnerMap[partnerKey].matchedMainProducts}" var="prdct" >
+                             <div class="slds-truncate"> <apex:outputtext value="{!prdct.pp.Anmerkung__c}" /> </div>
+                            </apex:repeat>
+                    </td>
+                    </tr>
+            </apex:repeat>
+        </tbody>
+    </table>
+    
+    
+    <!--
+    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+        <thead>
+            <tr class="slds-text-heading--label">
+              <th scope="col" title="Partner" class="slds-cell-shrink">
+                <div class="slds-truncate">Partner</div>
+              </th>
+              <th scope="col" title="">
+                <div class="slds-truncate"></div>
+              </th>
+              <th scope="col" title="Offenes Firmen-Kontingent">
+                <div class="slds-truncate">F.-Kont.</div>
+              </th>
+            </tr>
+        </thead>
+        <tbody>
+            <apex:repeat value="{!badController.partnerProductMapKeys}" var="partnerKey" id="partner_rep_id">
+                <tr>
+                    <!--td class="slds-cell-shrink" data-label="Select Row">
+                        <label class="slds-checkbox">
+                            <apex:inputcheckbox id="partnerCheck" disabled="true" />
+                            <span class="slds-checkbox--faux"></span>
+                        </label>
+                    </td->
+                    <td style="vertical-align:top"><div class="slds-truncate"><a href="/{!partnerKey}"><apex:outputtext value="{!badController.partnerMap[partnerKey].Name}" /></a></div>
+                    </td>
+                    <td>
+                        <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                            <thead>
+                                <tr class="slds-text-heading--label">
+                                  <th class="slds-cell-shrink"></th>
+                                  <th scope="col" title="Produkt">
+                                    <div class="slds-truncate">Produkt</div>
+                                  </th>
+                                  <th scope="col" title="Priorität">
+                                    <div class="slds-truncate">Prio</div>
+                                  </th>
+                                  <th scope="col" title="Anmerkungen">
+                                    <div class="slds-truncate">Anmerkungen</div>
+                                  </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <apex:repeat value="{!badController.partnerProductMap[partnerKey]}" var="prdct" id="rep_id">
+                                    <tr>
+                                        <td class="slds-cell-shrink" data-label="Select Row">
+                                            <label class="slds-checkbox">
+                                              <apex:inputcheckbox id="opnum" onchange="javascript:badPartnerSelect();" disabled="{!badController.disabledProductMap[prdct.pp.Id]}" />
+                                              <!-apex:inputHidden value="{!prdct.pp.partner__c}" id="ptid"/->
+                                              <apex:inputHidden value="{!prdct.pp.Id}" id="ophid"/>
+                                              <apex:inputHidden value="{!prdct.CPL_Exklusiv}" id="exhid"/>
+                                              <apex:inputHidden value="{!prdct.CPO_Exclusiv}" id="excpohid"/>
+                                              <span class="slds-checkbox--faux"></span>
+                                            </label>
+                                        </td>
+                                        <td style="vertical-align:top"><div class="slds-truncate"><a href="/{!prdct.pp.Id}"> <apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></a></div></td>
+                                        <!-td style="vertical-align:top"><div class="slds-truncate">{!prdct.pp.Kontingent_offen_Produkt__c}</div></td->
+                                        <td style="vertical-align:top"><div class="slds-truncate">{!prdct.pp.Priorit_t__c}</div></td>
+                                        <td style="vertical-align:top"><div class="slds-truncate">{!prdct.pp.Anmerkung__c}</div></td>
+                                    </tr>
+                                </apex:repeat>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td style="vertical-align:top">
+                        <div class="slds-truncate">{!badController.partnerMap[partnerKey].Kontingent_offen_Partner__c}</div>
+                    </td>
+                </tr>
+            </apex:repeat>
+        </tbody>
+    </table>
+-->
+</apex:component>

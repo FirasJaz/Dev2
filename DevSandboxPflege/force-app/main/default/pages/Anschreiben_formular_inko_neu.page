@@ -1,0 +1,117 @@
+<apex:page renderas="PDF" standardStylesheets="false" controller="RA_nur_anzeigen_ent_controller_class" sidebar="FALSE" showHeader="False" action="{!addTask}">
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Autor:          wds
+//      Stand:          03.09.2015
+//      Version:        1.0
+//      geändert:       
+//      Beschreibung:   Diese Seite ist das Anscreiben für neue Patienten (Inko)  bei PflegeDe. 
+//                      
+//  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--><HTML>
+<head>
+<apex:stylesheet value="{!$Resource.CSS_Anschreiben_Inko}" />
+</head>
+<body>
+<div id="head">    
+    <div id="logo">
+           <apex:image url="{!$Resource.pflegede_logo}" />
+    </div>
+                
+    <div id="address">
+           <span class="own_address">{!$Organization.Name} &bull; {!$Organization.Street} &bull; {!$Organization.PostalCode} {!$Organization.City}</span>
+           <br />
+           <br />
+           {!Kdaddr.Anrede}<br />
+           {!kdAddr.vorname_name}<br />
+           {!kdAddr.strasse}<br />
+           {!kdAddr.plz_ort}
+    </div>
+        
+    <div id="right">
+        <p>Postanschrift</p>
+       {!$Organization.Name}<br />
+       {!$Organization.Street}<br />
+       {!$Organization.PostalCode} {!$Organization.City}<br />
+       <br />
+       <p>Tel.</p>
+       {!FirmenInfo.Telefon__c}<br />
+       <p>Fax</p>
+       {!FirmenInfo.Fax__c}<br />
+       <p>Mail</p>
+       {!FirmenInfo.Email__c}<br />
+       <p>Web</p>
+       www.pflege.de/inkontinenz-<br/>
+       gratisprobe<br />
+       <br />
+       <p>Registergericht</p>
+       Amtsgericht Hamburg<br />
+
+       {!FirmenInfo.HRA__c}<br />
+        <br />
+       <p>Geschäftsführung</p>
+       <apex:outputtext escape="false" value="{!FirmenInfo.GF__c}"/><br />
+       <br />
+        <br />
+<!--       
+       {!FirmenInfo.Bank__c}<br />
+       BIC: {!FirmenInfo.BLZ__c}<br />
+       IBAN: {!FirmenInfo.Kontonummer__c}<br />
+-->
+        <br />
+       IK {!FirmenInfo.IK_Nummer__c}<br />
+    </div>
+</div>    
+    
+      <!-- Header is done -->
+      <div id="content">
+          <div id="subject">
+              <p><strong>Inkontinenzprodukte gratis testen 
+– damit Sie sich wieder sicher fühlen 
+</strong></p><br/> 
+              Hamburg, &nbsp;<apex:outputtext value="{0,date,dd.MM.yyyy}">
+                        <apex:param value="{!Now()}" /></apex:outputtext><br />
+          </div>   
+          <div id="text">
+               
+         
+
+
+              <p><apex:outputtext value="{!Anredeformel}"/></p>   
+              <p>herzlich willkommen bei pflege.de! Wir freuen uns Sie auf der Suche nach den besten Inkontinenzmaterialien unterstützen zu können.</p>
+              <p>Niemand kennt Ihre Bedürfnisse so gut wie Sie selbst. Also machen Sie sich ganz einfach Ihr eigenes Bild von den Produkten unseres Partners HARTMANN, der höchste Qualität mit bestmöglichem Komfort verbindet.</p>  
+              <p>Wie es funktioniert? So einfach, wie alles bei pflege.de!</p>
+              <p><apex:image url="{!$Resource.Inko_Kreise}" /></p>
+              <p><strong>Ihr Weg zu mehr Lebensqualität</strong></p>
+              <p>Einfach das beigefügte Formular ausfüllen und in dem Rückumschlag kostenfrei an uns zurück senden. Innerhalb von wenigen Tagen erhalten Sie dann Ihre individuelle Gratisprobe und können sich selbst von den Vorteilen der HARTMANN-Produkte überzeugen.</p>
+              <p>Wir sind immer für Sie da!</p>
+              <div id="unterschrift">Ihr pflege.de-Team<br/>
+              
+              </div>
+      
+          </div>
+
+       </div>
+
+<div id="bottom_notiz">
+<table>
+<tr><td colspan="2" style="padding-bottom: 12px;"></td></tr>
+<tr><td width="40">&nbsp;</td><td></td></tr>
+<tr><td width="40">&nbsp;</td><td></td></tr>
+<tr><td width="40">&nbsp;</td><td></td></tr>
+<tr><td width="40">&nbsp;</td><td></td></tr>
+</table>
+</div>
+
+<div id="bottom_right">
+Bei Fragen stehen wir Ihnen<br /> gerne kostenfrei telefonisch<br /> zur Verfügung unter:<br /> 
+<span>0800 – 666 222 141</span><br />
+oder besuchen Sie uns unter: <br />
+<span>www.pflege.de/</span>
+<span>inkontinenz-gratisprobe</span>
+</div>
+</body>
+</HTML>
+</apex:page>

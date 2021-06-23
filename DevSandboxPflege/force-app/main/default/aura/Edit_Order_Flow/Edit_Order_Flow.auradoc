@@ -1,0 +1,10 @@
+<!--
+ - Created by schne on 05.08.2020.
+ -->
+
+<aura:documentation>
+    <aura:description>Documentation for Edit_Order_Flow</aura:description>
+    <aura:example name="Edit_Order_Flow" ref="Edit_Order_Flow" label="Edit_Order_Flow">
+        This component is used for manually orders' editing within screen flow.
+    </aura:example>
+</aura:documentation>

@@ -1,0 +1,30 @@
+<!--
+/********************************************************************************************************************************************
+//  Created 08.07.2019 by BT
+//                          Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                          Nordkanalstraße 58
+//                          20097 Hamburg 
+//                          Tel.:  04064917161
+//                          Fax.: 04064917162
+//                          Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//
+//********************************************************************************************************************************************
+//
+// Description:    
+//                          This is the visualforce page displayed after clicking the "Back in Pool" button on the follow up task detail page.
+//                          
+//********************************************************************************************************************************************
+// Changes:
+//          
+//********************************************************************************************************************************************
+-->
+<apex:page standardController="Follow_up_Task__c" extensions="FollowUp_BackInPool" action="{!changeCurrentEditor}">
+  <apex:sectionHeader title="Auto-Running Apex Code"/>
+  <div class="slds">
+    <apex:pageMessages id="showmsg" escape="false"/>
+    </div>
+</apex:page>

@@ -1,0 +1,247 @@
+<!--
+/********************************************************************************************************************************************
+//  Created 21.05.2019 by BT
+//                          Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                          Nordkanalstraße 58
+//                          20097 Hamburg 
+//                          Tel.:  04064917161
+//                          Fax.: 04064917162
+//                          Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//
+//********************************************************************************************************************************************
+//
+// Description:    
+//                          This page represents a view of some approvals. 
+//                          It displays approvals, which are in a specific status
+//                          
+//********************************************************************************************************************************************
+// Changes:
+//          02.07.2019  BT  New column 'Name'
+//          18.07.2019  BT  pagination and column sort
+//          15.08.2019  BT  displayed translated KV status in title
+//			05.12.2019  BT  #2319 - new columns for status__c and contact__r.Kranken_Pflegekasse__c 
+//							and contact__r.Kranken_Pflegekasse__r.KV_per_Fax__c
+//			09.12.2019  BT	00002323 - Column genehmigt_ab__c is replaced by column Antrag_eingegangen_am__c
+//									   Added column LastModifiedDate
+//							00002324 - Approvals are now opened in new tabs
+//			04.02.2020  BT  00002391 - added page message
+//********************************************************************************************************************************************
+-->
+<apex:page controller="ApprovalController" title="Curabox Genehmigungen" action="{!queryApprovals}" showHeader="true" standardStylesheets="false" sidebar="false" applyHtmlTag="true"
+    applyBodyTag="false" docType="html-5.0" id="page_id">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="de">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <apex:slds />
+
+        <script type="text/javascript">
+        	function openApprovalRecord(input) {
+            	setApprovalCurrentEditor(input);                 
+                selectApproval(input);                
+            }
+        
+            function setApprovalCurrentEditor(input) {
+                setCurrentEditor(input);
+            }
+
+            function selectApproval(input) {
+                if(typeof sforce !='undefined' && sforce.one) {                   
+                    window.open('/one/one.app#/alohaRedirect/'+input, "_blank");
+                }
+                else {
+                    window.open('/'+input, "_blank");                    
+                } 
+            }
+        </script>
+    </head>
+
+    <body>
+        <apex:form >
+            <apex:actionFunction name="setCurrentEditor" action="{!setApprovalCurrentEditor}" reRender="panel, pageMessage" >
+                    <apex:param id="apId" name="approvalId" value="" />    
+            </apex:actionFunction>            
+            <div class="slds-scope" id=''>
+                <div class="myapp slds-p-horizontal--medium">
+                    <apex:outputPanel rendered="{!!kvStatusBool}">
+                        <p style="background-color: white;font-size: 20px;">Genehmigungen im Status "{!status}"</p>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!kvStatusBool}">
+                        <p style="background-color: white;font-size: 20px;">Genehmigungen im KV-Status "{!translatedKvStatuses[kvStatus]}"</p>
+                    </apex:outputPanel>                                        
+                    <br/>
+                    <apex:outputText id="pageMessage" value="{!pageMessage}" style="font-size:14px;color:blue;" />
+                    <apex:outputPanel id="panel" >
+                        <apex:outputPanel layout="block" style="text-align: center;" >
+                                    Anzahl der Datensätze : &nbsp;<apex:outputText rendered="{!IF(Con.resultSize==10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(Con.resultSize < 10000,true,false)}">{!Con.resultSize}</apex:outputText>&nbsp;&nbsp;                                
+                                    <apex:commandLink action="{!Previous}" title="zurück" value="zurück" rendered="{!Con.HasPrevious}"/>
+                                    <apex:outputPanel style="color:grey" rendered="{!NOT(Con.HasPrevious)}">zurück</apex:outputPanel>         
+                                    &nbsp;({!IF(Con.PageNumber == 1,1,((Con.PageNumber -1) * Con.PageSize)+1)}-{!IF(Con.resultSize < Con.PageSize,Con.resultSize,Con.PageNumber * Con.pageSize)})&nbsp;
+                                    <apex:outputPanel style="color:grey" rendered="{!NOT(Con.HasNext)}">weiter</apex:outputPanel>         
+                                    <apex:commandLink title="weiter" value="weiter" rendered="{!Con.HasNext}" action="{!Next}"/>&nbsp;                                        
+                        </apex:outputPanel>      
+                        <br/>              
+                        <apex:outputPanel layout="block" >                        
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                <thead>
+                                    <tr class="slds-text-title_caps">
+                                        <!-- Name -->
+                                        <th scope="col">
+                                                <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Name.Label}">                                                 
+                                                    <apex:commandLink action="{!queryApprovals}" value="{!$ObjectType.Curabox_Genehmigung__c.Fields.Name.Label}{!IF(sortExpression=='Name',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                        <apex:param value="Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                    </apex:commandLink>                                                                                              
+                                                </div>
+                                            </th>
+                                       
+                                        <!-- Nach_Paragraph__c -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Nach_Paragraph__c.Label}">
+                                                <apex:commandLink action="{!queryApprovals}" value="{!$ObjectType.Curabox_Genehmigung__c.Fields.Nach_Paragraph__c.Label}{!IF(sortExpression=='Nach_Paragraph__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                        <apex:param value="Nach_Paragraph__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink> 
+                                            </div>
+                                        </th>
+    
+                                        <!-- Status__c -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Status__c.Label}">
+                                                <apex:commandLink action="{!queryApprovals}" value="{!$ObjectType.Curabox_Genehmigung__c.Fields.Status__c.Label}{!IF(sortExpression=='Status__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                        <apex:param value="Status__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink> 
+                                            </div>
+                                        </th>
+                                        
+                                        <!-- Contact__c -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Contact__c.Label}">
+                                                <apex:commandLink action="{!queryApprovals}" value="{!$ObjectType.Curabox_Genehmigung__c.Fields.Contact__c.Label}{!IF(sortExpression=='Contact__r.Name',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                        <apex:param value="Contact__r.Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                             
+                                            </div>
+                                        </th>
+                                        
+                                        <!-- Contact__r.Kranken_Pflegekasse__c -->                                   
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Contact.Fields.Kranken_Pflegekasse__c.Label}">
+                                                <apex:commandLink action="{!queryApprovals}" value="{!$ObjectType.Contact.Fields.Kranken_Pflegekasse__c.Label}{!IF(sortExpression=='Contact__r.Kranken_Pflegekasse__r.Name',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                        <apex:param value="Contact__r.Kranken_Pflegekasse__r.Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                                  
+                                            </div>
+                                        </th>
+    
+                                        <!-- Antrag_eingegangen_am__c -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Antrag_eingegangen_am__c.Label}">
+                                                <apex:commandLink action="{!queryApprovals}" value="{!$ObjectType.Curabox_Genehmigung__c.Fields.Antrag_eingegangen_am__c.Label}{!IF(sortExpression=='Antrag_eingegangen_am__c',IF(sortDirection='ASC','▼','▲'),'')}">
+                                                        <apex:param value="Antrag_eingegangen_am__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                            
+                                            </div>
+                                        </th>
+    
+                                        <!-- Contact__r.Kranken_Pflegekasse__r.KV_per_Fax__c -->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Account.Fields.KV_per_Fax__c.Label}">
+                                                <apex:commandLink action="{!queryApprovals}" value="{!$ObjectType.Account.Fields.KV_per_Fax__c.Label}{!IF(sortExpression=='Contact__r.Kranken_Pflegekasse__r.KV_per_Fax__c',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                        <apex:param value="Contact__r.Kranken_Pflegekasse__r.KV_per_Fax__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                                  
+                                            </div>
+                                        </th>
+    
+                                        <!-- LastModifiedDate !-->
+                                        <th scope="col">
+                                            <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.LastModifiedDate.Label}">
+                                                <apex:commandLink action="{!queryApprovals}" value="{!$ObjectType.Curabox_Genehmigung__c.Fields.LastModifiedDate.Label}{!IF(sortExpression=='LastModifiedDate',IF(sortDirection='ASC','▼','▲'),'')}" >
+                                                        <apex:param value="LastModifiedDate" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                                </apex:commandLink>                                                  
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+    
+                                <tbody>
+                                    <apex:repeat value="{!approvals}" var="ap">
+                                        <tr>
+                                            <!-- Name -->
+                                            <td data-label="{!$ObjectType.Curabox_Genehmigung__c.Fields.Name.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Name.Label}">
+                                                    <a href="javascript:openApprovalRecord('{!ap.id}');" >{!ap.Name}</a>                                                
+                                                </div>
+                                            </td>
+                                            
+                                            <!-- Nach_Paragraph__c -->
+                                            <td data-label="{!$ObjectType.Curabox_Genehmigung__c.Fields.Nach_Paragraph__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Nach_Paragraph__c.Label}">
+                                                    <apex:outputField value="{!ap.Nach_Paragraph__c}" />
+                                                </div>
+                                            </td>
+                                            
+                                            <!-- Status -->
+                                            <td data-label="{!$ObjectType.Curabox_Genehmigung__c.Fields.Status__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Status__c.Label}">
+                                                    <apex:outputField value="{!ap.Status__c}" />
+                                                </div>
+                                            </td>                                        
+    
+                                            <!-- Contact__c -->
+                                            <td data-label="{!$ObjectType.Curabox_Genehmigung__c.Fields.Contact__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Contact__c.Label}">
+                                                    <apex:outputField value="{!ap.Contact__r.Name}" />
+                                                </div>
+                                            </td>
+                                            
+                                            <!-- Contact__r.Kranken_Pflegekasse__c -->
+                                            <td data-label="{!$ObjectType.Contact.Fields.Kranken_Pflegekasse__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Contact.Fields.Kranken_Pflegekasse__c.Label}">
+                                                    <apex:outputField value="{!ap.Contact__r.Kranken_Pflegekasse__r.Name}" />
+                                                </div>
+                                            </td>     
+                                                                                    
+                                            <!-- Antrag_eingegangen_am__c -->
+                                            <td data-label="{!$ObjectType.Curabox_Genehmigung__c.Fields.Antrag_eingegangen_am__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.Antrag_eingegangen_am__c.Label}">
+                                                    <apex:outputField value="{!ap.Antrag_eingegangen_am__c}" />
+                                                </div>
+                                            </td>
+                                            
+                                            <!-- Contact__r.Kranken_Pflegekasse__r.KV_per_Fax__c -->
+                                            <td data-label="{!$ObjectType.Account.Fields.KV_per_Fax__c.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Account.Fields.KV_per_Fax__c.Label}">
+                                                    <apex:outputField value="{!ap.Contact__r.Kranken_Pflegekasse__r.KV_per_Fax__c}" />
+                                                </div>
+                                            </td>                                        
+                                            
+                                            <!-- LastModifiedDate -->
+                                            <td data-label="{!$ObjectType.Curabox_Genehmigung__c.Fields.LastModifiedDate.Label}">
+                                                <div class="slds-truncate" title="{!$ObjectType.Curabox_Genehmigung__c.Fields.LastModifiedDate.Label}">
+                                                    <apex:outputField value="{!ap.LastModifiedDate}" />
+                                                </div>
+                                            </td>                                    
+                                        </tr>
+                                    </apex:repeat>
+                                </tbody>
+                            </table>
+                        </apex:outputPanel>   
+                        <br/>
+                        <apex:outputPanel layout="block" style="text-align: center;" >
+                                Anzahl der Datensätze : &nbsp;<apex:outputText rendered="{!IF(Con.resultSize==10000,true,false)}">10000 +</apex:outputText><apex:outputText rendered="{!IF(Con.resultSize < 10000,true,false)}">{!Con.resultSize}</apex:outputText>&nbsp;&nbsp;          
+                                    <apex:commandLink action="{!Previous}" title="zurück" value="zurück" rendered="{!Con.HasPrevious}"/>
+                                    <apex:outputPanel style="color:grey" rendered="{!NOT(Con.HasPrevious)}">zurück</apex:outputPanel>         
+                                    &nbsp;({!IF(Con.PageNumber == 1,1,((Con.PageNumber -1) * Con.PageSize)+1)}-{!IF(Con.resultSize < Con.PageSize,Con.resultSize,Con.PageNumber * Con.pageSize)})&nbsp;
+                                    <apex:outputPanel style="color:grey" rendered="{!NOT(Con.HasNext)}">weiter</apex:outputPanel>         
+                                    <apex:commandLink title="weiter" value="weiter" rendered="{!Con.HasNext}" action="{!Next}"/>&nbsp;                                        
+                        </apex:outputPanel>  
+                    </apex:outputPanel>
+                </div>
+            </div>
+        </apex:form>
+    </body>
+
+    </html>
+</apex:page>

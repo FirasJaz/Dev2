@@ -1,0 +1,112 @@
+<apex:page renderas="PDF" controller="SRG_nur_anzeigen" sidebar="FALSE" showHeader="False" applyBodyTag="false" applyHtmlTag="false" >
+  <html>
+    <head>
+    <!-- Stylesheets -->
+    <apex:stylesheet value="{!$Resource.SRG_PDFStyle}" />
+    </head>
+    <body>
+    <!-- First Page Header -->
+    <c:PDFHeaderFooter type="header" position="center"></c:PDFHeaderFooter>
+
+    <!-- All Pages Header -->
+    <c:PDFHeaderFooter type="header" position="left">
+        <div style="padding-top: 50px; padding-left: 50px; padding-bottom: 0px;">
+            <apex:image url="{!$Resource.Logo}" width="190" height="40" />
+        </div>
+    </c:PDFHeaderFooter>  
+    <c:PDFHeaderFooter type="header" position="right">
+        <div style="padding-top: 50px; padding-right: 50px; padding-bottom: 0px;">
+            <apex:image url="{!$Resource.webcare_logo_107_40}" width="107" height="40" />
+        </div>
+    </c:PDFHeaderFooter>  
+         <div id="head">
+            <div id="address_s">   
+            <apex:outputText value="{!$Organization.Name}, {!$Organization.Street}, {!$Organization.PostalCode} {!$Organization.City}" style="font-size:9px"/><br />
+               <br /><br />     
+               <apex:outputtext value="{!vorname} {!nachname}"/><br/>                              
+               <apex:outputtext value="{!Anschrift.Stra_e__c} {!Anschrift.Hausnummer__c}"/><br/>
+               <apex:outputtext value="{!Anschrift.PLZ__c} {!Anschrift.Ort__c}"/> 
+            </div> 
+            <div id="kunde_s">  
+            <table>
+                <tr><td><apex:outputtext rendered="{!MaKdNr}" value="Kundennummer:"></apex:outputtext></td>
+                    <td><apex:outputtext value="{!Kunde.Magento_Kundennummer__c}  "></apex:outputtext></td>
+                </tr>            
+                <tr><td>Datum:</td>
+                    <td><apex:outputtext value="{0,date,dd.MM.yyyy}"><apex:param value="{!Now()}" /></apex:outputtext></td>
+                </tr>
+                <tr><td><br /><br /></td>
+                    <td><br /><br /></td>
+                </tr>
+                <tr><td>Email:</td>
+                    <td><apex:outputtext value="shop@pflege.de"></apex:outputtext></td>
+                </tr>
+                <tr><td>Telefon:</td>
+                    <td><apex:outputtext value="0800 666 222 167"></apex:outputtext></td>
+                </tr>
+                <tr><td>Shop:</td>
+                    <td><apex:outputtext value="shop.pflege.de"></apex:outputtext></td>
+                </tr>
+            </table>      
+           </div> 
+           </div>
+        
+        <div id="document_info">
+            <H1>Rechnung <apex:outputtext value=" {!RG.Rechnungsnummer_shop__c}"/></H1>
+            <br />
+            <p>Sehr geehrte Damen und Herren, <br/><br/>
+            gemäß Ihrer Bestellung <apex:outputtext value=" {!magento_increment_id}"/> berechnen wir Ihnen den folgenden Auftrag:<br/>
+            </p>         
+        </div>
+        <div id="content">
+        <table border="0" cellpadding="0" cellspasing="0" class="ctab" width="660"> 
+        <apex:repeat value="{!Zeilen}" var="p">
+        <tr style="{!p.trs}">
+            <td width="30" align="center" style="{!p.th} padding-right:10px;">{!p.Pos}</td>
+            <td width="170" align="left" style="{!p.th} padding-right:10px;">{!p.Beschreibung}</td>
+            <td width="70" align="right" style="{!p.th} padding-right:10px;">{!p.Menge}</td>
+            <td width="80" align="right" style="{!p.th} padding-right:10px;">{!p.Einzelpreis}</td>
+            <td width="50" align="right" style="{!p.last_th} padding-right:10px;">{!p.Gesamtpreis}</td>
+        </tr>
+        <tr style="{!p.seitenw};"><td></td>
+        </tr>
+        </apex:repeat>
+        </table>
+          <div><p><br/>Zahlungsart:  <apex:outputtext value=" {!magento_payment_method}"/> <br/>
+            Zahlungsdienstleister: PAYONE GmbH<br/><br/>
+            Hinweise zu unseren Verkaufs- und Lieferbedingungen inkl. Rückgabe- und Widerrufsecht finden Sie <br/>
+            unter folgenden Links: <br/>
+            shop.pflege.de/agb<br/>
+            shop.pflege.de/widerruf<br/>
+            shop.pflege.de/versand
+            <br/><br/>
+            Wir danken Ihnen für Ihren Einkauf in unserem Shop und würden uns freuen, wenn Sie uns dort bald <br/>
+            wieder besuchen kommen.
+            <br/><br/>
+            Ihr pflege.de-Team
+            </p>    </div>     
+
+        </div>
+            
+    <c:PDFHeaderFooter type="footer" position="center" showPageNumbers="true">       
+         <table width="99%">
+            <tr>
+            <td style="vertical-align:top; text-align:left; font-size:11px;">
+            web care LBJ GmbH<br />
+            Spitalerstr. 32, 20095 Hamburg, Deutschland<br />
+            Geschäftsführer: Lars Kilchert, Sabine Schöler</td>
+            <td style="text-align:center; font-size:11px;">
+            Amtsgericht Hamburg<br />
+            Handelsregister-Nr.: HRB 117601<br />
+            USt-IdNr.:DE276352378</td>
+            <td style="text-align:right; font-size:11px; ">
+            Deutsche Handelsbank<br/>
+            IBAN: DE09 7001 1110 4007 8490 07<br />
+            BIC: DEKT DE 71 002</td>
+            </tr>
+         </table>  
+    </c:PDFHeaderFooter>
+    </body>
+  </html>
+           
+</apex:page>

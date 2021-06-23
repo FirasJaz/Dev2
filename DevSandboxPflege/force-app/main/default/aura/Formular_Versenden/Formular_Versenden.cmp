@@ -1,0 +1,109 @@
+<!--
+/****************************************************************************************************************************
+// Created 10.04.2019 von  AD
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.: 04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+//  ContactId
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	This component is used to send the application form to a contact.
+//
+//****************************************************************************************************************************
+// Changes: 
+// 22.05.2020	00002469 - open formular in new tab
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="Curabox_Formular_Versenden" access="global" >
+   
+    <aura:attribute name="recordId" type ="Id" />
+    <aura:attribute name="options" type="String[]"/>
+    <aura:attribute name="selectedValue" type="String" />
+    <aura:attribute name="hasEmail" type="boolean"/>
+    <aura:attribute name="hasAttachment" type="boolean" />
+    <aura:attribute name="emailAddress" type ="String" />
+    <aura:attribute name="blankoPostMsg" type ="String" default="Anschreiben für PG54 und PG51 ausdrucken" />
+    <aura:attribute name="blankoEmailMsg" type ="String" />
+    <aura:attribute name="ausPostMsg" type ="String" default="Vorausgefüllt ausdrucken" />
+    <aura:attribute name="ausEmailMsg" type ="String" />
+    <aura:attribute name="receiverId" type="String" default="None"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <!-- Label buttons-->
+    <aura:attribute name="perPost" type="String" default="Blanko per Post"/>
+    <aura:attribute name="perEmail" type="String" default="Blanko per Email"/>
+    <aura:attribute name="ausPerPost" type="String" default="Ausgefüllt per Post"/>
+    <aura:attribute name="ausPerEmail" type="String" default="Ausgefüllt per Email"/>
+    <!-- Attributes show File -->
+    <aura:attribute name="selectedDocumentId" type="string"/>
+    <aura:attribute name="hasModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="showButton" type="boolean" default="true"/>
+    
+    <div class="c-container">
+        <div class="slds-p-around_x-small">
+            <lightning:select aura:id="select" name="select" label="Versenden an" value="{!v.selectedValue}" onchange="{! c.onChange }">
+                <aura:iteration items="{!v.options}" var="option">
+                    <option text="{!option}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+        <div class="btn-contener">
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-3 slds-p-around_x-small">
+                    <lightning:button variant="brand" label="{! v.perPost}" title="Neutral action" onclick="{! c.blankoPost }"/>
+                </div>
+                <div class="slds-size_2-of-3 slds-p-around_x-small">
+                    <p><lightning:formattedText value="{!v.blankoPostMsg}" /></p>
+                </div>
+            </div>   
+            <div class="slds-grid slds-wrap">
+                    <div class="slds-size_1-of-3 slds-p-around_x-small">
+                        <lightning:button variant="brand" aura:id="bla_per_mail" label="{! v.perEmail}" title="Blanko per Email" onclick="{! c.sendMail}"/>
+                    </div>
+                    <div class="slds-size_2-of-3 slds-p-around_x-small">
+                        <p><lightning:formattedText value="{!v.blankoEmailMsg}" /></p>
+                    </div>
+            </div>
+            <aura:if isTrue="{!v.showButton}">
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-size_1-of-3 slds-p-around_x-small">
+                        <lightning:button variant="brand" aura:id="aus_per_post" label="{! v.ausPerPost}" title="Ausgefüllt per Post" onclick="{! c.ausPost}"/>
+                    </div>
+                    <div class="slds-size_2-of-3 slds-p-around_x-small">
+                        <p><lightning:formattedText value="{!v.ausPostMsg}" /></p>
+                    </div>
+                </div>   
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-size_1-of-3 slds-p-around_x-small">
+                        <lightning:button variant="brand" aura:id="aus_per_mail" label="{! v.ausPerEmail}" title="Ausgefüllt per Email" onclick="{! c.sendFilledMail}"/>
+                    </div>
+                    <div class="slds-size_2-of-3 slds-p-around_x-small">
+                        <p><lightning:formattedText value="{!v.ausEmailMsg}" /></p>
+                    </div>
+                </div>
+            </aura:if>
+        </div>
+        <aura:if isTrue="{!v.hasModalOpen}">
+            <section onclick="{!c.closeModel}"
+                    role="dialog"
+                    aria-modal="true"
+                    class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__content slds-p-around_medium slds-text-align_center"
+                            style="background: transparent;">
+                        <lightning:fileCard fileId="{!v.selectedDocumentId}" description="Antragsformular"/>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </div>
+</aura:component>

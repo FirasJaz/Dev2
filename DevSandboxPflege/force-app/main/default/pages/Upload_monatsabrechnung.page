@@ -1,0 +1,133 @@
+<!--
+//****************************************************************************************************************************
+// Erstellt 01.08.2016 von MZ
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Mindelweg 11
+//                         22393 Hamburg 
+//                         Tel.:  04064917161
+//                         Fax.: 04064917162
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// xxxx
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+//                      
+//
+//
+//****************************************************************************************************************************
+//Änderungen:
+//
+//    Mz    06.12.2016    Auswahl von Abrechnungszeitraum 
+//****************************************************************************************************************************
+-->
+<apex:page id="page_id" standardController="Account" extensions="Upload_monatsabrechnung" sidebar="false" showHeader="false" showQuickActionVfHeader="false">
+
+  <apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+  
+
+   <div class="slds">
+     <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+         <!-- LAYOUT GRID -->
+           <div class="slds-grid" id="id" >
+               <!-- GRID COL -->
+               <div class="slds-col" style="color: white;">
+               <!-- HEADING AREA -->
+               <h1 class="slds-text-heading--medium" style="text-align: center;">Upload Monatsabrechnung</h1> 
+               </div>
+           </div>
+    </div>   
+    
+    <apex:outputPanel >
+      <apex:pageMessages id="showmsg"/>
+    </apex:outputPanel>
+    <br/>
+
+    <!-- Message -->
+    <div class="slds-notify_container" style="text-align: center; display: {!message_display};">
+       <div class="slds-notify slds-notify--alert slds-theme--alert-texture" role="alert">    
+        <h2>{!message}</h2>
+       </div>
+       <br/>
+    </div>
+    <!-- Message -->
+    <div class="myapp">
+    <div class="slds-grid slds-grid--align-center" >
+    <div class="slds-p-around--xx-large">
+        <apex:form id="form">
+           <apex:actionFunction name="abbrechen" action="{!abbrechen}" /> 
+           <apex:actionFunction name="speichern" action="{!speichern}" />    
+           <div style="text-align: center;">
+                <apex:outputPanel id="theSecondPanel" layout="block" rendered="{!ptList.empty}">
+                   <apex:outputLabel value="CSV Hochladen" styleClass="slds-form-element__label" />
+                   <br />
+                   <apex:inputFile value="{!contentFile}" fileName="{!nameFile}"></apex:inputFile>   
+                </apex:outputPanel>
+    
+
+
+            <br/><br/>
+            <!-- Buttons -->
+            
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!speichern}"  rendered="{!!ptList.empty}"/>
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="Upload" action="{!upload}"  rendered="{!ptList.empty}"/>
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="Zurück zum Partner" action="{!zurueck}"  />
+                <br/>&nbsp;<br/>
+            </div>
+            
+            <apex:outputPanel id="theFirstPanel" layout="block" rendered="{!!ptList.empty}">
+                <table class="slds-table slds-table--bordered slds-table--fixed-layout" role="grid">
+                    <thead>
+                        <tr class="slds-text-heading--label">
+                             <th scope="col">
+                                <div class="slds-truncate">Name</div>                            
+                             </th>
+
+                             <th scope="col">Product                             
+                             </th>
+
+                             <th scope="col">Erstellt                            
+                             </th>
+
+                             <th scope="col">Status CPO                          
+                             </th>
+                             
+                             <th scope="col">Wert CPO                            
+                             </th>
+
+                             <th scope="col">Status CPL                          
+                             </th>
+                             <th scope="col">Wert CPL                            
+                             </th>
+                        </tr>
+                    </thead>
+                    <apex:repeat value="{!ptList}" var="PT" id="rpt">
+                        <tr class="slds-hint-parent" >
+                            <td class="slds-truncate" data-label="Name">{!PT.name}</td>
+                            <td class="slds-truncate" data-label="Product">{!PT.Partner_Produkt__r.name}</td>
+                            <td class="slds-truncate" data-label="Erstellt">
+                                <apex:outputtext value="{0,date,dd.MM.yyyy}">
+                                    <apex:param value="{!PT.createddate}" />
+                                </apex:outputtext>
+                            </td>
+                            <td class="slds-truncate" style="{!IF((PT.Status_CPO__c == 'Storniert'), 'background-color:#FFA0A0;', '')}"   data-label="Status_CPO">{!PT.Status_CPO__c}</td>
+                            <td class="slds-truncate" data-label="Wert_CPO">{!PT.Wert_des_Partner_Tickets_CPO__c}</td>
+                            <td class="slds-truncate" data-label="Status_CPL">{!PT.Status_CPL__c}</td>  
+                            <td class="slds-truncate" data-label="Wert_CPL">{!PT.Wert_des_Partner_Tickets_CPL__c}</td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+            </apex:outputPanel>
+            
+        <!-- Buttons -->
+        </apex:form>
+        </div> 
+        </div>
+        </div>
+  </div>
+  
+</apex:page>

@@ -1,0 +1,45 @@
+<!--
+/****************************************************************************************************************************
+// Created 27.05.2019 von  AD
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.: 04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+//  Contact Id
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	This component is used to send a confirmation message to a contact when the Application form is received. 
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="Curabox_Formular_Versenden" access="global">
+    <aura:attribute name="recordId" type ="Id"/>
+    <aura:attribute name="blankoPostMsg" type ="String" default="Eingangsbestätigung ausdrucken" />
+    <aura:attribute name="blankoEmailMsg" type ="String" default="Eingangsbestätigung ausdrucken"/>
+    <aura:attribute name="title" type="String" default=" Bestätigung an Kunde senden"/>
+    <aura:attribute name="perPost" type="String" default="Bestätigung per Post"/>
+    <aura:attribute name="perEmail" type="String" default="Bestätigung per Email"/>
+    <aura:attribute name="showButton" type="boolean" default="false"/>
+    
+    <lightning:card>
+        <aura:set attribute="title">
+            <lightning:icon iconName="utility:connected_apps" size="small"/>
+            {! v.title }
+        </aura:set>
+        <div class="c-container">
+            <lightning:button class="btn-zuruck" variant="success" label="Zurück zum Contact" title="Zurück zum Contact" onclick="{! c.zuruck }" />
+            <c:Formular_Versenden recordId="{! v.recordId}" blankoPostMsg="{!v.blankoPostMsg}" perPost="{!v.perPost}" perEmail="{!v.perEmail}" showButton="{!v.showButton}"/>
+        </div>
+    </lightning:card>
+</aura:component>

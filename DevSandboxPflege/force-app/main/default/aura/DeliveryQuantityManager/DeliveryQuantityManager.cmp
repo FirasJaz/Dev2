@@ -1,0 +1,38 @@
+<!--
+/********************************************************************************************************************************************
+// Created on 17.08.2020 by BT
+//                      Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                      Frankenstraße 29
+//                      20097  Hamburg 
+//                      Tel.:  0423882986
+//                      Fax.:  0423882986
+//                      Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+//  Parameter:
+//
+//********************************************************************************************************************************************
+//
+//  Description:    
+//                     This represents an user interface for managing delivery quantity settings
+//********************************************************************************************************************************************
+// Changes:
+//
+//********************************************************************************************************************************************
+*/
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes">
+    <lightning:layout horizontalAlign="space" multipleRows="true">
+        <lightning:layoutItem size="12"
+                              mediumDeviceSize="12"
+                              padding="around-small">
+            <c:DeliveryQuantitySettingSearch />
+        </lightning:layoutItem>
+        <lightning:layoutItem size="12"
+                              mediumDeviceSize="12"
+                              padding="around-small">
+            <c:DeliveryQuantitySettingList />            
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

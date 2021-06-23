@@ -1,0 +1,601 @@
+<!--
+/********************************************************************************************************************************************
+// Erstellt 27.12.2016 von MZ
+//                      Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                      Nordkanalstraße 58
+//                      20097  Hamburg 
+//                      Tel.:  0423882986
+//                      Fax.:  0423882986
+//                      Email: kontakt@klosesrockepartner.de
+//********************************************************************************************************************************************
+//
+// Parameter: Opportunity
+//
+//********************************************************************************************************************************************
+//
+// Beschreibung:             
+//
+//********************************************************************************************************************************************
+//Änderungen:
+// 17.08.2017   MZ    Unterstützung nur per Flyer added for PI
+// 27.02.2018   MZ    #155027699
+// 12.02.2019   MZ    163646169 ZWB - Änderung der Opt In Checkboxen
+// 16.12.2019 AM    170277552 Badumbau - Änderung der Opt In Checkboxen (wie oben, auch fü Badumbau)
+// 18.02.2020   DZ    Neue Checkbox ASP_PB_Einwilligungserkl_rung__c eingefügt
+//********************************************************************************************************************************************
+*/
+-->
+<apex:page id="page_id" sidebar="false" showHeader="false" showQuickActionVfHeader="false" controller="PLZTool_Basis" docType="html-5.0" action="{!recordTypeSpecificAction}">    
+
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+
+<script type="text/javascript">
+    var selectedPartnerStr;
+    var existPartner;
+    var productRtId;
+    
+    function setProductRtId(){
+        if({!TreppenliftOpp}){
+            productRtId =  'cm_tl_ProductList';
+        }
+        if({!BetreuungsleistungenOpp}){
+            productRtId =  'cm_bel_ProductList';
+        }
+        if({!HausnotrufOpp}){
+            productRtId =  'cm_hnr_ProductList';
+        }
+        if({!PflegeimmobilienOpp}){
+            productRtId =  'cm_pi_ProductList';
+        }
+        if({!WiderspruchOpp}){
+            productRtId =  'cm_ws_ProductList';
+        }
+        if({!BadumbauOpp}){
+            productRtId =  'cm_bad_ProductList';
+        }
+        if({!PflegeschulungenOpp}){
+            productRtId =  'cm_pflegeschulungen_ProductList';
+        }
+    }
+        
+    function partnerSelect() {
+        selPart = "";
+        showExMsg = "";
+        productRtId = "";
+        
+        setProductRtId();
+        
+        for( i=0; i<{!TotalSize}; i++) { 
+            if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:rep_id:' + i + ':opnum') != null) { 
+                if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:rep_id:' + i + ':opnum').checked == true) {
+                    var pa_id = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:rep_id:' + i + ':ophid').value;  
+                    var ex_id = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:rep_id:' + i + ':exhid').value; 
+                    var ex_cpo = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:rep_id:' + i + ':excpohid').value; 
+                    if(selPart == "") {
+                        selPart = pa_id;
+                    }
+                    else {
+                        selPart += "," + pa_id;
+                    }
+                    if((ex_id == 'true') || (ex_cpo == 'true'))
+                    { 
+                        showExMsg = 'show';                     
+                    } 
+                    
+                }
+            }     
+        }
+        if((showExMsg == 'show') && (selPart.indexOf(',') >= 0)) showExclusiveMessage();
+        document.getElementById('page_id:cmForm:sestr').value = selPart; 
+        //alert(document.getElementById('page_id:cmForm:sestr').value);
+    }
+
+   function partnerSelectWeiter() {
+        setProductRtId();
+        selectedPartnerStr = "";
+        document.getElementById('page_id:cmForm:sestr').value = "";
+        var tblKeyList = ["rep_id"];
+        if({!HausnotrufOpp}){
+            tblKeyList = ["dv_rep_id", "wl_rep_id", "ex_rep_id", "sm_rep_id"];
+        }
+        
+        for( j=0; j<tblKeyList.length; j++ ){
+          var tblKey = tblKeyList[j];
+
+          for( i=0; i<{!TotalSize}; i++) {     
+            
+            if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':opnum') != null) { 
+
+                if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':opnum').checked == true) {
+                    
+                    var pa_id = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':ophid').value;  
+                    var ex_id = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':exhid').value; 
+                    var ex_cpo = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':excpohid').value; 
+                    if(selectedPartnerStr == "") {
+                        selectedPartnerStr = pa_id;
+                        if((ex_id == 'true') || (ex_cpo == 'true')) break;
+                    }
+                    else {
+                        selectedPartnerStr += "," + pa_id;
+                    }
+                    
+                }
+             } 
+          }     
+        }
+        document.getElementById('page_id:cmForm:sestr').value = selectedPartnerStr; 
+        // alert(document.getElementById('page_id:cmForm:sestr').value);
+        selPartner();
+    }  
+
+    function setButtonDisabled(bID) {   
+
+            document.getElementById("page_id:cmForm:buttonMailTop").disabled = true;        
+            document.getElementById("page_id:cmForm:buttonMailBottom").disabled = true; 
+            checkOpportunityStatusJS();
+    }
+    
+    function zeigeDetailsAn(input){
+             if(document.getElementById(input).style.display === "none") {
+                 document.getElementById(input).style.display = "initial";
+             }
+             else{
+                 document.getElementById(input).style.display = "none";
+             }
+    }
+    
+    function setPosition(){
+        var page_y = document.getElementsByTagName("body")[0].scrollTop;
+        if(page_y == 0)
+            page_y = document.documentElement.scrollTop;
+        //window.pageYOffset;
+        //alert (window.pageYOffset + ' ' + document.documentElement.scrollTop + ' ' + document.getElementsByTagName("body")[0].scrollTop);
+        document.getElementById('page_id:cmForm:scrollPosition').value = page_y.toFixed(0);
+    }
+    
+    
+</script>
+
+<apex:form id="cmForm" >
+<apex:inputHidden value="{!selectedPartnerString}" id="sestr"/>
+<apex:inputHidden value="{!scrollPosition}" id="scrollPosition"/>
+<apex:inputHidden value="{!exPartnerString}" id="exstr"/>
+<apex:inputHidden value="{!exPartnerIsExclusive}" id="exPartnerIsExclusive"/>
+<apex:actionFunction action="{!showExclusive}" name="showExclusiveMessage" reRender="firstPanel, exclusiveMessagePanel, myNextButtonTop, myNextButtonBottom" />
+<apex:actionFunction action="{!confirm}" name="selPartner" />
+<apex:actionFunction action="{!acceptUnmachedCat}" name="acceptUnmachedCat" />
+<apex:actionFunction action="{!denyUnmachedCat}" name="denyUnmachedCat" />
+<apex:actionfunction action="{!checkOpportunityStatus}" name="checkOpportunityStatusJS" />
+<apex:actionFunction action="{!saveNewMemberAndRefreshThirdPage}" name="saveAndRefreshThirdPage" />
+<apex:actionFunction action="{!saveEditMemberAndRefreshThirdPage}" name="editMemberAndRefreshThirdPage" />
+<!-- apex:actionFunction action="{!acceptNoOptIn}" name="acceptNoOptIn" / -->
+<!-- apex:actionFunction action="{!denyNoOptIn}" name="denyNoOptIn" / -->
+
+<div class="slds">
+            <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+
+                  <!-- LAYOUT GRID -->
+                  <div class="slds-grid" id="id" >
+                    <!-- GRID COL -->
+                    <div class="slds-col" style="color: white;">
+                      <!-- HEADING AREA -->
+                      <h1 class="slds-text-heading--medium">Passenden Partner finden</h1> 
+                    </div>
+                  </div>
+             </div>
+             <br/>
+             
+             <div  style="text-align: center;" id="pbb">
+             
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Opportunity" action="{!backToOpportunity}"  rendered="{!firstPage}" id="myBackButton" />
+                 
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück" action="{!back}" rendered="{!secondPage}" id="myBackButton2" /> 
+                
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück" action="{!backTo2}" rendered="{!thirdPage && enableSendEmail}" id="myBackButton3" /> 
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück" action="{!back}" rendered="{!thirdPage && !enableSendEmail}" id="myBackButton4" /> 
+                
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="Neues Familienmitglied hinzufügen" action="{!newMemberController.start}"/>
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="Familienmitglied bearbeiten" action="{!editMemberController.start}"/>
+                
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="speichern" action="{!hnrController.saveKI}" rendered="{! firstPage && HausnotrufOpp}" disabled="{!!enableNextButton}"  id="hnrSaveButton"/>
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="Unterstützung nur per Flyer" action="{!pi_sendFlyerToCustomer}" rendered="{! firstPage && PflegeimmobilienOpp}" disabled="{!!enableNextButton}"  id="piFlyerToCustomerButton"/>
+                
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="weiter" onClick="partnerSelectWeiter();return false;" rendered="{!firstPage}" disabled="{!!enableNextButton}"  id="myNextButtonTop"/>
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="weiter" action="{!confirmTickets}" rendered="{!secondPage}"/> 
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="Email senden" rendered="{!thirdPage}"  id="buttonMailTop" onClick="setButtonDisabled();return false;"/> 
+             </div>
+             <br/> 
+ 
+<apex:actionFunction action="{!keepExclusive}" name="keepExclusiveInJavascript" >
+</apex:actionFunction>
+<apex:actionFunction action="{!removeExclusive}" name="removeExclusiveInJavascript" >
+</apex:actionFunction>
+<apex:actionFunction action="{!againInformPartner}" name="againInformPartner" >
+</apex:actionFunction>
+<apex:actionFunction action="{!notInformPartner}" name="notInformPartner" >
+</apex:actionFunction>
+<apex:actionFunction action="{!sendEmail}" name="sendEmailInJavascript">
+</apex:actionFunction>
+<apex:actionFunction action="{!backToContact}" name="GoBackToContact">
+</apex:actionFunction>
+<apex:actionFunction action="{!cancelSendEmail}" name="cancelEmailInJavascript">
+</apex:actionFunction>
+
+<apex:Pageblock id="cm_block" >  
+  
+    <apex:outputPanel id="firstPanel" rendered="{!firstPage}">
+    <apex:pageMessages id="showmsg" escape="false"/>
+        <c:PLZTool_Treppenlift_ProductList id="cm_tl_ProductList" productList="{!productList}" rendered="{! TreppenliftOpp }"/>
+        
+        <c:PLZTool_Betreuungsleistungen_ProductList id="cm_bel_ProductList" productList="{!productList}" rendered="{! BetreuungsleistungenOpp }"/>
+        
+        <c:PLZTool_Hausnotruf_ProductList id="cm_hnr_ProductList" hnrController="{! hnrController }" rendered="{! HausnotrufOpp }" />
+        
+        <c:PLZTool_Pflegeimmobilien_ProductList id="cm_pi_ProductList" productList="{!productList}" rendered="{! PflegeimmobilienOpp }"/>
+        
+        <c:PLZTool_Widerspruch_ProductList id="cm_ws_ProductList" productList="{!productList}" rendered="{! WiderspruchOpp }"/>
+        
+        <c:PLZTool_Badumbau_ProductList id="cm_bad_ProductList" badController="{!badController}" rendered="{! BadumbauOpp }"/>
+
+        <c:PLZTool_Pflegeschulungen_ProductList id="cm_pflegeschulungen_ProductList" productList="{!productList}" rendered="{! PflegeschulungenOpp }"/>
+        
+        <!-- <apex:outputPanel rendered="{! !BadumbauOpp }" > -->
+        <apex:outputPanel >
+        <div class="slds-theme--default slds-container--large">
+            <div class="slds-grid slds-wrap slds-grid--pull-padded slds-m-left--large" >
+                <div class="slds-col--padded slds-size--1-of-2" >
+                     <div class="slds-form-element slds-hint-parent" >
+                         <span class="slds-form-element__label" >Einverständnis zur telefonischen Kontaktaufnahme durch die Partner eingeholt</span>
+                         <div class="slds-form-element__control">
+                             <span class="slds-form-element">
+                                  <apex:inputCheckbox label="" value="{!formOpp.Partner_darf_sich_telefonisch_melden__c}" />
+                             </span>
+                         </div>
+                </div></div>
+                
+                <div class="slds-col--padded slds-size--1-of-2"  >
+                     <div class="slds-form-element slds-hint-parent">
+                         <span class="slds-form-element__label">Einverständnis zur Weiterleitung der Daten an die Partner eingeholt</span>
+                         <div class="slds-form-element__control">
+                             <span class="slds-form-element">
+                                  <apex:inputCheckbox label="" value="{!formOpp.Partner_darf_Infomaterial_senden__c}" />
+                             </span>
+                         </div>
+                </div></div>
+                
+                <div class="slds-col--padded slds-size--1-of-2"  >
+                     <div class="slds-form-element slds-hint-parent">
+                         <span class="slds-form-element__label">Einverständnis zur Kontaktaufnahme per E-Mail durch die Partner eingeholt</span>
+                         <div class="slds-form-element__control">
+                             <span class="slds-form-element">
+                                  <apex:inputCheckbox label="" value="{!formOpp.Partner_kann_per_E_Mail_kontaktieren__c}" />
+                             </span>
+                         </div>
+                </div></div>
+                
+                <div class="slds-col--padded slds-size--1-of-2"  >
+                     <div class="slds-form-element slds-hint-parent">
+                         <span class="slds-form-element__label">ASP Einwilligungserklärung für Aufnahme der Daten des PBs</span>
+                         <div class="slds-form-element__control">
+                             <span class="slds-form-element">
+                                  <apex:inputCheckbox label="" value="{!formOpp.ASP_PB_Einwilligungserkl_rung__c}" />
+                             </span>
+                         </div>
+                </div></div>
+            </div>
+        </div>
+        </apex:outputPanel>
+        
+    </apex:outputPanel>
+
+    <apex:outputPanel id="secondPanel" rendered="{!secondPage}">
+    
+    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+    <thead>
+        <tr class="slds-text-heading--label">
+          <th scope="col" title="Partner">
+            <div class="slds-truncate">Partner</div>
+          </th>
+          <th scope="col" title="Produkt">
+            <div class="slds-truncate">Produkt</div>
+          </th>
+          <th scope="col" title="Kommentar">
+              <div>Kommentar - Gleichen Kommentar für alle Partner?
+              <label class="slds-checkbox">
+              <apex:inputCheckbox tabIndex="1" value="{!sameComment}" >
+                    <apex:actionSupport event="onchange" action="{!updateCommentFields}" reRender="commentTextArea"></apex:actionSupport>
+              </apex:inputCheckbox>
+              <span class="slds-checkbox--faux"></span>
+              </label>
+              </div>
+          </th>
+          <th scope="col" title="Anmerkungen">
+            <div class="slds-truncate">Anmerkungen</div>
+          </th>
+        </tr>
+    </thead>
+    <tbody>
+        <apex:repeat value="{!selectedProductList}" var="prdct">
+        <tr>
+          <td><div class="slds-truncate"><a href="/{!prdct.pp.Partner__c}"> <apex:outputtext value="{!prdct.pp.Partner__r.Name}" /></a></div></td>
+          <td><div class="slds-truncate"><a href="/{!prdct.pp.Id}"> <apex:outputtext value="{!prdct.pp.Produktgruppe__c}" /></a></div></td>
+          <td><apex:inputTextArea id="commentTextArea" value="{!prdct.comment}" styleclass="slds-textarea" disabled="{!prdct.disabled}">
+              </apex:inputTextArea>
+          </td>
+          <td><div class="slds-truncate">{!prdct.pp.Anmerkung__c}</div></td>
+        </tr>
+        </apex:repeat>
+    </tbody>
+    </table>
+    </apex:outputPanel>
+
+
+    <apex:outputPanel id="thirdPanel" rendered="{!thirdPage}">
+    <apex:pageMessages id="showmsg3" escape="false"/>
+    
+    <apex:outputPanel rendered="{! contactPerson != null}">
+    <div class="slds-box slds-theme--default slds-container--large slds-container--center">   
+      <h3 class="slds-text-heading--small slds-m-bottom--medium">Ansprechpartner(in)</h3>
+      <div class="slds-grid slds-wrap slds-grid--pull-padded">
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Name</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!contactPerson.name}</span>
+            </div>
+          </div></div>
+          
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Straße</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!contactPerson.mailingStreet}</span>
+            </div>
+          </div></div>
+
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Telefon</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!contactPerson.Phone}</span>
+            </div>
+          </div></div>
+          
+      <br/>
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Stadt</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!contactPerson.MailingCity}</span>
+            </div>
+          </div></div>
+          
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Postleitzahl</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!contactPerson.MailingPostalCode }</span>
+            </div>
+          </div></div>                             
+
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Email</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!contactPerson.Email}</span>
+            </div>
+          </div></div>         
+    </div>     
+    </div>
+    </apex:outputPanel>
+
+
+    <apex:outputPanel rendered="{! insuredPerson.Id != contactPerson.Id}">
+    <div class="slds-box slds-theme--default slds-container--large slds-container--center">   
+      <h3 class="slds-text-heading--small slds-m-bottom--medium">Pflegebedürftige(r)</h3>
+      <div class="slds-grid slds-wrap slds-grid--pull-padded">
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Name</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!insuredPerson.name}</span>
+            </div>
+          </div></div>
+          
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Straße</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!insuredPerson.mailingStreet}</span>
+            </div>
+          </div></div>
+
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Telefon</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!insuredPerson.Phone}</span>
+            </div>
+          </div></div>
+          
+      <br/>
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Stadt</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!insuredPerson.MailingCity}</span>
+            </div>
+          </div></div>
+          
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Postleitzahl</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!insuredPerson.MailingPostalCode }</span>
+            </div>
+          </div></div>                             
+
+          <div class="slds-col--padded slds-size--1-of-3">
+          <div class="slds-form-element slds-hint-parent slds-has-divider--bottom">
+            <span class="slds-form-element__label">Email</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static">{!insuredPerson.Email}</span>
+            </div>
+          </div></div>         
+    </div>     
+    </div>
+    </apex:outputPanel>
+    
+    <div class="slds-box slds-theme--default slds-container--large slds-container--center">
+        <apex:outputLabel value="Anmerkungen an den Kunden" for="customerCommentTextArea" styleClass="slds-form-element__label"/>
+        <apex:inputTextArea id="customerCommentTextArea" value="{!customerComment}"  styleclass="slds-textarea" >
+        </apex:inputTextArea>
+        <br/>
+        
+        <apex:outputLabel value="Mögliches Potenzial vorhanden in" for="potentialList" styleClass="slds-form-element__label"/> 
+        <apex:selectList id="potentialList" value="{!potentialValue}" size="1" styleClass="slds-select">
+            <apex:selectOptions value="{!potentialItems}" />
+        </apex:selectList>
+    </div>
+      
+    </apex:outputPanel>
+
+<c:NewFamilyMemeberCmp id="cm_newMember" newMemberCntlr="{! newMemberController}" rendered="{! newMemberController.showNewMember }" />
+<c:EditFamilyMemberCmp id="cm_eidtMember" editMemberCntlr="{! editMemberController}" rendered="{! editMemberController.showEditMember }" />
+
+</apex:Pageblock>
+           
+             <div  style="text-align: center;" >
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Opportunity" action="{!backToOpportunity}" rendered="{!firstPage}" />
+                 
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück" action="{!back}" rendered="{!secondPage}"/> 
+                
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück" action="{!backTo2}" rendered="{!thirdPage && enableSendEmail}"/> 
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück" action="{!back}" rendered="{!thirdPage && !enableSendEmail}"/> 
+                
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="Neues Familienmitglied hinzufügen" action="{!newMemberController.start}"/>
+                <apex:commandButton styleClass="slds-button slds-button--neutral" value="Familienmitglied bearbeiten"  action="{!editMemberController.start}"/>
+                
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="speichern" action="{!hnrController.saveKI}" rendered="{! firstPage && HausnotrufOpp }" disabled="{!!enableNextButton}"  id="hnrSaveButtonBottom"/>
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="Unterstützung nur per Flyer" action="{!pi_sendFlyerToCustomer}" rendered="{! firstPage && PflegeimmobilienOpp}" disabled="{!!enableNextButton}"  id="piFlyerToCustomerButtonBottom"/>
+                
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="weiter" onClick="partnerSelectWeiter();return false;" rendered="{!firstPage}"  disabled="{!!enableNextButton}" id="myNextButtonBottom"/>
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="weiter" action="{!confirmTickets}" rendered="{!secondPage}"/> 
+                <apex:commandButton styleClass="slds-button slds-button--brand" value="Email senden" rendered="{!thirdPage}" id="buttonMailBottom" onClick="setButtonDisabled();return false;"/> 
+             </div>
+            <br/> 
+             
+</div>
+
+     
+
+</apex:form>
+
+<script type="text/javascript">
+    
+    function updateCommentFields(){
+        
+    }
+
+    function addLoadEvent(func) { 
+        var oldonload = window.onload;
+        if (typeof window.onload != 'function') {
+            window.onload = func;
+        } else {
+            window.onload = function() {
+                oldonload();
+                func();
+            }
+        }
+    }
+    
+    function setFocus() {
+    try {
+        setProductRtId();
+        
+        selectedPartnerStr = document.getElementById('page_id:cmForm:sestr').value;
+        existPartner = document.getElementById('page_id:cmForm:exstr').value;
+        var allDisabe = '';
+        var tblKeyList = ["rep_id"];
+        if({!HausnotrufOpp}){
+            tblKeyList = ["dv_rep_id", "wl_rep_id", "ex_rep_id", "sm_rep_id"];
+        }
+        
+        for( j=0; j<tblKeyList.length; j++ ){
+          var tblKey = tblKeyList[j];
+          for( i=0; i<{!TotalSize}; i++ ){
+            if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':opnum') != null) { 
+                var pa_id = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':ophid').value;
+                //alert(pa_id + ' exp=' + existPartner);
+                if(selectedPartnerStr.indexOf(pa_id) >= 0) {
+                    document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':opnum').checked = true;
+                }
+                if(existPartner.indexOf(pa_id) >= 0) {
+                
+                    document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':opnum').disabled ="disabled";
+                    var ex_id = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':exhid').value; 
+                    var ex_cpo = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':excpohid').value;                    
+                    if((ex_id == 'true') || (ex_cpo == 'true')) {
+                        allDisabe = 'disabled';
+                    }
+                }
+            }
+          }     
+        }
+        
+        if(existPartner != '') {
+            for( j=0; j<tblKeyList.length; j++ ){
+              var tblKey = tblKeyList[j];
+              for( i=0; i<{!TotalSize}; i++ ){
+                if(document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':opnum') != null) { 
+                    if(allDisabe == 'disabled') {
+                        // wenn einen bereits ausgewählten partner exclusive ist - keine weitere Auswahl möglich
+                        document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':opnum').disabled ="disabled";                  
+                    }
+                    else {
+                        var ex_id = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':exhid').value; 
+                        var ex_cpo = document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':excpohid').value;    
+                        if((ex_id == 'true') || (ex_cpo == 'true')) {
+                            document.getElementById('page_id:cmForm:cm_block:'+productRtId+':cmp_pl:'+tblKey +':' + i + ':opnum').disabled ="disabled";
+                        }                       
+                    }
+                }
+              }
+            }
+        }
+        
+    }
+    catch (e) {}
+    
+    
+        try {
+            document.getElementById('page_id:cmForm:myBackButton').focus();     
+        }
+        catch (e) {
+                    try {
+                            document.getElementById('page_id:cmForm:myBackButton2').focus();
+                        }
+                        catch (e) { 
+                            try {document.getElementById('page_id:cmForm:myBackButton3').focus();} 
+                            catch(e) {
+                                try {document.getElementById('page_id:cmForm:myBackButton4').focus();} catch(e) {}
+                            }
+                        
+                        }                       
+                }
+        
+        // set scroll position
+        if({!scrollPosition} != -1){
+            document.getElementsByTagName("body")[0].scrollTop = {!scrollPosition};
+            document.documentElement.scrollTop = {!scrollPosition};
+            
+            //alert (window.pageYOffset + ' ' + document.documentElement.scrollTop + ' ' + document.getElementsByTagName("body")[0].scrollTop);
+            document.getElementById('page_id:cmForm:scrollPosition').value = -1;
+        }         
+            
+    }
+    addLoadEvent(setFocus);
+</script>   
+
+
+</apex:page>

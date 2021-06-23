@@ -1,0 +1,79 @@
+<apex:page standardController="Kunde__c"  extensions="sendenFaxAusKunde" id="page_id" sidebar="False" tabStyle="Kunde__c">
+<script type="text/javascript"> 
+function abDownload() {
+//    document.getElementById('page_id:kuForm:kuPb:pbbs:btnzurueck').style.display='none'; 
+}
+
+function anDeckblatt() {
+    var URL = "./apex/Antrag_fax?KdID={!KdID}&Agrp='{!artikelGruppe}'" ;
+    window.open(URL, "_blank");
+}
+
+
+</script>
+    <apex:form id="kuForm" >
+        
+        <apex:Pageblock id="kuPb" title="{!SeitenTitel}">
+        <apex:pagemessages id="Page_Message"  escape="false"/>
+            <apex:pageBlockButtons id="pbbs" >
+                <apex:CommandButton id="btnzurueck" value="zurück zum Kunden" immediate="True" action="{!sendenFaxAusKunde_zurueck}"/>
+<!--               <apex:CommandButton id="btnantrag" value="Fax Deckblatt" immediate="True" onClick="javascript:anDeckblatt()"/>
+ -->               
+            </apex:pageBlockButtons>
+            
+            <apex:PageBlocksection title="Kunde" collapsible="false" id="kdPbs" columns="1">
+                <apex:outputText label="Für" value="{!kkName}"  />   
+               
+                <apex:selectList value="{!artikelGruppe}" label="Gruppe:" id="pg" multiselect="false" size="1" >
+                    <apex:selectOptions value="{!artikelGruppen}"/>
+                    <apex:actionSupport action="{!sendenFaxAusKunde_reload}"  event="onchange"/>
+                </apex:selectList>              
+                                    
+                <apex:outputText value="{!apName}" label="Ansprechpartner:" />
+               
+ 
+                           
+
+                <apex:outputText value="{!kdSubject}" label="Betreff:" />
+                <apex:inputText label="Fax" value="{!kdFax}" rendered="{!buttonFaxVisible}"/>
+                <!-- <apex:inputText label="E-Mail" value="{!kdMail}" rendered="{!buttonMailVisible}" style="width:400px;"/> -->
+
+                <apex:selectList value="{!kdMail}" label="E-Mail" id="kdm" multiselect="false" size="1" rendered="{!buttonMailVisible}">
+                    <apex:selectOptions value="{!targetMail}"/>
+                </apex:selectList>                 
+
+               <apex:outputText value="{!mText.RichText__c}" label="Text:" escape="false" style="width:500px; height:30pt" id="body"/>
+
+            </apex:PageBlocksection> 
+            
+            <apex:PageBlocksection title="Anhänge" collapsible="false" id="atPbs" >
+                <apex:pageBlockTable value="{!Att}" var="AT" id="AtTab">
+                    <apex:column headerValue="" >
+                        <apex:commandLink action="{!startFax}"  value="Fax" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none;" rendered="{!buttonFaxVisible}" >
+                            <apex:param name="fAtId" assignto="{!fAtId}"  value="{!AT.id}" />
+                        </apex:commandLink>
+                    </apex:column>
+                    <apex:column headerValue="" >
+                        <apex:commandLink action="{!startMail}" value="Mail" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none;" rendered="{!buttonMailVisible}">
+                            <apex:param name="mAtId" assignto="{!mAtId}" value="{!AT.id}" />
+                        </apex:commandLink>
+                    </apex:column>                    
+                    <apex:column headerValue="Dokument" > 
+                        <apex:outputtext value="{!AT.Name}" style="white-space : nowrap; padding-right:40px;"/>
+                    </apex:column> 
+                    <apex:column headerValue="Grösse" > 
+                        <apex:outputtext value="{!AT.BodyLength}" style="white-space : nowrap; padding-right:40px;"/>
+                    </apex:column> 
+                    <apex:column headerValue="Typ" > 
+                        <apex:outputtext value="{!AT.ContentType}" style="white-space : nowrap; padding-right:40px;"/>
+                    </apex:column>                                                          
+                </apex:pageBlockTable>             
+            </apex:PageBlocksection>
+            
+        </apex:Pageblock>   
+ 
+        <script type="text/javascript"> 
+        </script>
+        
+    </apex:form>           
+</apex:page>

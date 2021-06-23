@@ -1,0 +1,79 @@
+@page { 
+	size: A4 portrait;
+	
+	margin-top: 100px;
+	margin-bottom: 80px;
+
+}
+
+.header_left {
+	text-align: left;
+    position: running(header_left);
+}
+
+.header_center{
+	text-align: center;
+	position: running(header_center);
+}
+
+.header_right {
+	text-align: right;
+	position: running(header_right);
+}
+
+.footer_left {
+	text-align: left;
+	position: running(footer_left);
+}
+
+.footer_center {
+	text-align: center;
+	position: running(footer_center);
+}
+
+.footer_right {
+	text-align: right;
+	position: running(footer_right);
+}
+
+.pageNumber:before {
+	content: counter(page); 
+}
+
+.pageCount:before {
+	content: counter(pages);  
+}
+body {
+	font-family: Dialog;
+	font-size: 8pt;
+}
+
+#logo {
+	position:absolute;
+	top:10px;
+	left:25px;
+}
+#address {
+	position:absolute;
+	top:120px;
+	left:25px;
+	line-height:1.2;
+}
+.own_address {
+	font-size:8pt;
+	text-decoration: underline;
+}
+#right {
+	position:absolute;
+	top:60px;
+	right:70px;
+	color:#808080;
+	font-size:8.5pt;
+}
+
+#content {
+	position:absolute;
+	top:335px;
+	left:25px;
+	line-height:1.2;
+}

@@ -1,0 +1,62 @@
+<!--
+/********************************************************************************************************************************************
+// Created on 17.08.2020 by BT
+//                      Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                      Frankenstraße 29
+//                      20097  Hamburg 
+//                      Tel.:  0423882986
+//                      Fax.:  0423882986
+//                      Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+//  Parameter:
+//
+//********************************************************************************************************************************************
+//
+//  Description:    
+//                     This represents an user interface component for searching delivery quantity settings based on the specified curabox
+//********************************************************************************************************************************************
+// Changes:
+//
+//********************************************************************************************************************************************
+*/
+-->
+<aura:component controller="DeliveryQuantityManagerController" >
+    <aura:registerEvent name="DeliveryQuantitySettingsLoaded" type="c:DeliveryQuantitySettingsLoaded"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
+    <aura:attribute name="curaboxes" type="List" />
+    <aura:attribute name="curabox" type="String" />
+    <aura:attribute name="searchKey" type="String" />
+    <lightning:card title="Suche" iconName="standard:search">
+        <lightning:layout horizontalAlign="space" multipleRows="true">           
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="6"
+                                  padding="around-small">   
+                <lightning:select name="selectCurabox" label="Curabox" aura:id="selectCurabox" onchange="{!c.onCuraboxChange}">
+                    <aura:iteration items="{!v.curaboxes}" var="curabox">
+                        <option value="{!curabox}">{!curabox}</option>  
+                    </aura:iteration>                      
+                </lightning:select>
+            </lightning:layoutItem> 
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="6"
+                                  padding="around-small">   
+                <ui:inputText label="Schlüssel" value="{!v.searchKey}" />
+            </lightning:layoutItem>        
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="6"
+                                  padding="around-small">
+                <lightning:button label="suchen" variant="brand" title="suchen" onclick="{!c.searchDeliveryQuantitySettings}" /> 
+            </lightning:layoutItem>    
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="6"
+                                  padding="around-small">  
+                	<div style="align-text:right;">                        
+                        <ui:button label="Neue Lieferscheinstellung" press="{!c.openCreateDeliveryQuantitySettingWindow}"/>
+                        <ui:button label="Upload neuer Lieferscheinstellungen" press="{!c.openUploadWindow}"/>
+                	</div>                	
+            </lightning:layoutItem>                    
+        </lightning:layout>
+    </lightning:card>
+</aura:component>

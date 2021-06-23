@@ -1,0 +1,145 @@
+<!--
+//****************************************************************************************************************************
+// Erstellt tt.mm.yyyy von YY
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Mindelweg 11
+//                         22393 Hamburg 
+//                         Tel.:  04064917161
+//                         Fax.: 04064917162
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// xxxx
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+//                      
+// Seite für die Erfassung der Genehmigungen
+//
+//
+//****************************************************************************************************************************
+//Änderungen:
+//
+// 13.05.2015 von wds: KUWV wieder eingebaut #127
+//                        
+//      
+
+//****************************************************************************************************************************
+-->
+<apex:page standardController="Genehmigung__c" extensions="neuePBGenehmigungController" tabStyle="Genehmigung__c">
+
+   <apex:form >
+        <apex:messages />
+        <apex:Pageblock id="pbId" title="Neue Genehmigung erstellen">
+            <apex:pageBlockButtons >
+                <apex:CommandButton id="gensichern" value="speichern" action="{!neueGenehmigungSichern}"/>
+                <apex:CommandButton id="genzurueck" value="abbrechen" immediate="True" action="{!neueGenehmigungZurueck}"/>
+            </apex:pageBlockButtons>    
+            <apex:pageBlockSection title="Details der Genehmigung" collapsible="false" id="Genehmigunssection" columns="2">
+                
+                <apex:inputfield value="{!Genehmigung.Nach_Paragraph__c}" required="True" taborderhint="2">
+                    <apex:actionSupport event="onchange" action="{!selectPG}" reRender="pbId" />
+                </apex:inputfield>
+                 <apex:inputfield value="{!Genehmigung.Kunde__c}" required="True" taborderhint="11" rendered="{!IF(Genehmigung.Kunde__c != null, false, true)}"/>
+                 <apex:outputfield value="{!Genehmigung.Kunde__c}"  rendered="{!IF(Genehmigung.Kunde__c != null, true, false)}"/>
+                <apex:inputfield value="{!Genehmigung.Status__c}" required="True" taborderhint="1"/>
+                <apex:inputfield value="{!Genehmigung.unbefristet_genehmigt__c}" taborderhint="3"/>
+                 
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Kommunikation Krankenkasse" collapsible="false" id="Genehmigunssection2" columns="2">
+                <apex:inputfield value="{!Genehmigung.Antrag_eingegangen_am__c}" required="True" />
+                <apex:outputText value=""/>
+                <apex:inputfield value="{!Genehmigung.Antrag_versandt_am__c}"/>
+                <apex:outputText value=""/>
+                <apex:inputfield value="{!Genehmigung.Antrag_beantwortet_am__c}" taborderhint="3"/>
+                <apex:outputText value=""/>
+                <apex:inputfield value="{!Genehmigung.genehmigt_ab__c}"/>
+                <apex:outputText value=""/>
+                <apex:inputfield value="{!Genehmigung.genehmigt_bis__c}"/>
+                
+            </apex:pageBlockSection>
+                <apex:PageBlocksection title="Nach § 54" collapsible="false" id="nach54" columns="5" rendered="{!show54}">
+                    <apex:pageBlockTable style="text-align:center;white-space: pre;"
+                            value="{!positionen}" var="p" id="APBlockTable">
+
+                        <apex:column >
+                            <apex:facet name="header">Artikelgruppe</apex:facet>
+                            <apex:outputfield value="{!p.Artikelgruppe__r.Name}"/>
+                        </apex:column>
+ <!--                       
+                        <apex:column >
+                            <apex:facet name="header">Beantragte Menge</apex:facet>
+                            <apex:inputfield value="{!p.Ant_Menge_Stk_Mon__c}"/>
+                        </apex:column>
+ -->                      
+                        
+                        <apex:column >
+                            <apex:facet name="header">Genehmigte Menge</apex:facet>
+                            <apex:inputfield value="{!p.Gen_Menge_Stk_Mon__c}" />
+                        </apex:column>
+                        
+                        <apex:column >
+                            <apex:facet name="header">ab</apex:facet>
+                            <apex:inputfield value="{!p.genehmigt_ab__c}"/>
+                        </apex:column>
+                        
+                        <apex:column >
+                            <apex:facet name="header">Genehmigt bis</apex:facet>
+                            <apex:inputfield value="{!p.genehmigt_bis__c}"/>
+                        </apex:column>
+                        
+                        <apex:column >
+                            <apex:facet name="header">Unbefristet</apex:facet>
+                            <apex:inputfield value="{!p.unbefristet_genehmigt__c}"/>
+                        </apex:column>
+
+                    </apex:pageBlockTable>
+            </apex:PageBlocksection>
+          
+            <apex:PageBlocksection title="Nach § 51" collapsible="false" id="nach51" columns="5" rendered="{!show51}">
+                <apex:pageBlockTable style="text-align:center;white-space: pre;"
+                    value="{!positionen54}" var="p" id="APBlockTable">
+
+                        <apex:column >
+                            <apex:facet name="header">Artikelgruppe</apex:facet>
+                            <apex:outputfield value="{!p.Artikelgruppe__r.Name}"/>
+                        </apex:column>
+<!--                      
+                        <apex:column >
+                            <apex:facet name="header">Beantragte Menge</apex:facet>
+                            <apex:inputfield value="{!p.Ant_Menge_Stk__c}"/>
+                        </apex:column>
+ -->                      
+                        
+                        <apex:column >
+                            <apex:facet name="header">Genehmigte Menge</apex:facet>
+                            <apex:inputfield value="{!p.Gen_Menge_Stk_Mon__c}" />
+                        </apex:column>
+                        
+                        <apex:column >
+                            <apex:facet name="header">ab</apex:facet>
+                            <apex:inputfield value="{!p.genehmigt_ab__c}"/>
+                        </apex:column>
+                        
+                        <apex:column >
+                            <apex:facet name="header">Genehmigt bis</apex:facet>
+                            <apex:inputfield value="{!p.genehmigt_bis__c}"/>
+                        </apex:column>
+                        
+                        <apex:column >
+                            <apex:facet name="header">Unbefristet</apex:facet>
+                            <apex:inputfield value="{!p.unbefristet_genehmigt__c}"/>
+                        </apex:column>
+
+                    </apex:pageBlockTable>
+
+            </apex:pageBlockSection>
+            
+
+
+        </apex:Pageblock>
+    </apex:form>
+</apex:page>

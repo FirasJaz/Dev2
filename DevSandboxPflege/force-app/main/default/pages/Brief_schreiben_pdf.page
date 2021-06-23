@@ -1,0 +1,90 @@
+<apex:page renderAs="PDF" showHeader="false" sidebar="false" standardController="Kunde__c" extensions="Brief_schreiben_controller_class" tabStyle="Kunde__c">
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Autor:          WDS
+//      Stand:          28.04.2015
+//      Version:        1.0
+//      geändert:       
+//      Beschreibung:   Diese Seite ist die Basis für ein "normales Kundenanschreiben". 
+//                      Ursprünglich von MS entwickelt
+//                    
+//  28.04.2015 von wds:     Bankinfos ausgeblendet, Layout angepasst
+//  06.05.2015 von wds:     Datum und Hamburg mit eingebunden, Betreff verkleinert analog andere Anschreiben
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--><HTML>
+<head>
+<apex:stylesheet value="{!$Resource.CSS_brief}" />
+</head>
+<body>
+<div id="head">    
+    <div id="logo">
+           <apex:image url="{!$Resource.curabox_logo}" />
+    </div>
+                
+    <div id="address">
+           <span class="own_address">{!$Organization.Name} &bull; {!$Organization.Street} &bull; {!$Organization.PostalCode} {!$Organization.City}</span>
+           <br />
+           <br />
+            {!adr.empAnrede}<br />
+            {!adr.empName}<br />
+            {!adr.empStrasse}<br />
+            {!adr.empPLZ} {!adr.empOrt}<br />
+    </div>
+        
+    <div id="right">
+        <p>Postanschrift</p>
+       {!$Organization.Name}<br />
+       {!$Organization.Street}<br />
+       {!$Organization.PostalCode} {!$Organization.City}<br />
+       <br />
+       <p>Tel.</p>
+       {!FirmenInfo.Telefon__c}<br />
+       <p>Fax</p>
+       {!FirmenInfo.Fax__c}<br />
+       <p>Mail</p>
+       {!FirmenInfo.Email__c}<br />
+       <p>Web</p>
+       www.pflege.de/curabox<br />
+       <br />
+       <p>Registergericht</p>
+       Amtsgericht Hamburg<br />
+
+       {!FirmenInfo.HRA__c}<br />
+        <br />
+       <p>Geschäftsführung</p>
+       <apex:outputtext escape="false" value="{!FirmenInfo.GF__c}"/><br />
+       <br />
+        <br />
+
+        <br />
+       IK {!FirmenInfo.IK_Nummer__c}<br />
+       </div>
+</div>    
+    
+      <!-- Header is done -->
+      <div id="content"> 
+          <div id="document_info">
+
+                                <p><strong>{!betreff}</strong><br/>
+            Hamburg,&nbsp;<apex:outputtext value="{0,date,dd.MM.yyyy}">
+                        <apex:param value="{!Now()}" /></apex:outputtext><br /></p>
+            <p><apex:outputText value="{!schreiben_formatted}" escape="false" /></p>
+        </div>
+      
+      </div>
+
+       
+
+
+
+<div id="bottom_right">
+Bei Fragen stehen wir Ihnen<br /> gerne kostenfrei telefonisch<br /> zur Verfügung unter:<br /> 
+<span>0800 – 666 222 141</span><br />
+oder besuchen Sie uns unter: <br />
+<span>www.pflege.de/curabox</span>
+</div>
+</body>
+</HTML>
+</apex:page>

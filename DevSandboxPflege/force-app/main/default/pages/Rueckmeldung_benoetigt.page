@@ -1,0 +1,55 @@
+<!--
+/****************************************************************************************************************************
+// Created 15.10.2016 von  MZ
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// 	opportunity Id 
+//
+//****************************************************************************************************************************
+//
+// Description: changes the opportunity status to "Rueckmeldung benötigt" 
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
+-->
+<apex:page id="page_id" standardController="Opportunity" extensions="Rueckmeldung_benoetigt" >
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+
+<script type="text/javascript">
+    function setButtonDisabled() {   
+            document.getElementById("page_id:cmForm:buttonSave").disabled = true;    
+            SpeichernJS();
+    }
+</script>
+
+<div class="slds">
+
+<apex:pageMessages id="showmsg" escape="false"/>
+<apex:form id="cmForm">
+
+    <apex:actionfunction action="{!start_rueckmeldung}" name="SpeichernJS" />
+    
+    <apex:outputLabel value="Rückmeldunggrund" styleClass="slds-form-element__label"/>
+    <apex:selectList value="{!selectedCause}" size="1" styleClass="slds-select">
+    <apex:selectOptions value="{!PickListValuesIntoList}" />
+    </apex:selectList>
+    
+    <br/><br/>
+                
+    <div style="text-align: right;">
+        <apex:commandButton styleClass="slds-button slds-button--brand" id="buttonSave" value="Speichern" onClick="setButtonDisabled();return false;"/>
+    </div>
+</apex:form>
+</div>
+
+</apex:page>

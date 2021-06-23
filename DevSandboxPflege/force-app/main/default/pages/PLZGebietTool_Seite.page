@@ -1,0 +1,285 @@
+<!--
+// Erstellt 22.07.2016 von BT
+//  Klose und Srocke Gesellschaft für kreative Konfliktlösungen GmbH
+//  Mindelweg 11
+//  22393 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+// PLZ Gebiet Tool            
+//
+//****************************************************************************************************************************
+// Änderungen:
+//
+// 13.02.2017    BT    Mehrfache Auswahl von Produtken jetzt möglich
+//****************************************************************************************************************************
+-->
+<apex:page standardStylesheets="false" sidebar="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0" StandardController="Account" extensions="PLZGebietTool">    
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">    
+    <head></head>
+
+     <body >     
+     <apex:pageMessages id="showmsg" escape="false"/>
+          <!-- REQUIRED SLDS WRAPPER -->
+          <div class="slds" >    
+  
+              <!-- PAGE HEADER -->
+             <div class="slds-page-header" role="banner" style="text-align: center; background-color: #00396b;">
+
+                  <!-- LAYOUT GRID -->
+                  <div class="slds-grid" id="id" >
+
+                    <!-- GRID COL -->
+                    <div class="slds-col" >
+                      <!-- HEADING AREA -->
+                      <h1 class="slds-text-heading--medium" style="color: white;" >PLZ Gebiet Tool</h1> 
+                      <br/> 
+                    </div>
+                  </div>
+             </div>
+             <br/>
+
+<!-- PRIMARY CONTENT WRAPPER -->
+<div class="myapp" >   
+<!-- Produktliste -->
+<div class="slds-grid" >
+<div class="slds-picklist--draggable slds-grid slds-size--5-of-8 slds-m-left--xx-large" >
+  <div class="slds-form-element slds-size--2-of-2" >    
+    <div style="text-align: center;"><span class="slds-form-element__label" aria-label="select-1" >Verfügbar</span></div>    
+    <div class="slds-picklist picklist--multi ">
+      <ul class="slds-picklist__options slds-picklist__options--multi slds-size--2-of-2" >  
+        <apex:repeat value="{!AusloeserListe}" var="al">  
+        <li draggable="true" id="{!al.pp.Id}_links" class="slds-picklist__item left" aria-selected="false" tabindex="0" role="option" onclick="waehleProduktAus('{!al.pp.Id}_links');" >
+          <span class="slds-truncate" style="font-size:0.8em;">{!al.ppName}</span>
+        </li>  
+        </apex:repeat>      
+      </ul>     
+    </div>
+  </div>
+  <div class="slds-grid slds-grid--vertical">
+    <button class="slds-button slds-button--icon-container" onclick="nachLinksVerschieben();">
+      <svg aria-hidden="true" class="slds-button__icon">      
+        <use xlink:href="{!URLFOR($Resource.SLDS0122, '/assets/icons/utility-sprite/svg/symbols.svg#left')}"></use>
+      </svg>
+      <span class="slds-assistive-text">Arrow left</span>
+    </button>
+    <button class="slds-button slds-button--icon-container" onclick="nachRechtsVerschieben();">
+      <svg aria-hidden="true" class="slds-button__icon">
+        <use xlink:href="{!URLFOR($Resource.SLDS0122, '/assets/icons/utility-sprite/svg/symbols.svg#right')}"></use>
+      </svg>
+      <span class="slds-assistive-text">Arrow right</span>
+    </button>
+  </div>
+  <div class="slds-form-element slds-size--2-of-2">
+    <div style="text-align: center;"><span class="slds-form-element__label" aria-label="select-1">Ausgewählt</span></div>
+    <div class="slds-picklist picklist--multi">    
+      <ul class="slds-picklist__options slds-picklist__options--multi slds-size--2-of-2" >
+        <apex:repeat value="{!ausgwListe}" var="aw">  
+        <li draggable="true" id="{!aw.pp.Id}_rechts" class="slds-picklist__item right" aria-selected="false" tabindex="0" role="option" onclick="waehleProduktAus('{!aw.pp.Id}_rechts');" style='display: none;'>
+          <span class="slds-truncate" style="font-size:0.8em;">{!aw.ppName}</span>
+        </li>  
+        </apex:repeat>           
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- Produktliste -->
+
+<div class="slds-grid slds-size--1-of-8"></div>
+<div >
+     <apex:form id="form" >
+        <apex:outputLabel value="Manuelle Eingabe" styleClass="slds-form-element__label"  rendered="{!!franchise}"/><br />
+        <apex:outputLabel value="von " rendered="{!!franchise}" />&nbsp;
+        <apex:inputfield value="{!tmpPPG.von__c}" label="von" styleClass="slds-input" style="width:100px;" id="plzVon" rendered="{!!franchise}" />&nbsp;&nbsp;
+        <apex:outputLabel value=" bis "  rendered="{!!franchise}"/>&nbsp;
+    
+        <apex:inputfield value="{!tmpPPG.bis__c}" styleClass="slds-input" label="von" style="width:100px;" id="plzBis"  rendered="{!!franchise}"/>
+      <br /><br/> 
+     
+           <!-- Hochladen der Datei -->
+           
+           <apex:outputLabel value="oder CSV Hochladen" styleClass="slds-form-element__label" rendered="{!!franchise}"/>
+           <apex:outputLabel value="CSV Hochladen" styleClass="slds-form-element__label" rendered="{!franchise}"/>
+           <br />
+           <apex:inputFile value="{!contentFile}" fileName="{!nameFile}"></apex:inputFile>   
+                     
+           <apex:inputHidden value="{!naechsterSchritt}" id="schritt"/>
+           <apex:inputHidden value="{!plzStatus}" id="status"/>
+           <apex:actionFunction name="abbrechen" action="{!abbrechen}" /> 
+           <apex:actionFunction name="speichern" action="{!speichern}" />    
+           <!-- <apex:actionFunction name="bereinigen" action="{!bereinigen}" />     -->          
+           <apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />              
+           <apex:inputHidden value="{!ppIdsStr}" id="ppString"/>                   
+           
+           <script type="text/javascript">
+                var alListe = document.getElementsByClassName("slds-picklist__item left");
+                var awListe = document.getElementsByClassName("slds-picklist__item right");
+                var idStr = document.getElementById('{!$Component.form}').elements['{!$Component.ppString}'].value;
+                
+                function waehleProduktAus(input){                    
+                    var pp = document.getElementById(input);
+                    
+                    if(alListe !== undefined && alListe.length != 0) {
+                        for(var i = 0; i< alListe.length ;i++){
+                               if(alListe[i] == pp){
+                                   if(alListe[i].getAttribute("aria-selected") == "false") {
+                                       alListe[i].setAttribute("aria-selected", true);
+                                   }
+                                   else {
+                                       alListe[i].setAttribute("aria-selected", false);
+                                   }
+                               }
+                               else {}
+                        }; 
+                    }   
+                    
+                    if(awListe !== undefined && awListe.length != 0) {
+                        for(var i = 0; i< awListe.length ;i++){
+                               if(awListe[i] == pp){
+                                   if(awListe[i].getAttribute("aria-selected") == "false") {
+                                       awListe[i].setAttribute("aria-selected", true);
+                                   }
+                                   else {
+                                       awListe[i].setAttribute("aria-selected", false);
+                                   }
+                               }
+                               else {}
+                        }; 
+                    }                     
+                }
+                
+                function nachLinksVerschieben(){
+                     var id;
+                     
+                     if(awListe !== undefined && awListe.length != 0) {
+                        for(var i = 0; i< awListe.length ;i++){
+                               if(awListe[i].getAttribute("aria-selected") == "true"){                                                                     
+                                   awListe[i].style.display = "none"; 
+                                   id = awListe[i].id;                                                                           
+                                   id = id.replace("rechts","links");                                 
+                                   document.getElementById(id).style.display = "block"; 
+                                   alListe[i].setAttribute("aria-selected", false);                                  
+                                   id = id.slice(0, id.length-6);                                   
+                                   if(idStr.includes(id + " ") === true){
+                                      idStr = idStr.replace(id + " ", "");
+                                      document.getElementById('{!$Component.form}').elements['{!$Component.ppString}'].value = idStr;
+                                   }
+                                   
+                               }
+
+                        }; 
+                    }   
+                }                
+                
+                function nachRechtsVerschieben(){
+                     var id;
+                     
+                     if(alListe !== undefined && alListe.length != 0) {
+                        for(var i = 0; i< alListe.length ;i++){
+                               if(alListe[i].getAttribute("aria-selected") == "true"){                                                                     
+                                   alListe[i].style.display = "none";   
+                                   id = alListe[i].id;
+                                   id = id.replace("links","rechts");                                 
+                                   document.getElementById(id).style.display = "block";  
+                                   awListe[i].setAttribute("aria-selected", false);
+                                   id = id.slice(0, id.length-7);                                    
+                                   idStr = idStr.concat(id + " ");
+                                   document.getElementById('{!$Component.form}').elements['{!$Component.ppString}'].value = idStr;
+                               }
+
+                        }; 
+                    }   
+                }                            
+                
+                function setPlzStatus(input){
+                    
+                    document.getElementById('{!$Component.form}').elements['{!$Component.status}'].value = input;
+                }
+                
+                function setSchritt(input){
+                    document.getElementById('{!$Component.form}').elements['{!$Component.schritt}'].value = input;
+                    if(input == 'Bestehende Daten ersetzen') {
+                        document.getElementById('select-02').disabled='disabled';
+                        document.getElementById('select-02').value = 'Inbegriffen';
+                    }
+                    else {
+                        document.getElementById('select-02').disabled='';
+                    }
+                    
+                }
+                
+                function DateiHochladen() {
+                    document.getElementById('{!$Component.form}').elements['{!$Component.content}'].value = document.getElementById('{!$Component.Datei}').value; 
+                }
+           </script>                                            
+    <!--  </apex:form> -->
+<br/>
+<br/>
+<br/>
+<!-- Picklist 1 -->
+<div class="slds-form-element" >  
+  <label class="slds-form-element__label" for="select-01">Was soll mit den importierten Daten geschehen ?</label>
+  <div class="slds-form-element__control">
+    <div class="slds-select_container">            
+      <select id="select-01" class="slds-select" onchange="setSchritt(this.value);" >
+        
+        <option value="Neue PLZ hinzufügen">PLZ hinzufügen / entfernen</option>
+        <option value="Bestehende Daten ersetzen">Bestehende Daten ersetzen</option>
+      </select>
+    </div>
+  </div>
+</div>
+<!-- Picklist 1 -->
+<br/>
+<br/>
+<!-- Picklist 2 -->
+<div class="slds-form-element" id="stts">
+  <label class="slds-form-element__label" for="select-02">Sind die PLZs inbegriffen oder ausgeschlossen ?</label>
+  <div class="slds-form-element__control">
+    <div class="slds-select_container">
+      <select id="select-02" class="slds-select" onchange="setPlzStatus(this.value);">
+        <option value="Inbegriffen">Inbegriffen</option>
+        <option value="Ausgeschlossen">Ausgeschlossen</option>
+      </select>            
+    </div>
+  </div>
+</div>
+<br/>
+<br/>
+<!-- Picklist 2 -->
+<div class="slds-form-element" style="text-align:right;">
+<!-- <apex:form > -->
+    <apex:outputLabel value="Gültig von:" for="gVon" styleClass="slds-form-element__label"/>
+    <apex:inputfield value="{!tmpPPG.G_ltig_von__c}" styleClass="slds-input" style="width:120px;" id="gVon"></apex:inputfield>
+    <br /><br/>
+    <apex:outputLabel value="Gültig bis:" for="gBis" styleClass="slds-form-element__label"/>
+    <apex:inputfield value="{!tmpPPG.G_ltig_bis__c}" styleClass="slds-input" style="width:120px;" id="gBis"></apex:inputfield>  
+
+</div>
+</apex:form>
+<br/>
+<br/>
+<!-- Buttons -->
+<div  >
+  <button class="slds-button slds-button--neutral" onclick="speichern();">Speichern</button>
+  <button class="slds-button slds-button--neutral" onclick="abbrechen();">Abbrechen</button>
+  <!-- <button class="slds-button slds-button--neutral" onclick="bereinigen();">Bereinigen</button> -->
+</div>
+<!-- Buttons -->
+
+
+
+
+</div>
+</div>    
+</div>
+</div>  
+</body>
+
+</html>
+</apex:page>

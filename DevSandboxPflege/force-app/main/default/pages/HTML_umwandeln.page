@@ -1,0 +1,10 @@
+<apex:page standardController="Task">
+    <apex:pageBlock title="HTML Text">
+        
+        
+         
+    <apex:outputText escape="false" value="{!task.description}" />
+            
+       
+    </apex:pageBlock>
+</apex:page>

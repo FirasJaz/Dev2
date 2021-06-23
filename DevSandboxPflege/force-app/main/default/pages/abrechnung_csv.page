@@ -1,0 +1,23 @@
+<apex:page controller="abrechnung_csv" tabStyle="Delivery_Line__c" sidebar="false" >
+
+    <apex:form id="auForm" >
+    <apex:Pageblock id="pb" title="CSV für AS-Bremen nachträglich erstellen">
+    <apex:pagemessages id="Page_Message"  escape="false"/>
+    <apex:pageBlockButtons location="top">
+        <apex:outputPanel id="myButtons">   
+            <apex:CommandButton id="btnSend" value="Erzeugen und versenden" action="{!goSend}" rendered="{!Aufruf}"/>
+        </apex:outputPanel>           
+    </apex:pageBlockButtons>
+
+    <apex:PageBlocksection title="Auswahl" rendered="{!Aufruf}" collapsible="false" id="kkPbs" >
+        <apex:pageBlockSectionItem id="pbsiKkID"> 
+             Rchnungsnummer  
+            <apex:outputPanel id="opID">
+                <apex:inputtext value="{!kkName}" title="Rechnungen" style="width:500px"/>
+            </apex:outputPanel> 
+        </apex:pageBlockSectionItem>
+    </apex:PageBlocksection>
+    
+    </apex:Pageblock>
+    </apex:form>
+</apex:page>

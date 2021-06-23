@@ -1,0 +1,32 @@
+<apex:page standardController="Kunde__c" id="fmPage" extensions="sendefaxanPHAG_pdf_Auswahl" tabStyle="Kunde__c" sidebar="true">
+<script type="text/javascript"> 
+function fmDrucken(ta) {
+    // alert(ta);
+    var URL = ta ;
+    window.open(URL, "_blank");
+}
+</script>  
+    <apex:form id="fmForm">
+    <apex:pagemessages id="Page_Message"  escape="false"/>
+        <apex:Pageblock id="pblp" title="{!pageTitle}">
+        
+            <apex:pageBlockButtons >              
+                <apex:CommandButton id="btnzurueck" value="Zurück zu Kunde" immediate="True" action="{!zurueck}"/>
+            </apex:pageBlockButtons>
+            
+            <apex:PageBlocksection title="Versandart" collapsible="false" id="fmPbs" columns="2">
+                   
+            
+                        <apex:commandButton onClick="javascript:fmDrucken('{!MainPageName}')" value="Bereits durchgestellt" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;"  />
+                        <apex:outputtext value="{!beschreibung}"  />
+                        
+                        <apex:commandButton onClick="javascript:fmDrucken('{!MainPageNamemR}')" value="Mit Rezept" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;"  />
+                        <apex:outputtext value="{!beschreibung_rezept}"  />
+
+                        <apex:commandButton onClick="javascript:fmDrucken('{!MainPageNameoR}')" value="Ohne Rezept" styleClass="btn" style="padding:2px 5px 2px 5px; text-decoration:none; width:200;"  />
+                        <apex:outputtext value="{!beschreibung_orezept}"  />
+                        
+            </apex:PageBlocksection>            
+        </apex:Pageblock> 
+    </apex:form>           
+</apex:page>

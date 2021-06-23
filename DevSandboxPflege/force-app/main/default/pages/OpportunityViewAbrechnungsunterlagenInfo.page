@@ -1,0 +1,29 @@
+<!--
+/****************************************************************************************************************************
+// Created 12.07.2018 von  MS
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// 	opportunity Id 
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	to show how many Abrechnungsunterlagen__c the opportunity has on opportunity layout
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
+-->
+<apex:page standardController="Opportunity" lightningStylesheets="true" extensions="OpportunityViewAbrechnungsunterlagenInfo" showHeader="false">
+    <apex:slds />
+    <apex:outputText value="{!abrechnungsunterlagenDescription}" />
+</apex:page>

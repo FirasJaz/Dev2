@@ -1,0 +1,10 @@
+<!--
+ - Created by schne on 05.08.2020.
+ -->
+
+<aura:documentation>
+    <aura:description>Documentation for Curabox_Order_Flow</aura:description>
+    <aura:example name="Curabox_Order_Flow" ref="Curabox_Order_Flow" label="Curabox_Order_Flow">
+        This component is used for manually defining orders' delivery date and delivery frequency within screen flow.
+    </aura:example>
+</aura:documentation>

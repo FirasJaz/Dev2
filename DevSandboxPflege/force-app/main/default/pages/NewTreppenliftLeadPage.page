@@ -1,0 +1,423 @@
+<!--
+// Erstellt 13.09.2016 von Mz
+//  Klose und Srocke Gesellschaft für kreative Konfliktlösungen GmbH
+//  Mindelweg 11
+//  22393 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+// New Treppenlift Lead             
+//
+//****************************************************************************************************************************
+// Änderungen:
+//****************************************************************************************************************************
+-->
+<apex:page id="page" sidebar="false" showHeader="false" showQuickActionVfHeader="false"  title="Neu Lead erstellen" controller="NewTreppenliftLead" docType="html-5.0">
+
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+
+
+
+    <script src="https://maps.googleapis.com/maps/api/js?language=de&sensor=false&libraries=places" type="text/javascript"></script>  
+    <script type="text/javascript">        
+
+      var placeSearch, autocomplete;
+      var componentForm = {
+        street_number: 'short_name',
+        route: 'long_name',
+        locality: 'long_name',
+        administrative_area_level_1: 'short_name',
+        country: 'long_name',
+        postal_code: 'short_name'
+      };
+      
+      
+      
+      function initAutocomplete() {
+        // Create the autocomplete object, restricting the search to geographical
+        // location types.
+        autocomplete = new google.maps.places.Autocomplete(
+            
+            (document.getElementById('page:form:pb:address_input')),
+            {types: ['geocode']});
+
+        // When the user selects an address from the dropdown, populate the address
+        // fields in the form.
+        autocomplete.addListener('place_changed', fillInAddress);        
+      }
+
+      
+
+      function fillInAddress() {
+         
+        // Get the place details from the autocomplete object.
+        var place = autocomplete.getPlace();
+        
+        document.getElementById('page:form:pb:street').value = '';
+        document.getElementById('page:form:pb:street').disabled = false;
+        document.getElementById('page:form:pb:city').value = '';
+        document.getElementById('page:form:pb:city').disabled = false;
+        document.getElementById('page:form:pb:state').value = '';
+        document.getElementById('page:form:pb:state').disabled = false;
+        document.getElementById('page:form:pb:postalCode').value = '';
+        document.getElementById('page:form:pb:postalCode').disabled = false;
+        document.getElementById('page:form:pb:country').value = '';
+        document.getElementById('page:form:pb:country').disabled = false;
+        
+        var street_val = '';
+        var street_number_val = '';
+        // Get each component of the address from the place details
+        // and fill the corresponding field on the form.
+        for (var i = 0; i < place.address_components.length; i++) {
+          var addressType = place.address_components[i].types[0];
+          if(addressType == 'street_number' ){
+              street_number_val = place.address_components[i]['short_name'];
+          }
+          if(addressType == 'route' ){
+              street_val = place.address_components[i]['long_name'];
+          }
+          if(addressType == 'locality'){
+              var val = place.address_components[i]['long_name'];
+              document.getElementById('page:form:pb:city').value = val;
+          }
+          if(addressType == 'postal_code'){
+              var val = place.address_components[i]['short_name'];
+              document.getElementById('page:form:pb:postalCode').value = val;
+          }
+          if(addressType == 'administrative_area_level_1'){
+              var val = place.address_components[i]['short_name'];
+              document.getElementById('page:form:pb:state').value = val;
+          }
+          if(addressType == 'country'){
+              var val = place.address_components[i]['long_name'];
+              document.getElementById('page:form:pb:country').value = val;
+          }
+        }
+        document.getElementById('page:form:pb:street').value = street_val + ' ' + street_number_val;
+        document.getElementById('page:form:pb:address_input').value = '';
+      }
+      
+      function geolocate() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var geolocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var circle = new google.maps.Circle({
+              center: geolocation,
+              radius: position.coords.accuracy
+            });
+            autocomplete.setBounds(circle.getBounds());
+          });
+        }
+      }
+      
+      google.maps.event.addDomListener(window, 'load', initAutocomplete);
+      
+    </script>
+    
+<apex:form id="form">
+
+<div class="slds">
+        <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+
+                  <!-- LAYOUT GRID -->
+                  <div class="slds-grid" id="id" >
+                    <!-- GRID COL -->
+                    <div class="slds-col" style="color: white;">
+                      <!-- HEADING AREA -->
+                      <h1 class="slds-text-heading--medium">Lead erstellen : Treppenlift</h1> 
+                    </div>
+                  </div>
+             </div>
+             <br/>
+             
+             <div style="text-align: center;">
+                  <apex:commandButton styleClass="slds-button slds-button--neutral" value="Abbruch" immediate="true" html-formnovalidate="formnovalidate" action="{!zuLeads}"/>      
+                  <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!Speichern}" />
+             </div>
+             <br/>
+
+        <apex:pageBlock id="pb" >
+            <apex:pageMessages id="showmsg"/>
+            
+            <div class="slds-box slds-theme--default slds-container--medium slds-container--center">
+                <h3 class="slds-form-element__label slds-m-bottom--small">Name</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Anrede</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Salutation}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Telefon</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Phone}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Vorname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.FirstName}" label="" styleClass="slds-input" >
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">E-Mail</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Email}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Nachname</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.LastName}" label="" styleClass="slds-input" >
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>
+                </div>
+                
+                <!-- address block !-->
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Anschrift</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                            <apex:input styleClass="slds-input" id="address_input"  onFocus="geolocate()" ></apex:input>
+                        </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>
+                </div>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Straße</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Street}" label="" id="street" styleClass="slds-textarea" >
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>
+                </div>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Stadt</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.City}" label="" id="city" styleClass="slds-input" >
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-6">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Bundesland</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.State}" label="" id="state" styleClass="slds-input" >
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>
+                </div>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-3">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Postleitzahl</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.PostalCode}" label="" id="postalCode" styleClass="slds-input" >
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-6">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Land</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Country}" label="" id="country" styleClass="slds-input" >
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>
+                </div>
+                <!-- address block !-->
+                
+                <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Treppenlift Konfigurator Antworten</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Treppenliftart</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TL_Treppenliftart__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label">Häusliche Situation</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TL_H_usliche_Situation__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Umgebung</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.Umgebung__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Belastbarkeit</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TL_Belastbarkeit__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Zu überwindendes Hindernis</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TL_Zu_berwindendes_Hindernis__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Postleitzahl für Suche</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TL_Postleitzahl_f_r_Suche__c}" label="" styleClass="slds-input">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                </div>
+                
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent">
+                        <span class="slds-form-element__label slds-m-top--small">Anzahl der Etagen</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.TL_Anzahl_der_Etagen__c}" label="" styleClass="slds-select">
+                            </apex:inputField>
+                            </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>
+                      
+                </div>
+                
+                <h3 class="slds-text-heading--small slds-m-bottom--small slds-m-top--large">Marketing Details</h3>
+                <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      <div class="slds-form-element slds-hint-parent slds-lookup">
+                        <span class="slds-form-element__label">Ursprungsanfrage2</span>
+                        <div class="slds-form-element__control">
+                        <span class="slds-form-element">
+                          <apex:inputField value="{!formObj.OM_Wizzard_Name2__c}" label="" styleClass="slds-select">
+                          </apex:inputField>
+                        </span>
+                        </div>
+                      </div></div>
+                      
+                      <div class="slds-col--padded slds-size--1-of-2">
+                      </div>
+                </div>
+                
+            </div>
+ 
+         </apex:pageBlock>
+        
+             <div  style="text-align: center;">
+                 <apex:commandButton styleClass="slds-button slds-button--neutral" value="Abbruch" immediate="true" html-formnovalidate="formnovalidate" action="{!zuLeads}"/>      
+                 <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" action="{!Speichern}" />
+             </div>
+             <br/>            
+             
+</div>
+</apex:form>
+
+</apex:page>

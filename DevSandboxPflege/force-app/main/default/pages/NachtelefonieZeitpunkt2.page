@@ -1,0 +1,163 @@
+<!--
+//****************************************************************************************************************************
+// Created Mai 2016        by MZ
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Mindelweg 11
+//                         22393 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.:  04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// xxxx
+//
+//****************************************************************************************************************************
+//
+// Description:
+//                      
+// The programm generates an activity on the opportunity for calling and an email to customer
+//
+//
+//****************************************************************************************************************************
+//Changes:
+//
+// 05.09.2016    BT Die Prozesse "Nachtelefonie individuell einrichten" und "Nächsten Zeitpunkt definieren" laufen 
+//                   über die Seite NachtelefonieZeitpunkt2
+// 13.10.2016    TK Wortlaut geändert für letzte Checkbox auf "keine Mail an ASP senden"
+// 24.07.2018	 MZ	00001549 adjusting NT for Badumabu project
+//****************************************************************************************************************************
+-->
+<apex:page id="page_id" sidebar="false" showHeader="false" showQuickActionVfHeader="false"  title="{!pagetitle}" controller="NachtelefonieZeitpunkt2">
+
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+<script type="text/javascript">
+    function setButtonDisabled() {   
+            document.getElementById("page_id:cmForm:buttonSave1").disabled = true;        
+            document.getElementById("page_id:cmForm:buttonSave2").disabled = true; 
+            SpeichernJS();
+    }
+</script>
+
+<apex:pageMessages id="showmsg"/>
+<apex:form id="cmForm">
+
+<apex:actionfunction action="{!Speichern}" name="SpeichernJS" />
+
+<div class="slds">
+        <div class="slds-page-header" role="banner" style="background-color: #0076DE;">
+
+                  <!-- LAYOUT GRID -->
+                  <div class="slds-grid" id="id" >
+                    <!-- GRID COL -->
+                    <div class="slds-col" style="color: white;">
+                      <!-- HEADING AREA -->
+                      <h1 class="slds-text-heading--medium">Bitte wähle den nächsten Nachtelefonie-Zeitpunkt</h1> 
+                    </div>
+                  </div>
+             </div>
+             <br/>
+             
+             <div  style="text-align: center;">
+                 <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Nachtelefonie" action="{!zuNachtelefonie}" rendered="{!ntButton}"/>
+                 <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Opportunity" action="{!zuOpportunity}" rendered="{!oppButton}" /> 
+                 <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" id="buttonSave1" onClick="setButtonDisabled();return false;" />
+             </div>
+             <br/>
+
+        <apex:pageBlock >
+            <div class="slds-box slds-theme--default slds-container--medium slds-container--center" style="display: {!NtTypeDisplayValue}">
+            	<apex:pageBlockSection id="NtTypeBlock" columns="2">
+                    <apex:outputLabel value="NT - Art" for="NtTypeField" styleClass="slds-form-element__label"/>
+                    <apex:selectList id="NtTypeField" value="{!formObj.NT_Badumbau_Type__c}" size="1" styleClass="slds-select" label="">
+                        <apex:selectOptions value="{!TypeItems}" />
+                    </apex:selectList>
+                </apex:pageBlockSection>
+            </div>
+            <br/>
+            <div class="slds-box slds-theme--default slds-container--medium slds-container--center">
+            <apex:pageBlockSection id="nichtErreichtBlock" columns="2">
+                <apex:outputLabel value="Nicht erreicht" for="nichtErreichtCheckbox" styleClass="slds-form-element__label" style="font-weight: bold"/>
+                <apex:inputCheckbox id="nichtErreichtCheckbox" value="{!nichtErreichtCheckBox}" styleClass="slds-checkbox slds-checkbox--faux">
+                <apex:actionSupport event="onclick" action="{!nichtErreicht}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>    
+                </apex:inputCheckbox>
+                
+                
+                <apex:outputLabel value="Nächstes Zeitfenster" for="ZeitCheckbox" styleClass="slds-form-element__label"/>
+                <apex:inputCheckbox id="ZeitCheckbox" value="{!ZeitCheckbox}" styleClass="slds-checkbox slds-checkbox--faux">
+                <apex:actionSupport event="onchange" action="{!neNextFrame}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>    
+                </apex:inputCheckbox>
+                
+                <apex:outputLabel value="vorgegebenenes Zeitfenster" for="ZeitList" styleClass="slds-form-element__label"/>                
+                <apex:selectList id="ZeitList" value="{!selectedTime}" size="1" styleClass="slds-select">
+                <apex:selectOptions value="{!items}" />
+                <apex:actionSupport event="onchange" action="{!neGivenFrame}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>
+                </apex:selectList>
+       
+                <apex:outputLabel value="Individueller Termin" for="ZeitInput" styleClass="slds-form-element__label"/>
+                <apex:inputField value="{!dummyObj1.F_lligkeitsdatum__c}" label="" styleClass="slds-input" style="width:250px;">
+                <apex:actionSupport event="onchange" action="{!neTermin}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>
+                </apex:inputField>
+                
+                <apex:outputLabel value="In 4 Tagen" for="ZeitCheckbox4Tagen" styleClass="slds-form-element__label"/>
+                <apex:inputCheckbox id="ZeitCheckbox4Tagen" value="{!ZeitCheckbox4Tagen}" styleClass="slds-checkbox slds-checkbox--faux">
+                <apex:actionSupport event="onchange" action="{!ne4Tagen}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>    
+                </apex:inputCheckbox>
+                
+            </apex:pageBlockSection>
+            </div>
+            <br/>
+            <div class="slds-box slds-theme--default slds-container--medium slds-container--center">
+            <apex:pageBlockSection id="erreichtBlock" columns="2">
+                
+                <apex:outputLabel value="Erreicht" for="erreichtCheckbox" styleClass="slds-form-element__label"  style="font-weight: bold"/>
+                <apex:inputCheckbox id="erreichtCheckbox" value="{!erreichtCheckBox}" styleClass="slds-checkbox slds-checkbox--faux">
+                <apex:actionSupport event="onclick" action="{!erreicht}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>    
+                </apex:inputCheckbox>
+                
+                <apex:outputLabel value="vorgegebenenes Zeitfenster" for="ZeitList" styleClass="slds-form-element__label"/>
+                <apex:selectList id="ZeitList" value="{!selectedTimeErreicht}" size="1" styleClass="slds-select">
+                <apex:selectOptions value="{!items}" />
+                <apex:actionSupport event="onchange" action="{!eGivenFrame}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>
+                </apex:selectList>
+                
+                <apex:outputLabel value="Individueller Termin" for="ZeitInput" styleClass="slds-form-element__label"/>
+                <apex:inputField value="{!dummyObj2.F_lligkeitsdatum__c}" label="" styleClass="slds-input" style="width:250px;">
+                <apex:actionSupport event="onchange" action="{!eTermin}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>
+                </apex:inputField>
+                                
+                <apex:outputLabel value="Auswahl der Kategorie" for="catList" styleClass="slds-form-element__label" rendered="{!showCategory}"/>
+                <apex:selectList id="catList" value="{!selectedCategory}" size="1" styleClass="slds-select" rendered="{!showCategory}">
+                <apex:selectOptions value="{!catItems}" />
+                <apex:actionSupport event="onchange" action="{!eKat2Grund}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>
+                </apex:selectList>
+                
+                <apex:outputLabel value="Kat. 2 Grund" styleClass="slds-form-element__label" rendered="{!showCategory}"/>
+                <apex:inputField label="" value="{!formObj.Wiedervorlage_Kat_2_Grund__c}" styleClass="slds-select" rendered="{!showCategory}">
+                <apex:actionSupport event="onchange" action="{!eKat2}" reRender="nichtErreichtBlock, erreichtBlock"></apex:actionSupport>
+                </apex:inputField>
+                
+            </apex:pageBlockSection>
+            </div>
+            <br/>
+            <div class="slds-box slds-theme--default slds-container--medium slds-container--center" style="display: {!display_value}">
+            <apex:pageBlockSection columns="2">
+                <apex:outputLabel value="Keine Mail an ASP senden" for="noEmailCheckbox" styleClass="slds-form-element__label"/>
+                 <apex:inputCheckbox id="noEmailCheckbox" value="{!noEmail}" >
+                </apex:inputCheckbox>
+            </apex:pageBlockSection>  
+            </div>          
+           
+        </apex:pageBlock>
+        
+             <div  style="text-align: center;">
+                 <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Nachtelefonie" action="{!zuNachtelefonie}" rendered="{!ntButton}"/>
+                 <apex:commandButton styleClass="slds-button slds-button--neutral" value="zurück zur Opportunity" action="{!zuOpportunity}" rendered="{!oppButton}" />                 
+                 <apex:commandButton styleClass="slds-button slds-button--brand" value="Speichern" id="buttonSave2" onClick="setButtonDisabled();return false;" />
+             </div>
+             <br/>
+</div>
+</apex:form>
+
+</apex:page>

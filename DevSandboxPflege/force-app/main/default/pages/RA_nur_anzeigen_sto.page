@@ -1,0 +1,88 @@
+<apex:page renderas="PDF" controller="RA_nur_anzeigen_sto_controller_class" sidebar="FALSE" showHeader="False">
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Autor:          WDS
+//      Stand:          06.12.2012
+//      Version:        0.1
+//      geändert:       
+//      Beschreibung:   auf dieser Seite wird die Patienteninformation und die Rückantwort für die Versorgung mit Stomaprodukten angezeigt
+//
+//
+//  wds         am 06.12.2012 deployed
+//  wds         am 03.09.2013 Einbindung Druckersteuerung
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--><HTML>
+<head> 
+    <apex:stylesheet value="{!$Resource.pdf_style}"/>   
+</head>
+ 
+<body> 
+<div id="head">
+    <div id="inoxision">
+        %%01[Adpt_FEDO]%% 
+        %%99[CreateFullTextChecked=1]%% 
+        %%99[AutoExecute=1]%%
+        </div>
+        
+        <div id="logo">
+           <apex:image url="{!$Resource.Logo}" width="150" height="60" />
+        </div>
+        
+        <div id="address">
+           <apex:outputText value="{!$Organization.Name}, {!$Organization.Street}, {!$Organization.PostalCode} {!$Organization.City}" styleClass="underita own_adress"/><br />
+           <br />
+           <apex:outputtext value="{!Kunde.Anrede__c}"/><br />
+            <apex:outputtext value="{!Kunde.Vorname__c} {!Kunde.Name__c}"/><br />
+            <apex:outputtext value="{!Kunde.Stra_e__c} {!Kunde.Hausnummer__c}"/><br />
+            <apex:outputtext value="{0,number, 00000}">  <apex:param value="{!Kunde.PLZ__c}" /> </apex:outputText>&nbsp;<apex:outputtext value=" {!Kunde.Ort__c}"/>
+        </div>
+        
+        <div id="bearbeiter">
+             <table>
+                <tr>
+                <td>Bearbeiter: </td><td><apex:outputtext value="{!$User.LastName}" /></td>
+                </tr>
+                <tr>
+                <td>Tel: </td><td><apex:outputtext value="{!$User.Phone}" /></td>
+                </tr>
+                <tr>
+                <td>Fax: </td><td><apex:outputtext value="{!$User.Fax}" /></td>
+                </tr>
+                <tr>
+                <td>Datum: </td><td><apex:outputtext value="{0,date,dd.MM.yyyy}">
+                        <apex:param value="{!Now()}" /></apex:outputtext></td>
+                </tr>
+               </table>
+        </div>
+    </div>    
+    
+      <!-- Header is done -->
+      <div id="document_info">
+
+      
+      <p style="font-family:'Arial'; font-weight: bold; text-align: center;">Patienteninformation</p> 
+     
+      <p style="font-family:'Arial'; font-weight: bold; text-align: center;">zum Verbleib beim Patienten<br/></p>   
+      
+               
+         
+      <p><apex:outputtext value="{!Anredeformel}"/>&nbsp;<apex:outputtext value="{!Kunde.Name__c}"/>,</p>   
+      <p>bitte heben Sie diese Information auf.</p>
+      <p>1. Ihre Krankenkasse hat die Firma FEDO mit der Lieferung der beantragten Versorgung mit Stomaprodukten beauftragt.</p>    
+      <p>Die Kosten für eine Versorgung mit diesen Produkten durch andere Firmen können nur nach vorheriger Genehmigung durch Ihre Krankenkasse übernommen werden.</p><br/>
+      <p>2. FEDO Öffnungszeiten:</p> <p style="text-align: center;"> Montag - Freitag 10-13 Uhr und 15-17 Uhr</p>
+      <p>3. Bestellmöglichkeiten:</p> <p style="text-align: center;"> Tel.   02362 6776-150</p>
+      <p style="text-align: center;">Fax    02362 6776-160</p>
+      <p style="text-align: center;">mail   info@fedo-online.de</p>
+      <p>Bei weiteren Nachfragen stehen wir Ihnen selbstverständlich gerne zur Verfügung. Sobald uns die unterschriebene Rückantwort vorliegt, können wir die Auslieferung Ihrer Bestellung veranlassen</p>
+      <p>Mit freundlichen Grüßen</p>
+      <p>FEDO Praxis- und Sanitätsbedarf</p>
+
+       </div>   
+       
+       <c:PDFFooter />
+</body>
+</HTML>
+</apex:page>

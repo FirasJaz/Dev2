@@ -1,0 +1,6 @@
+<apex:page standardController="Lead" extensions="Change_Owner_To_CurrentUser_Ld" action="{!Change_owner}">
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+<div class="slds">
+<apex:pageMessages id="showmsg" escape="false"/>
+</div>
+</apex:page>

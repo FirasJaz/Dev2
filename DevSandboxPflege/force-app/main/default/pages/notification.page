@@ -1,0 +1,116 @@
+<!--
+/********************************************************************************************************************************************
+//  Created 15.10.2016 by TK
+//  Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//  Nordkanalstraße 58
+//  20097 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: Opportunity
+//
+//********************************************************************************************************************************************
+//
+// Description:    
+//
+//********************************************************************************************************************************************
+// Changes:
+// 03.04.2018    MZ    #155510105 link added to notification center
+// 26.07.2018    MZ     Badumabu lead and email link added
+// 17.06.2019    WDS   #xxxxxxxxx add curabox to notification center
+// 05.08.2019    DZ    Commented Pflegeimmobilien and Widerspruch out
+// 13.05.202     DZ    Multilead eingebaut
+//********************************************************************************************************************************************
+*/
+-->
+<apex:page controller="notification">
+<apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+    <apex:form >       
+        <apex:actionFunction name="countleads" action="{!countleads}" rerender="out" status="myStatus"/>
+
+    </apex:form>
+
+    <apex:outputPanel id="out"> 
+        <apex:outputLink value="/apex/Notification_Leads_anzeigen" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 18px; font-weight: bold" value="Leads: {!totalleads} "/>
+        </apex:outputLink>  
+        
+        <apex:outputText >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:outputText>
+        
+        <apex:outputLink value="/apex/Notifications_Mails_anzeigen" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 18px; font-weight: bold" value="Emails: {!neueEmails}"/>
+        </apex:outputLink>   
+        
+        <apex:outputText >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</apex:outputText>
+        
+        <apex:outputLink value="/apex/Notification_Opps_anzeigen" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 18px; font-weight: bold" value="Prio: {!totalOpps}"/>
+        </apex:outputLink>  
+        
+       <apex:outputText ><br/><br/></apex:outputText>
+
+       
+         <apex:outputLink value="/apex/Notification_Leads_anzeigen_BEL" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Betreuungsleistungen: {!totalleadsBEL}"/>
+        </apex:outputLink>  
+
+       <apex:outputText ><br/></apex:outputText>
+        
+        <apex:outputLink value="/apex/Notification_Leads_anzeigen_TL" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Treppenlifte: {!totalleadsTL}"/>
+        </apex:outputLink>  
+        
+        <apex:outputText ><br/></apex:outputText>
+        
+        <apex:outputLink value="/apex/Notification_Leads_anzeigen_HNR" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Notrufsysteme: {!totalleadsHNR}"/>
+        </apex:outputLink>
+        &nbsp;&nbsp;&nbsp;
+        <apex:outputLink value="/apex/Notification_Opps_anzeigen_HNR" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Notrufsysteme Prio: {!totalleadsHNR_prio}"/>
+        </apex:outputLink>      
+        
+        <apex:outputText ><br/></apex:outputText>
+        
+        <!--<apex:outputLink value="/apex/Notification_Leads_anzeigen_PI" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Pflegeimmobilien: {!totalleadsPI}"/>
+        </apex:outputLink> 
+        
+        <apex:outputText ><br/></apex:outputText>
+        -->
+        
+        <!--<apex:outputLink value="/apex/Notification_Leads_anzeigen_WS" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Widerspruch: {!totalleadsWS}"/>
+        </apex:outputLink>
+        
+        <apex:outputText ><br/></apex:outputText>
+        -->
+        
+        <apex:outputLink value="/apex/Notification_Leads_anzeigen_curabox" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Curabox: {!totalleadscurabox}"/>
+        </apex:outputLink>
+               
+        &nbsp;&nbsp;&nbsp;
+              
+                <apex:outputLink value="/apex/Notification_Leads_anzeigen_Multilead" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Multilead: {!totalleadsMultilead}"/>
+        </apex:outputLink>
+        <apex:outputText ><br/></apex:outputText>
+        
+        <apex:outputLink value="/apex/Notification_Leads_anzeigen_Bad" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Badumbau Leads: {!totalleadsBad}"/>
+        </apex:outputLink>
+        &nbsp;&nbsp;&nbsp;
+        <apex:outputLink value="/lightning/n/Badumbau_E_Mails" target="_self">
+            <apex:outputText style="color: #54698d; text-align: center; font-size: 14px; font-weight: bold" value="Badumbau E-Mails: {!newEmailsBadumbau}"/>
+        </apex:outputLink>
+        
+    </apex:outputPanel>
+    <apex:actionStatus startText="." id="myStatus"/>
+    
+    <script>window.setInterval(countleads,30000)</script>
+    
+</apex:page>

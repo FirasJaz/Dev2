@@ -1,0 +1,127 @@
+<!--
+/********************************************************************************************************************************************
+// Created on 17.08.2020 by BT
+//                      Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                      Frankenstraße 29
+//                      20097  Hamburg 
+//                      Tel.:  0423882986
+//                      Fax.:  0423882986
+//                      Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+//  Parameter:
+//
+//********************************************************************************************************************************************
+//
+//  Description:    
+//                     This represents an user interface component for displaying delivery quantity settings based on the specified curabox
+//********************************************************************************************************************************************
+// Changes:
+//
+//********************************************************************************************************************************************
+*/
+-->
+<aura:component controller="DeliveryQuantityManagerController" >
+    <aura:handler event="c:DeliveryQuantitySettingsLoaded" action="{!c.onDeliveryQuantitySettingsLoaded}"/>
+    <aura:attribute name="deliveryQuantitySettings" type="LiefermengeReduzierung__c[]"/> 
+    
+    <lightning:notificationsLibrary aura:id="notifLib"/>    
+    <lightning:card>
+        <lightning:layout horizontalAlign="space" multipleRows="true">
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="12"
+                                  padding="around-small">
+                <div style="text-align:center;">
+                    <lightning:button class="slds-m-top_small" variant="brand" label="speichern" onclick="{!c.saveDeliveryQuantitySettings}" />
+                </div>                
+            </lightning:layoutItem>
+        </lightning:layout>  
+        <br/>
+        
+        <!-- table header -->
+        <div class="c-container">
+        <lightning:layout horizontalAlign="space" multipleRows="true">
+           <lightning:layoutItem size="12"
+                                  mediumDeviceSize="3"
+                                  padding="around-small">
+                <ui:outputText value="MD5-Key" class="hdcol" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="2"
+                                  padding="around-small">
+                <ui:outputText value="Produkt" class="hdcol" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="1"
+                                  padding="around-small">
+                <ui:outputText value="Menge" class="hdcol" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="1"
+                                  padding="around-small">
+                <ui:outputText value="Liefermenge (alte Kunden)" class="hdcol" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="1"
+                                  padding="around-small">
+                <ui:outputText value="Liefermenge (neue Kunden)" class="hdcol" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="2"
+                                  padding="around-small">
+                <ui:outputText value="Gültig ab" class="hdcol" />
+            </lightning:layoutItem>
+            
+            <lightning:layoutItem size="12"
+                                  mediumDeviceSize="2"
+                                  padding="around-small">
+                <ui:outputText value="Gültig bis" class="hdcol" />
+            </lightning:layoutItem>        
+        </lightning:layout> 
+        </div>
+        <!-- table header -->
+        
+        <!-- table body -->        
+        <aura:iteration items="{!v.deliveryQuantitySettings}" var="deliverySetting">        
+            <lightning:layout horizontalAlign="space" multipleRows="true" >
+               <lightning:layoutItem size="12"
+                                      mediumDeviceSize="3"
+                                      padding="around-small">
+                    <ui:outputText value="{!deliverySetting.key__c}" />
+                </lightning:layoutItem>                
+                <lightning:layoutItem size="12"
+                                      mediumDeviceSize="2"
+                                      padding="around-small">                
+                    <ui:outputText value="{!deliverySetting.Product__r.Name}" />
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12"
+                                      mediumDeviceSize="1"
+                                      padding="around-small">                
+                    <ui:outputNumber value="{!deliverySetting.Menge__c}" />
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12"
+                                      mediumDeviceSize="1"
+                                      padding="around-small">                
+                    <ui:inputNumber value="{!deliverySetting.Liefermenge_alt__c}" />
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12"
+                                      mediumDeviceSize="1"
+                                      padding="around-small">                
+                    <ui:inputNumber value="{!deliverySetting.Liefermenge_neu__c}" />
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12"
+                                      mediumDeviceSize="2"
+                                      padding="around-small">                
+                    <ui:inputDate value="{!deliverySetting.valid_from__c}" displayDatePicker="true" />
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12"
+                                      mediumDeviceSize="2"
+                                      padding="around-small">          
+                    <ui:inputDate value="{!deliverySetting.valid_to__c}" displayDatePicker="true" />
+                </lightning:layoutItem>
+            </lightning:layout> 
+        </aura:iteration>  
+        <!-- table body -->   
+    </lightning:card>
+</aura:component>

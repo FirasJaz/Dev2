@@ -1,0 +1,40 @@
+<!--
+/****************************************************************************************************************************
+// Created 25.06.2019 von  AD
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.: 04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter:
+//  ContactId
+//
+//****************************************************************************************************************************
+//
+// Description:       
+//	This component is used to show all created orders for a contact.
+//
+//****************************************************************************************************************************
+// Changes: 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="title" type="String" default="Auftragsübersicht"/>
+
+    <lightning:card>
+        <aura:set attribute="title">
+            <lightning:icon iconName="utility:connected_apps" size="small"/>
+            {! v.title }
+        </aura:set>
+        <aura:set attribute="footer">
+            <lightning:button class="btn-zuruck" label="Zurück zum Contact" title="Zurück zum Contact" onclick="{! c.zuruck }" />
+        </aura:set>
+        <c:Edit_Order recordId="{!v.recordId}" />
+    </lightning:card>
+
+</aura:component>

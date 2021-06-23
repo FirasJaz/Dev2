@@ -1,0 +1,98 @@
+<!--
+/****************************************************************************************************************************
+// Erstellt 23.04.2018 von AM
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Nordkanalstr. 58
+//                         20097 Hamburg 
+//                         Tel.:  04023882986
+//                         Fax.: 04023882989
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+//                      
+// display LS Status 
+//
+//
+//****************************************************************************************************************************
+//  Änderungen
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
+!-->
+<apex:page Controller="LS_erzeugen" >
+    <script type="text/javascript">      
+        function sort(s) {
+            SortToggle(s);
+        }
+    </script>
+    <apex:form id="lpForm">
+        <apex:actionFunction name="SortToggle" action="{!SortToggle}" reRender="pbs, myButtons">
+            <apex:param name="sortToggleParam" value=""/>
+        </apex:actionFunction>
+        <apex:Pageblock id="pblp" title="Lieferscheine betrachten">
+            <apex:pagemessages id="Page-Messages"/>
+            <apex:pageBlockButtons location="top" >              
+                <apex:outputPanel id="myButtons">   
+                        <apex:selectList value="{!qrySelect}" multiselect="false" styleclass="SelectOptions" size="1" label="Query">
+                            <apex:selectOptions value="{!querySelect}"/>
+                            <apex:actionSupport event="onchange" action="{!initPage}"/>
+                        </apex:selectList>
+
+                        <apex:commandButton status="fetchStatus" reRender="pb" value="|<" action="{!first}" disabled="{!!hasPrevious}" title="First Page" rerender="pbs, myButtons"/>
+                        <apex:commandButton status="fetchStatus" reRender="pb" value="<" action="{!previous}" disabled="{!!hasPrevious}" title="Previous Page"  rerender="pbs, myButtons"/>
+                        <apex:commandButton status="fetchStatus" reRender="pb" value=">" action="{!next}" disabled="{!!hasNext}" title="Next Page"  rerender="pbs, myButtons"/>
+                        <apex:commandButton status="fetchStatus" reRender="pb" value=">|" action="{!last}" disabled="{!!hasNext}" title="Last Page" rerender="pbs, myButtons"/>                
+                        </apex:outputPanel>   
+                        <apex:outputPanel style="color:#4AA02C;font-weight:bold">
+                            <apex:actionStatus id="fetchStatus" startText="Fetching..." stopText="" />                
+               </apex:outputPanel>                 
+            </apex:pageBlockButtons>
+            
+        <apex:PageBlocksection id="pbs" title="Sätze {!(pageNumber * size)+1-size}-{!IF((pageNumber * size)> noOfRecords, noOfRecords,(pageNumber * size))} von {!noOfRecords} " collapsible="false" columns="1">
+            <apex:pageBlockTable value="{!lbList}" var="LB" id="lstab" width="90%" >
+         
+                <apex:column >
+                    <apex:facet name="header">
+                        <a href="javascript:sort('Lieferschein__r.Name');">{!$ObjectType.Lieferschein__c.Label} {!IF(sortExpression=='Lieferschein__r.Name',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                    </apex:facet> 
+                    <apex:outputLink value="/{!LB.Lieferschein__c}" >{!LB.Lieferschein__r.Name}</apex:outputLink>
+                </apex:column>
+
+                <apex:column > 
+                    <apex:facet name="header">
+                        <a href="javascript:sort('Lieferschein__r.Lieferdatum__c');" >{!$ObjectType.Lieferschein__c.Fields.Lieferdatum__c.Label} {!IF(sortExpression=='Lieferschein__r.Lieferdatum__c',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                    </apex:facet> 
+                    <apex:outputField value="{!LB.Lieferschein__r.Lieferdatum__c}" />
+                </apex:column> 
+
+                <apex:column > 
+                    <apex:facet name="header">
+                        <a href="javascript:sort('Lieferschein__r.Liefertext__c');" >PG {!IF(sortExpression=='Lieferschein__r.Liefertext__c',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                    </apex:facet> 
+                    <apex:outputField value="{!LB.Lieferschein__r.Liefertext__c}" />
+                </apex:column>   
+
+                <apex:column > 
+                    <apex:facet name="header">
+                        <a href="javascript:sort('Kunde__r.Name');" >{!$ObjectType.Kunde__c.Label} {!IF(sortExpression=='Kunde__r.Name',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                    </apex:facet>                 
+                    <apex:outputLink value="/{!LB.Kunde__c}" >{!LB.Kunde__r.Name}</apex:outputLink>
+                </apex:column> 
+
+                <apex:column > 
+                    <apex:facet name="header">
+                        <a href="javascript:sort('Kunde__r.Krankenkasse__r.Name');" >{!$ObjectType.Kunde__c.Fields.Krankenkasse__c.Label} {!IF(sortExpression=='Kunde__r.Krankenkasse__r.Name',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                    </apex:facet>   
+                    <apex:outputLink value="/{!LB.Kunde__r.Krankenkasse__c}" >{!LB.Kunde__r.Krankenkasse__r.Name}</apex:outputLink>
+                </apex:column>                                   
+         </apex:pageBlockTable>  
+        </apex:PageBlocksection>
+            
+        </apex:Pageblock> 
+    </apex:form>           
+</apex:page>

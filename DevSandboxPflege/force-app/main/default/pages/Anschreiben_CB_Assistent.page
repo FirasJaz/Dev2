@@ -1,0 +1,110 @@
+<apex:page renderas="PDF" standardStylesheets="false" controller="RA_nur_anzeigen_ent_controller_class" sidebar="FALSE" showHeader="False" action="{!addTask}">
+<!--  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Autor:          AM
+//      Stand:          04.11.2015
+//      Version:        1.0
+//      geändert:       
+//      Beschreibung:   Diese Seite ist das Anscreiben für neue Patienten mit vorausgefüllten Formular. 
+//                      
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--><HTML>
+<head>
+<apex:stylesheet value="{!$Resource.CSS_Anschreiben}" />
+</head>
+<body>
+<div id="head">    
+    <div id="logo">
+           <apex:image url="{!$Resource.curabox_logo}" />
+    </div>
+                
+    <div id="address">
+           <span class="own_address">{!$Organization.Name} &bull; {!$Organization.Street} &bull; {!$Organization.PostalCode} {!$Organization.City}</span>
+           <br />
+           <br />
+           {!Kdaddr.Anrede}<br />
+           {!kdAddr.vorname_name}<br />
+           {!kdAddr.strasse}<br />
+           {!kdAddr.plz_ort}
+    </div>
+        
+    <div id="right">
+        <p>Postanschrift</p>
+       {!$Organization.Name}<br />
+       {!$Organization.Street}<br />
+       {!$Organization.PostalCode} {!$Organization.City}<br />
+       <br />
+       <p>Tel.</p>
+       {!FirmenInfo.Telefon__c}<br />
+       <p>Fax</p>
+       {!FirmenInfo.Fax__c}<br />
+       <p>Mail</p>
+       {!FirmenInfo.Email__c}<br />
+       <p>Web</p>
+       www.pflege.de/curabox<br />
+       <br />
+       <p>Registergericht</p>
+       Amtsgericht Hamburg<br />
+
+       {!FirmenInfo.HRA__c}<br />
+        <br />
+       <p>Geschäftsführung</p>
+       <apex:outputtext escape="false" value="{!FirmenInfo.GF__c}"/><br />
+       <br />
+        <br />
+<!--       
+       {!FirmenInfo.Bank__c}<br />
+       BIC: {!FirmenInfo.BLZ__c}<br />
+       IBAN: {!FirmenInfo.Kontonummer__c}<br />
+-->
+        <br />
+       IK {!FirmenInfo.IK_Nummer__c}<br />
+    </div>
+</div>    
+    
+      <!-- Header is done -->
+      <div id="content">
+          <div id="subject">
+              <p><strong>Vielen Dank für Ihr Interesse an der curabox</strong></p><br/> 
+              Hamburg, &nbsp;<apex:outputtext value="{0,date,dd.MM.yyyy}">
+                        <apex:param value="{!Now()}" /></apex:outputtext><br />
+          </div>   
+          <div id="text">
+               
+         
+             <p><apex:outputtext value="{!Anredeformel}"/></p>   
+
+<p>vielen Dank für Ihr Interesse an unserem curabox-Service.</p>
+
+<p>Anbei erhalten Sie das Formular, welches bereits mit Ihren angegebenen Daten gefüllt ist. Mit diesem  können Sie die kostenfreien Pflegehilfsmittel im Wert von bis zu 40€/Monat (Produktgruppe 54) schnell und einfach beantragen. Gleichzeitig haben Sie die Möglichkeit die <b>wiederverwendbaren Bettschutzeinlagen</b> (Produktgruppe 51), falls gewünscht, zusätzlich anzufordern. Bei diesen ist in der Regel eine gesetzliche Zuzahlung zu leisten. Wir verzichten jedoch auf die Rechnungsstellung. Somit erhalten Sie auch dieses Produkt <b>kostenfrei</b>!</p>
+
+<p>Um schnellstmöglich Ihre erste curabox zu erhalten, versehen Sie einfach beide Antragsseiten mit einer Unterschrift und schicken diese an uns zurück. Nutzen Sie dazu am besten den Vordruck unseres Rückumschlages, zu finden auf der fünften Seite des angehängten Dokuments – das Porto übernehmen wir! Gerne können Sie uns den Antrag auch per Email curabox@pflege.de oder Fax 040 226 161 645 zukommen lassen.</p>
+
+<p>Sobald ihr Formular bei uns eingegangen ist, kümmern wir uns  umgehend um die Beantragung. Die Bearbeitung bei der Pflegekasse nimmt max. vier Wochen in Anspruch. Sie erhalten die von Ihnen gewünschte curabox unverzüglich nach Erhalt der Genehmigung.</p>
+
+<p>Haben Sie noch Fragen? Wir beraten Sie gerne unter 0800 666 222 141.</p>
+
+<p>Wir freuen uns Sie mit unserem curabox-Service unterstützen zu können.</p>
+
+<p>Mit herzlichen Grüßen</p>
+
+Ihr curabox Team
+             
+              </div>
+      
+          </div>
+
+
+
+
+
+<div id="bottom_right">
+Bei Fragen stehen wir Ihnen<br /> gerne kostenfrei telefonisch<br /> zur Verfügung unter:<br /> 
+<span>0800 – 666 222 141</span><br />
+oder besuchen Sie uns unter: <br />
+<span>www.pflege.de/curabox</span>
+</div>
+</body>
+</HTML>
+</apex:page>

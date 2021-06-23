@@ -1,0 +1,148 @@
+<!--
+ * @author			BS @ Cloud Monsters GmbH
+ * @description 	This component is used for manually orders' editing within screen flow. Copied from Edie_Order.cmp and edited to fit flow needs.
+ * @date 			05.08.2020
+ -->
+<aura:component implements="lightning:availableForFlowScreens" controller="Curabox_Edit_Order" access="global" >
+
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="curabox" type="String" />
+    <!-- Attribute for the order table -->
+    <aura:attribute name="order" type="Order__c" />
+    <aura:attribute name="line" type="Order_Line__c" />
+    <aura:attribute name="rowToPausing" type="Order__c" />
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="positions" type="List"/>
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="showLines" type="boolean" default="false"/>
+    <!-- aura:attribute name="draftValues" type="Object" default="[]"/ -->
+    <aura:attribute name="lieferdatum" type="date" />
+    <aura:attribute name="minDate" type="date" />
+    <aura:attribute name="ifOrderExists" type="boolean" default="false"/>
+
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:html tag="style">
+        .slds-modal__container{
+        width: 96%;
+        max-width: 90rem;
+        }
+    </aura:html>
+    <!-- Here add order lines Component-->
+    <div class="slds-p-around_x-small">
+        <!-- the container element determine the height of the datatable -->
+        <div style="height: 300px">
+            <lightning:datatable columns="{! v.columns }"
+                                 data="{! v.order }"
+                                 keyField="Id"
+                                 aura:id="ordersTable"
+                                 hideCheckboxColumn="true"
+                                 errors="{! v.errors }"
+                                 onrowaction="{! c.handleRowAction }" />
+        </div>
+    </div>
+    <aura:if isTrue="{!v.isOpen}">
+        <!-- Pop up to set the delivery date-->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- MODAL BOX HEADER Start -->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Lieferdatum festlegen</h2>
+                </header>
+                <!-- MODAL BOX BODY Part Start -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning:input type="date"
+                                     label="Lieferdatum"
+                                     value="{! v.lieferdatum}"
+                                     min="{! v.minDate}" />
+                </div>
+                <!-- MODAL BOX FOOTER Part Start -->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeModel }"/>
+                    <lightning:button variant="brand"
+                                      label="Save"
+                                      title="Save"
+                                      onclick="{! c.save }"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <!-- Pop up to show order lines -->
+    <aura:if isTrue="{!v.showLines}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- MODAL BOX HEADER Start -->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeLines }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Auftragspositionen</h2>
+                </header>
+                <!-- MODAL BOX BODY Part Start -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div style="height: 250px">
+                        <lightning:datatable columns="{! v.positions }"
+                                             data="{! v.line }"
+                                             keyField="Id"
+                                             aura:id="linesTable"
+                                             hideCheckboxColumn="true"
+                                             errors="{! v.errors }"
+                                             onrowaction="{! c.handleRowAction }" />
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.ifOrderExists}">
+        <!-- Pop up to set the delivery date-->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- MODAL BOX HEADER Start -->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeExists }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Hinweis</h2>
+                </header>
+                <!-- MODAL BOX BODY Part Start -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Im angegebenen Lieferzeitraum erfolgte bereits eine Lieferung, soll eine weitere Lieferung wirklich erfolgen ?</p>
+                    <br/>
+                    <div class="modal-btn">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-size_1-of-8 ">
+                                <lightning:button variant="neutral"
+                                                  label="Nein"
+                                                  title="Nein"
+                                                  onclick="{! c.closeExists }"/>
+                            </div>
+                            <div class="slds-size_1-of-8 ">
+                                <lightning:button variant="brand"
+                                                  label="Ja"
+                                                  title="Ja"
+                                                  onclick="{! c.onSaveHinweis}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+</aura:component>

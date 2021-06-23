@@ -1,0 +1,167 @@
+@page { 
+	size: A4 portrait;
+}
+
+body {
+	margin-top:0;
+	padding-top:0;
+	font-family: Dialog;
+	font-size: 12pt;	
+} 
+
+#pdf_id {
+	position:absolute;
+	top:5px;
+	left:50px;
+}
+
+#pdf_id h1 {
+	margin:0;
+	padding:0;
+	font-size:25px;
+}
+
+#inoxision {
+	font-size:5px;
+	color:white;
+}
+	
+#logo {
+	position:absolute;
+	top:13px;
+	left:25px;
+}
+.own_adress {
+	font-size:8pt;
+	text-decoration: none;
+}
+.underita {
+	font-style:normal;
+ 	
+}
+
+#address {
+	position:absolute;
+	top:100px;
+	left:25px;
+	line-height:1.2;
+}
+
+#Belegnr {
+	position:absolute;
+	top:3px;
+	left:20px;	
+	line-height:16p;
+	font-size:12px;
+}
+#kopie_label {
+	position:absolute;
+	top:170px;
+	right:50px;
+}
+#bearbeiter {
+	position:absolute;
+	top:100px;
+	right:20px;
+	
+}
+
+#bearbeiter td {
+	font-size:12px;
+	text-align:right;
+	padding-left:10px;
+	padding-right:20px;
+	width: 100px;
+}
+#bearbeiter table {
+	border-top: black solid 1px;
+	border-left: black solid 1px;
+	border-right: black solid 1px;
+	border-bottom: black solid 1px;
+}
+
+#document_info {
+	padding-top:50px;
+	position:absolute;
+	top:260px;
+	left:20px;
+}
+#document_info h1 {
+	margin:0;
+	padding:0;
+}
+#document_info p {
+	margin-top:10px;
+}
+#document_info table{
+	border-spacing:0;
+}
+#document_info table td{
+	padding-right:22px;
+	padding-top:3px;
+}
+#document_info table th {
+	text-align:left;
+	padding-right:22px;
+}
+
+#content {
+	position:absolute;
+	top:360px;
+	left:20px;
+	width:1000px;
+}
+#content .anrede {
+	font-weight:bold;
+}
+#content p {
+	line-height:20px;
+	font-size:12px;
+}
+#content #text {
+	margin-top: 170px;
+}
+#content table td {
+	font-size:14px;
+}
+
+#content table {
+	margin-top:20px;
+	border-collapse:collapse;
+    margin-bottom:10px;
+}
+
+#content .content_table {
+	width:700px;
+}
+#content table tr.nobo td {
+	border:0;
+}
+                  
+#footer {
+	position:absolute;
+	top:900px;
+	left:6px;
+	font-size:8px;
+}
+
+.align_right {
+	text-align:right;
+	padding-right:10px;
+}
+#content #sum_table {
+	width:600px;
+}
+
+#sum_table table {
+	border: black solid 1px;
+}
+
+.summe td {
+	width:150px;
+	font-weight:bold;
+}
+
+.align_right {
+	text-align:right;
+}

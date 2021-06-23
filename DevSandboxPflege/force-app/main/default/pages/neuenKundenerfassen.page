@@ -1,0 +1,141 @@
+<!--//****************************************************************************************************************************
+// Erstellt tt.mm.yyyy von YY
+//                         Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//                         Mindelweg 11
+//                         22393 Hamburg 
+//                         Tel.:  04064917161
+//                         Fax.: 04064917162
+//                         Email: kontakt@klosesrockepartner.de
+//
+//****************************************************************************************************************************
+//
+// Parameter: 
+// xxxx
+//
+//****************************************************************************************************************************
+//
+// Beschreibung:
+//                      
+// Seite für die Erfassung neuer Kunden
+//
+//
+//****************************************************************************************************************************
+//Änderungen:
+//
+// 05.03.2015 von wds: Modifikationen für pflege.de
+//                        
+//                                 ausgeliefert mit Patch: x.v.zz
+// 08.04.2015 von wds: Erfassungen angepaßt mehr Felder anzeigen
+// 09.04.2015 von wds: noch eine Marketing Related list eingefügt
+// 23.04.2015 von wds: Hausnummer aus der Erfassung raus, neues Feld "RM Familen ID" eingebaut! #111
+// 10.08.2015 von wds: Produktgruppe eingeführt #100636896
+// 10.09.2015 von BT : neue Blocksections "Message", "Duplikate" und neuer Button "Speichern (Warnung ignorieren)" 
+// 29.01.2016 von BT    Das Feld 'Geburtsdatum__c' wird durch das Feld 'Geburtsdatum_text__c' erstetzt
+// 07.02.2016 von MZ    new field Pflegegrad
+//****************************************************************************************************************************
+-->
+<apex:page standardController="Kunde__c" extensions="neuenKundenerfassenController" tabStyle="Kunde__c">
+
+<script>
+function changedZuzahlungBefreit(elem){
+    var d = new Date();
+    var s = d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
+    if(elem.checked == true){
+        DatePicker.insertDate(s,
+            'j_id0:j_id2:Kundenblock:Zahlungssection:ZuzahlungBefreitVon',true);
+    }else{
+        DatePicker.insertDate('',
+            'j_id0:j_id2:Kundenblock:Zahlungssection:ZuzahlungBefreitVon',true);
+    }
+    return false;
+}
+
+</script>
+
+   <apex:form >
+        <apex:messages />
+        <apex:Pageblock id="Kundenblock" title="neuen Kunden anlegen">
+            <apex:pageBlockButtons >
+                <apex:CommandButton id="btnsichern" value="speichern" action="{!neuenKundensichern}" rendered="{!!error}"/>
+                <apex:CommandButton id="btnnachwarnungsichern" value="speichern (Warnung ignorieren)" action="{!neuenKundenNachWarnungSichern}" rendered="{!error}"/>
+                <apex:CommandButton id="btnzurueck" value="abbrechen" immediate="True" action="{!neuerKundezurueck}"/>
+            </apex:pageBlockButtons>    
+            <apex:pageBlockSection id="Message" columns="1" >
+            <apex:outputLabel value="1 möglicher doppelter Datensatz gefunden." style="color: red; display: block; text-align: center; font-size: 13px; font-weight: bold" rendered="{!error}"/>
+            <apex:outputLabel value="Sie erstellen gerade einen doppelten Datensatz. Es wird empfohlen, dass Sie stattdessen den vorhandenen Datensatz verwenden." style="color: red; display: block; text-align: center; font-size: 13px; font-weight: bold" rendered="{!error}"/>             
+             </apex:pageBlockSection>
+            <apex:pageBlockSection id="Duplikate" columns="1" rendered="{!error}">
+               <apex:pageBlockTable value="{!Kdlist}" var="k">
+                <apex:column headerValue="Kunde Name" >
+                    <apex:outputLink value="/{!k.Id}" id="theLink">{!k.Name}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Email">
+                    <apex:outputText value="{!k.e_mail__c}" />
+                </apex:column>
+             </apex:pageBlockTable>
+           </apex:pageBlockSection>
+            <apex:pageBlockSection title="Details des Kunden" collapsible="false" id="Kundensection" columns="2">
+                <apex:inputfield value="{!Kd.Anrede__c}"/>
+                <apex:outputtext value=""/>
+                <apex:inputfield value="{!Kd.Vorname__c}"/>
+                <apex:inputfield value="{!Kd.Name__c}" required="True"/>
+                <apex:inputfield value="{!Kd.Geburtsdatum_text__c}"/>
+            </apex:pageBlockSection>
+            <apex:PageBlocksection title="Kontaktangaben" collapsible="false" id="Adresssection" columns="2">
+                <apex:inputfield value="{!Kd.Stra_e__c}"/>
+                <apex:inputfield value="{!Kd.PLZ__c}"/>
+                <apex:inputfield value="{!Kd.Ort__c}"/>
+                <apex:inputfield value="{!Kd.Telefon__c}"/>
+                <apex:inputfield value="{!Kd.Mobil__c}"/>
+                <apex:inputfield value="{!Kd.Fax__c}"/>
+                <apex:inputfield value="{!Kd.e_mail__c}"/>
+            </apex:PageBlocksection>
+            
+            <apex:PageBlocksection title="Bestellinformation" collapsible="false" id="Bestellinformationssection" columns="2">
+                <apex:inputfield value="{!Kd.Art_der_bestellung__c}"/>
+                <apex:inputfield value="{!Kd.Lieferadresse__c}"/>
+            </apex:pageBlockSection>
+            <apex:PageBlocksection title="Versicherungsinformationen" collapsible="false" id="Versicherungssection" columns="2">
+                <apex:inputfield value="{!Kd.Versichertennummer__c}"/>
+                <apex:inputfield value="{!Kd.Pflegegrad__c}"/>
+                
+                <apex:inputfield value="{!Kd.Versichertenstatus__c}"/>
+                <apex:inputfield value="{!Kd.Krankenkasse__c}" required="False"/>
+                <apex:inputfield value="{!Kd.Pflegestufe__c}"/>
+                
+                <apex:inputField value="{!Kd.Next_step__c}" />
+                <apex:inputField value="{!Kd.Produktgruppe__c}" required="True"/>
+                
+                <apex:OutputText ></apex:OutputText>
+                <apex:inputField value="{!Kd.Zuzahlung_befreit__c}" onChange="changedZuzahlungBefreit(this);"/>
+            </apex:pageBlockSection>
+<!--     <apex:PageBlocksection title="Zahlungsangaben" collapsible="false" id="Zahlungssection" columns="2">
+            <apex:outputText>Test</apex:outputText>
+            <apex:inputfield value="{!Kd.Betreuer__c}"/>
+                <apex:inputfield value="{!Kd.Zahlungsmodalit_t__c}"/>
+                <apex:outputtext value=""/>
+                <apex:inputfield value="{!Kd.Zuzahlung_befreit_von__c}" id="ZuzahlungBefreitVon"/>
+                <apex:inputfield value="{!Kd.Zuzahlung_befreit_bis__c}"/>
+                <apex:inputfield value="{!Kd.Kontonummer__c}"/>
+                <apex:inputfield value="{!Kd.BLZ__c}"/>
+                <apex:outputtext value=""/>
+                <apex:outputtext value=""/>
+                <apex:inputfield value="{!Kd.CreditPoints__c}" rendered="{!WSIG_prop}"/> 
+               <apex:inputfield value="{!Kd.Lieferstop__c}"/>
+            </apex:pageBlockSection>-->
+            <apex:PageBlocksection title="Beteiligte" collapsible="false" id="Betreuungssection" columns="2">
+                <apex:inputfield value="{!Kd.Betreuer__c}"/>
+                <apex:inputfield value="{!Kd.Pflegedienst__c}"/>
+                
+            </apex:pageBlockSection>
+             <apex:PageBlocksection title="Marketing" collapsible="false" id="Marketingsection" columns="2">
+               
+                <apex:inputfield value="{!Kd.Ursprungsanfrage__c}"/>
+               
+                <apex:inputfield value="{!Ks.Mitarbeiter__c}"/>
+                <apex:inputfield value="{!Kd.Tracking_Order_ID__c}"/>
+                <apex:inputfield value="{!Ks.CRM_Ticket_ID__c}"/>
+            </apex:pageBlockSection>
+        </apex:Pageblock>
+    </apex:form>
+</apex:page>

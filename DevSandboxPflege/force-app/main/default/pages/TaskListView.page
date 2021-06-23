@@ -1,0 +1,233 @@
+<!--
+/********************************************************************************************************************************************
+//  Created 05.06.2018 by MZ
+//  Klose und Srocke Gesellschaft für kreative Konfliktlösungen mbH
+//  Nordkanalstraße 58
+//  20097 Hamburg 
+//  Tel.:  04064917161
+//  Fax.: 04064917162
+//  Email: kontakt@klosesrockepartner.de
+//
+//********************************************************************************************************************************************
+//
+// Parameter: 
+//  opportunity Id could be considered as a parameter in future. 
+//
+//********************************************************************************************************************************************
+//
+// Description:    
+//  Task overview to be able to filter tasks
+//
+//********************************************************************************************************************************************
+// Changes:
+// 06.08.2018   MZ  subject colspan changed and truncate 
+//********************************************************************************************************************************************
+*/
+-->
+<apex:page id="page_id" sidebar="false" showHeader="false" showQuickActionVfHeader="false" controller="TaskListView" docType="html-5.0"> 
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="de">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <apex:slds />
+    <apex:stylesheet value="{!URLFOR($Resource.SLDS0122, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+    
+    <script type="text/javascript">      
+      sforce.connection.sessionId = "{!$Api.Session_ID}";   
+      var userId = '{!$User.Id}';             
+      function selectTask(input) {
+        try{        
+            var selectedTask = sforce.connection.query("SELECT Id, OwnerId from Task where id=\'" + input + "\' limit 1");     
+            var taskRecords = selectedTask.getArray("records");
+            var ts = taskRecords[0];
+            ts.OwnerId = userId;
+            var newTaskRecords = [];
+            newTaskRecords.push(ts); 
+            sforce.connection.update(newTaskRecords);
+        }
+        catch(e){alert(e)}
+        
+        sforce.console.openPrimaryTab(null, '/' + input, true, '', openSuccess, input);
+        var openSuccess = function(){};
+        sforce.console.focusPrimaryTabByName(input);
+        window.location.reload();
+      }
+
+      function sort(s) {
+          SortToggle(s);
+      }
+
+
+    function noenter(ev){
+        if (window.event && window.event.keyCode == 13 || ev.which == 13) {
+              doSearchTasks();
+            return false;
+         } else {
+              return true;
+        }
+     }
+  </script>
+    
+   
+</head>  
+<body>
+    <apex:form id="cmForm" >
+        <apex:actionFunction name="doSearchTasks" action="{!doSearchTasks}" reRender="PB" />
+        <apex:actionFunction name="SortToggle" action="{!SortToggle}" reRender="PB">
+            <apex:param name="sortToggleParam" value=""/>
+        </apex:actionFunction>
+        
+        <div class="slds">
+        <div class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                  <div class="slds-media slds-no-space slds-grow">
+                    <div class="slds-media__figure">
+                      <span class="slds-icon_container slds-icon-standard-Opportunity" >
+                          <svg aria-hidden="true" class="slds-icon slds-icon--x-small">
+                            <use xlink:href="{!URLFOR($Resource.SLDS0122, '/assets/icons/utility-sprite/svg/symbols.svg#Opportunity')}"></use>              
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="slds-media__body">
+                      <nav>
+                        <ol class="slds-breadcrumb slds-line-height_reset">
+                          <li class="slds-breadcrumb__item">
+                            <span>{!$ObjectType.Task.LabelPlural}</span>
+                          </li>
+                        </ol>
+                      </nav>
+                      <h1 class="slds-page-header__title slds-m-right_small slds-align-middle slds-truncate" title="Badumbau">Badumbau</h1>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+            
+        <apex:pageBlock id="PB">
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer" >
+          <thead>
+            <tr class="slds-text-title_caps">
+                <th>
+                    <apex:actionregion >
+                        <apex:inputText value="{!srchOpportunityNumber}" id="srchOpportunityNumberId" onkeypress="return noenter(event);" styleclass="slds-input"/>
+                    </apex:actionregion>
+                </th>     
+                <!--th>
+                    <apex:actionregion >
+                        <apex:inputText value="{!srchSubject}" id="srchSubjectId" onkeypress="return noenter(event);" styleclass="slds-input"/>
+                    </apex:actionregion>
+                </th-->
+                <th>      
+                    <apex:inputField value="{!dummyTask.Task_Phase__c}"  styleclass="slds-select">
+                        <apex:actionSupport event="onchange" action="{!taskPhaseChanegd}" reRender="PB"/>
+                    </apex:inputField>
+                </th>
+                <th>
+                    <apex:inputField value="{!dummyTask.Task_SubPhase__c}" styleclass="slds-select">
+                        <apex:actionSupport event="onchange" reRender="PB"/>
+                    </apex:inputField>
+                </th>
+                <th>&nbsp;
+                    <!--apex:inputField value="{!dummyTask.ActivityDate}" styleclass="slds-input"/-->
+                </th> 
+                <!--th>      
+                    <apex:inputField value="{!dummyTask.Task_Phase__c}"  styleclass="slds-select">
+                        <apex:actionSupport event="onchange" action="{!taskPhaseChanegd}" reRender="PB"/>
+                    </apex:inputField>
+                </th>
+                <th>     
+                    <apex:inputField value="{!dummyTask.Task_SubPhase__c}" styleclass="slds-select">
+                        <apex:actionSupport event="onchange" reRender="PB"/>
+                    </apex:inputField>
+                </th-->
+                <th>     
+                    <apex:actionregion >
+                        <apex:inputText value="{!srchUser}" id="srchUserId" onkeypress="return noenter(event);" styleclass="slds-input"/>
+                    </apex:actionregion>
+                    <!-- apex:selectList value="{!srchUser}" size="1" multiselect="false" styleclass="slds-select">
+                       <apex:selectOptions value="{!userList}" />                                                                                     
+                       <apex:actionSupport event="onchange" reRender="PB"/>                                        
+                    </apex:selectList -->  
+                </th>
+            </tr>
+            <tr class="slds-text-title_caps">
+              <th scope="col">
+                <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Opportunity.fields.Opportunity_Nummer__c.Label}">
+                  <a href="javascript:sort('what.name');" class="slds-text-link--reset">{!$ObjectType.Opportunity.fields.Opportunity_Nummer__c.Label} {!IF(sortExpression=='what.name',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                </div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Task.fields.Subject.Label}">
+                  <a href="javascript:sort('Subject');" class="slds-text-link--reset">{!$ObjectType.Task.fields.Subject.Label} {!IF(sortExpression=='Subject',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                </div>
+              </th>
+              <th/>
+              <th scope="col">
+                <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Task.fields.ActivityDate.Label}">
+                  <a href="javascript:sort('ActivityDate');" class="slds-text-link--reset">{!$ObjectType.Task.fields.ActivityDate.Label} {!IF(sortExpression=='ActivityDate',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                </div>
+              </th>
+              <!--th scope="col">
+                <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Task.fields.Task_Phase__c.Label}">
+                  <a href="javascript:sort('Task_Phase__c');" class="slds-text-link--reset">{!$ObjectType.Task.fields.Task_Phase__c.Label} {!IF(sortExpression=='Task_Phase__c',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                </div>
+              </th>
+              <th scope="col">
+                <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Task.fields.Task_SubPhase__c.Label}">
+                  <a href="javascript:sort('Task_SubPhase__c');" class="slds-text-link--reset">{!$ObjectType.Task.fields.Task_SubPhase__c.Label} {!IF(sortExpression=='Task_SubPhase__c',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                </div>
+              </th-->
+              <th scope="col">
+                <div class="slds-truncate" style="font-weight: bold; color: #16325c;" title="{!$ObjectType.Task.fields.Task_SubPhase__c.Label}">
+                  <a href="javascript:sort('Owner.Name');" class="slds-text-link--reset">{!$ObjectType.Task.fields.OwnerId.Label} {!IF(sortExpression=='Owner.Name',IF(SortDirection='ASC','▲','▼'),'')}</a>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+          <apex:repeat value="{!TaskList}" var="tsk">
+            <tr> 
+              <td data-label="{!$ObjectType.Opportunity.fields.Name.Label}">
+                <div class="slds-truncate" title="{!$ObjectType.Opportunity.fields.Name.Label}">
+                    <a href="/{!tsk.whatId}"> <apex:outputtext value="{!tsk.what.name}" /></a>
+                </div>
+              </td>
+              <td data-label="{!$ObjectType.Task.fields.Subject.Label}" colspan="2">
+                <div  title="{!$ObjectType.Task.fields.Subject.Label}">
+                    <a href="/{!tsk.Id}"> <apex:outputtext value="{!tsk.Subject}" /></a>
+                    <!--apex:outputLink onclick="selectTask('{!tsk.Id}');" >{!tsk.Subject}</apex:outputLink-->
+                </div>
+              </td>
+              <td data-label="{!$ObjectType.Task.fields.ActivityDate.Label}">
+                <div class="slds-truncate" title="{!$ObjectType.Task.fields.ActivityDate.Label}">
+                    <apex:outputField value="{!tsk.ActivityDate}"/>
+                </div>
+              </td>
+              <!--td data-label="{!$ObjectType.Task.fields.Task_Phase__c.Label}">
+                <div class="slds-truncate" title="{!$ObjectType.Task.fields.Task_Phase__c.Label}">
+                    <apex:outputField value="{!tsk.Task_Phase__c}"/>
+                </div>
+              </td>
+              <td data-label="{!$ObjectType.Task.fields.Task_SubPhase__c.Label}">
+                <div class="slds-truncate" title="{!$ObjectType.Task.fields.Task_SubPhase__c.Label}">
+                    <apex:outputField value="{!tsk.Task_SubPhase__c}"/>
+                </div>
+              </td-->   
+              <td data-label="{!$ObjectType.Task.fields.OwnerId.Label}">
+                <div class="slds-truncate" title="{!$ObjectType.Task.fields.OwnerId.Label}">
+                    <apex:outputField value="{!tsk.Owner.Name}"/>
+                </div>
+              </td>  
+            </tr>
+            </apex:repeat>
+          </tbody>
+        </table>
+        </apex:pageBlock>
+    </div>
+    </apex:form> 
+</body>
+</html>
+</apex:page>

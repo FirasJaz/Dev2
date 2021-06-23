@@ -1,0 +1,33 @@
+span.dateFormat {
+	display:none;
+}
+.headerRow span {
+	display:none;
+	position:absolute;
+	background:#d7f1fa;
+	padding:7px;
+	border:1px solid #ccc;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+}
+.headerRow div:hover span {
+	display:inline-block;
+}
+
+.fixed_width div {
+	width:150px;
+}
+
+
+
+a.btn, a.btn:hover  {
+float:right;
+width:47px;
+color:#333;
+text-decoration:none;
+padding:4px 3px !important;
+}
+
+td.containsButtonLink {
+white-space:normal;
+}

@@ -1,0 +1,81 @@
+<apex:page controller="SelfmailerController" RenderAS="PDF" sidebar="FALSE" showHeader="False" applyBodyTag="false"  >    
+<html>
+<head>
+<style>
+    
+   #kopf {
+    left: 55px;
+    top: 36px;  
+  }
+
+</style>
+</head>
+
+<body>
+
+    <div><apex:image id="seite1" value="{!$Resource.Selfmailer_Seite1}" width="100%" height="950px" /></div>
+    
+    <div><apex:image id="seite2" value="{!$Resource.Selfmailer_2fach_Seite2}" width="100%" height="950px" /></div>
+    
+    <div><apex:image id="seite3" value="{!$Resource.Selfmailer_2fach_Seite3}" width="100%" height="950px" /></div>
+    
+    <div id="seitenbereich" >           
+            
+            <!-- Kundendaten !-->
+            <div style="margin-top: 90px; position: absolute; font-size: 11px; font-family: sans-serif;">
+            <div style="margin-left: 55px; float: left;width: 327px;" >
+                <div style="height: 27px;">{!$CurrentPage.parameters.cust_fname}</div>            
+                <div style="height: 25px;" >{!$CurrentPage.parameters.cust_street}</div>            
+                <div style="height: 22px;" >{!$CurrentPage.parameters.cust_phone}</div>
+            </div>
+          
+            <div style="float: right;width: 200px;">
+                <div style="height: 27px;">{!$CurrentPage.parameters.cust_lname}</div>            
+                <div style="height: 25px;" >{!$CurrentPage.parameters.cust_pcode} {!$CurrentPage.parameters.cust_city}</div>            
+                <div style="height: 22px;" >{!$CurrentPage.parameters.cust_email}</div>
+            </div>          
+            </div>
+            
+            <!-- Checkboxes 1 !-->
+            <div style="margin-top: 178px; position: absolute; font-size: 11px; font-family: sans-serif;">
+            <div style="font-size: 20px; margin-left: 54px; float: left;">{!$CurrentPage.parameters.cb1}</div>
+          
+            <div style="font-size: 20px; margin-left: 380px;">{!$CurrentPage.parameters.cb2}</div>          
+            </div>              
+            
+            <!-- Alternative Adresse !-->
+            <div style="margin-top: 232px; position: absolute; font-size: 11px; font-family: sans-serif;">
+            <div style="margin-left: 55px; float: left;width: 326px;" >
+                <div style="height: 27px;">{!$CurrentPage.parameters.alt_fname}</div>            
+                <div style="height: 25px;" >{!$CurrentPage.parameters.alt_street}</div>            
+                <div style="height: 22px;" >{!$CurrentPage.parameters.alt_phone}</div>
+            </div>
+          
+            <div style="float: right;width: 200px;">
+                <div style="height: 27px;">{!$CurrentPage.parameters.alt_lname}</div>            
+                <div style="height: 25px;" >{!$CurrentPage.parameters.alt_pcode} {!$CurrentPage.parameters.alt_city}</div>            
+                <div style="height: 22px;" >{!$CurrentPage.parameters.alt_email}</div>
+            </div>          
+            </div>    
+            
+            <!-- Gewuenschtes Paket !-->
+            <div style="margin-top: 360px; position: absolute; font-size: 11px; font-family: sans-serif;">
+            <div style="font-size: 36px; margin-left: 64px;width:100%;height:47px;">{!$CurrentPage.parameters.kbp}</div>          
+            <div style="font-size: 36px; margin-left: 64px; margin-top: 93px;width:100%;height:49px;">{!$CurrentPage.parameters.mbp}</div>   
+            <div style="font-size: 36px; margin-left: 64px; margin-top: 79px;width:100%">{!$CurrentPage.parameters.msp}</div>       
+            </div>                                       
+        
+        
+        <!-- Checkboxes 2 !-->   
+        <div style="margin-top: 755px; position: absolute; font-family: sans-serif;">
+        <div style="font-size: 14px; margin-left: 54px; margin-top: 20px;height:22px;">
+                <div style="float: left;width: 335px;">{!$CurrentPage.parameters.cb6}</div>
+                <div style="float: right;font-size: 14px;width: 270px;">{!$CurrentPage.parameters.phone}</div>
+        </div>    
+            </div>          
+        <apex:image value="{!$Resource.Selfmailer_Bestellformular_2fach}" width="100%" height="948px"  />        
+    </div>
+</body>
+</html>
+
+</apex:page>

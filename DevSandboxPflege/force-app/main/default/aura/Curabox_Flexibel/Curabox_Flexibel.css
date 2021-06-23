@@ -1,0 +1,47 @@
+.THIS .product_price{
+    margin-left: 20%;
+}
+
+.THIS .product_header{
+    font-size: 18px;
+}
+
+.THIS .product_header_name{
+    font-size: 18px;
+    margin-left: 5%;
+}
+
+.THIS .product_header_price{
+    font-size: 18px;
+    margin-left: 20%;  
+}
+
+.THIS .product_name{
+    margin-left: 5%;  
+}
+
+.THIS .total_price{
+    text-align: center;
+    font-size: 15px;
+}
+
+.THIS .redPriceColor{
+    color:red;
+}
+
+.THIS .greenPriceColor{
+    color: green;
+}
+
+.THIS .bluePriceColor{
+    color: blue;
+}
+
+.THIS .blackPriceColor{
+    color: black;
+}
+
+.THIS.artikel_contener{
+    margin-left: 3%;
+    margin-bottom: 2%;
+}

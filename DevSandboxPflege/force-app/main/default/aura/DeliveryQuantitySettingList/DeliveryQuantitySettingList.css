@@ -1,0 +1,10 @@
+.THIS .c-container {
+    border: 1px solid #d8dde6;
+    margin: 10px 10px 10px 10px;
+    background-color: rgba(27, 82, 151, 1);
+    color: white; 
+}
+
+.THIS .hdcol {
+    font-weight: bold;   
+}
