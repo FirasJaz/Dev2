@@ -10,7 +10,7 @@ public class FlowController{
     public Map<Id, Contact> contactsMap{
         get{
             if (contactsMap == null){
-                
+                System.debug('I have just changed this line to check it ');
              Set<Id> contactIds = new Set<Id>();
                 if (UpdatedFollowUpTasks != null){
                     for (Follow_up_Task__c task : UpdatedFollowUpTasks){
