@@ -10,7 +10,8 @@ public class FlowController{
     public Map<Id, Contact> contactsMap{
         get{
             if (contactsMap == null){
-                System.debug('I have just changed this line to check it ');
+                
+                System.debug('Flow created  ');
              }
             return contactsMap;
         }
